@@ -10,11 +10,9 @@ using namespace std;
 class Program : public Node
 {
 public:
-    vector<Declaration *> *dec_list;
-    Program(vector<Declaration *> *l) : dec_list(l) {}
-    void print() {
-        
-    }
+    vector<Declaration *> *decs;
+    Program(vector<Declaration *> *l) : decs(l) {}
+    virtual string getName() { return "Program"; }
 };
 
 #endif

@@ -1,9 +1,14 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "parser.hpp"
 
-void debug() { printf("%s ", yytext); }
+uint64_t cnt = 0;
+void debug() {
+    printf("token %ld:\t%s\n", cnt, yytext);
+    cnt++;
+}
 %}
 
 %option noyywrap
@@ -15,6 +20,7 @@ void debug() { printf("%s ", yytext); }
 "/*"([^*]|"*"+[^/*])*"*"+"/"    {}
 \\$                             {}
 ";"                             { debug(); return DELIM; }
+","                             { debug(); return COMMA; }
 
 "auto"                          { debug(); return AUTO; }
 "double"                        { debug(); return DOUBLE; }
@@ -53,8 +59,10 @@ void debug() { printf("%s ", yytext); }
 "-"                             { debug(); return SUB; }
 "*"                             { debug(); return MUL; }
 "/"                             { debug(); return DIV; }
+"%"                             { debug(); return MOD; }
 "&"                             { debug(); return AND; }
 "|"                             { debug(); return OR; }
+"~"                             { debug(); return NOT; }
 "^"                             { debug(); return XOR; }
 "&&"                            { debug(); return ANDAND; }
 "||"                            { debug(); return OROR; }
@@ -62,18 +70,28 @@ void debug() { printf("%s ", yytext); }
 "-="                            { debug(); return SUBASSIGN; }
 "*="                            { debug(); return MULASSIGN; }
 "/="                            { debug(); return DIVASSIGN; }
+"%="                            { debug(); return MODASSIGN; }
 "&="                            { debug(); return ANDASSIGN; }
 "|="                            { debug(); return ORASSIGN; }
 "^="                            { debug(); return XORASSIGN; }
 "="                             { debug(); return ASSIGN; }
 "<"                             { debug(); return LT; }
 ">"                             { debug(); return GT; }
-"!="                            { debug(); return NOTEQ; }
+"<="                            { debug(); return LEQ; }
+">="                            { debug(); return GEQ; }
+"!="                            { debug(); return NEQ; }
 "=="                            { debug(); return EQ; }
 "<<"                            { debug(); return SL; }
 ">>"                            { debug(); return SR; }
 "<<="                           { debug(); return SLASSIGN; }
 ">>="                           { debug(); return SRASSIGN; }
+
+"("                             { debug(); return LP; }
+")"                             { debug(); return RP; }
+"["                             { debug(); return LB; }
+"]"                             { debug(); return RB; }
+"{"                             { debug(); return LC; }
+"}"                             { debug(); return RC; }
 
 -?(0|([1-9][0-9]*))             { debug(); return NUMBER; }
 -?0[0-7]*                       { debug(); return NUMBER; }
