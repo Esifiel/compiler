@@ -22,20 +22,19 @@
 //     quicksort(A + i, len - i);
 // }
 
-// int main(void)
-// {
-//     int a[10010] = {0};
-//     int n;
-//     scanf("%d", &n);
-//     for (int i = 0; i < n; i++)
-//         scanf("%d", &a[i]);
-//     quicksort(a, n);
-//     for (int i = 0; i < n; i++)
-//         printf("%d\n", a[i]);
+int main(void)
+{
+    int a;
+    double b;
+    char c;
+    // int a[10010] = {0};
+    // int n;
+    // scanf("%d", &n);
+    // for (int i = 0; i < n; i++)
+    //     scanf("%d", &a[i]);
+    // quicksort(a, n);
+    // for (int i = 0; i < n; i++)
+    //     printf("%d\n", a[i]);
 
-//     return 0;
-// }
-
-int a;
-double b;
-char c;
+    return 0;
+}

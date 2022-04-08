@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string>
 #include "parser.hpp"
 
 uint64_t cnt = 0;
@@ -97,7 +98,11 @@ void debug() {
 -?0[0-7]*                       { debug(); return NUMBER; }
 -?0[xX][0-9a-fA-F]+             { debug(); return NUMBER; }
 -?(0|([1-9][0-9]*))(\.[0-9]+)?  { debug(); return NUMBER; }
-[A-Za-z_][A-Za-z0-9_]*          { debug(); return IDENTIFIER; }
+[A-Za-z_][A-Za-z0-9_]*          {
+                                    debug();
+                                    yylval._string = new string(yytext);
+                                    return IDENTIFIER;
+                                }
 \'.\'                           { debug(); return NUMBER; }
 \".*\"                          {}
                             

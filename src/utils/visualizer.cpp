@@ -1,5 +1,7 @@
-// traverse AST and write to json
+// traverse AST in pre-order and write to .json file
 #include "visualizer.hpp"
+#include "../ast/type.h"
+#include "../ast/declaration.h"
 #include <string>
 #include <cstdio>
 #include <cstdlib>
@@ -16,14 +18,14 @@ void Visualizer::traverse()
     out << head;
     if (program)
         visitProgram(program);
-    out << tail;
+    out << tail << endl;
 }
 
 void Visualizer::visitProgram(Program *p)
 {
     if (p->decs)
     {
-        out << head << p->getName() << sub;
+        out << p->getName() << sub;
         out << head;
         visitDeclarationList(p->decs);
         out << tail;
@@ -44,37 +46,71 @@ void Visualizer::visitDeclarationList(vector<Declaration *> *l)
 
 void Visualizer::visitDeclaration(Declaration *d)
 {
-
+    if (d->getName() == "FunctionDeclaration")
+        visitFunctionDeclaration((FunctionDeclaration *)d);
+    else if (d->getName() == "VariableDeclaration")
+        visitVariableDeclaration((VariableDeclaration *)d);
 }
 
-void Visualizer::visitVarDeclaration(VariableDeclaration *d)
+void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
 {
-
+    out << d->type->getName();
+    if (d->type->getName() == "array")
+    {
+        out << sub;
+        out << head;
+        visitType(d->type);
+        out << tail;
+    }
+    out << sep;
+    out << d->name->getName();
 }
 
-void Visualizer::visitFunDeclaration(FunctionDeclaration *d)
+void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
 {
+    out << d->rettype->getName();
+    if (d->rettype->getName() == "array")
+    {
+        out << sub;
+        out << head;
+        visitType(d->rettype);
+        out << tail;
+    }
+    out << sep;
 
+    out << d->name->getName();
+    out << sep;
+
+    for (auto p = d->params->begin(); p != d->params->end(); p++)
+    {
+        out << (*p)->getName() << sub;
+        out << head;
+        visitParameter(*p);
+        out << tail;
+        out << sep;
+    }
+    out << sep;
+    
+    visitCompoundStatement(d->stmts);
 }
 
-// var-declaration : type-specifier IDENTIFIER DELIM { $$ = new VariableDeclaration($1, $2); }
-//     | type-specifier IDENTIFIER LB NUMBER RB DELIM { $$ = new ArrayDeclaration($1, $2, $4); }
-//     ;
+void Visualizer::visitType(Type *t)
+{
+    if (t->getName() == "array")
+        out << ((ArrayType *)t)->size;
+}
 
-// type-specifier : CHAR   { $$ = new CharType(); }
-//     | SHORT             { $$ = new ShortType(); }
-//     | INT               { $$ = new IntType(); }
-//     | LONG              { $$ = new LongType(); }
-//     | FLOAT             { $$ = new FloatType(); }
-//     | DOUBLE            { $$ = new DoubleType(); }
-//     | STRUCT
-//     | ENUM
-//     | UNION
-//     | VOID              { $$ = new VoidType(); }
-//     ;
+void Visualizer::visitIdentifier(Identifier *i)
+{
+}
 
-// fun-declaration : type-specifier IDENTIFIER LP params RP compound-stmt
-//     ;
+void Visualizer::visitCompoundStatement(CompoundStatement *c)
+{
+}
+
+void Visualizer::visitParameter(Parameter *p)
+{
+}
 
 // params : param-list
 //     | VOID { $$ = new vector<Parameter *>; $$->push_back(new Parameter(new VoidType())); }

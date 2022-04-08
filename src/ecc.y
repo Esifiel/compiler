@@ -59,7 +59,7 @@ void yyerror(string s);
 %token  DELIM COMMA LP RP LB RB LC RC
 
 %token<_int> NUMBER
-%token<identifier> IDENTIFIER
+%token<_string> IDENTIFIER
 
 %type<program> program
 %type<declarations> declaration-list local-declarations
@@ -73,6 +73,7 @@ void yyerror(string s);
 %type<statement> statement
 %type<statements> statement-list
 %type<compoundStatement> compound-stmt
+%type<identifier> id
 
 
 %left ADD SUB MUL DIV
@@ -92,8 +93,11 @@ declaration : var-declaration { $$ = $1; }
     | fun-declaration { $$ = $1; }
     ;
 
-var-declaration : type-specifier IDENTIFIER DELIM { $$ = new VariableDeclaration($1, $2); }
-    | type-specifier IDENTIFIER LB NUMBER RB DELIM { $$ = new VariableDeclaration(new ArrayType($1, $4), $2); }
+var-declaration : type-specifier id DELIM { $$ = new VariableDeclaration($1, $2); }
+    | type-specifier id LB NUMBER RB DELIM { $$ = new VariableDeclaration(new ArrayType($1, $4), $2); }
+    ;
+
+id : IDENTIFIER { $$ = new Identifier(*$1); }
     ;
 
 type-specifier : CHAR   { $$ = new CharType(); }
@@ -108,7 +112,7 @@ type-specifier : CHAR   { $$ = new CharType(); }
     | VOID              { $$ = new VoidType(); }
     ;
 
-fun-declaration : type-specifier IDENTIFIER LP params RP compound-stmt { $$ = new FunctionDeclaration($1, $2, $4, $6); }
+fun-declaration : type-specifier id LP params RP compound-stmt { $$ = new FunctionDeclaration($1, $2, $4, $6); }
     ;
 
 params : param-list { $$ = $1; }
@@ -120,8 +124,8 @@ param-list : param-list COMMA param { $1->push_back($3); $$ = $1; }
     | param { $$ = new vector<Parameter *>; }
     ;
 
-param : type-specifier IDENTIFIER { $$ = new Parameter($1, $2); }
-    | type-specifier IDENTIFIER LB RB { $$ = new Parameter(new ArrayType($1, 0), $2); }
+param : type-specifier id { $$ = new Parameter($1, $2); }
+    | type-specifier id LB RB { $$ = new Parameter(new ArrayType($1, 0), $2); }
     ;
 
 compound-stmt : LC local-declarations statement-list RC { $$ = new CompoundStatement($2, $3); }
@@ -161,8 +165,8 @@ expression : var ASSIGN expression
     | simple-expression
     ;
 
-var : IDENTIFIER
-    | IDENTIFIER LB expression RB
+var : id
+    | id LB expression RB
     ;
 
 simple-expression : additive-expression relop additive-expression
@@ -201,7 +205,7 @@ factor : LP expression RP
     | NUMBER
     ;
 
-call : IDENTIFIER LP args RP
+call : id LP args RP
     ;
 
 args : arg-list

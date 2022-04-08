@@ -26,8 +26,12 @@ private:
     void visitProgram(Program *p);
     void visitDeclarationList(vector<Declaration *> *l);
     void visitDeclaration(Declaration *d);
-    void visitVarDeclaration(VariableDeclaration *d);
-    void visitFunDeclaration(FunctionDeclaration *d);
+    void visitVariableDeclaration(VariableDeclaration *d);
+    void visitFunctionDeclaration(FunctionDeclaration *d);
+    void visitType(Type *t);
+    void visitIdentifier(Identifier *i);
+    void visitCompoundStatement(CompoundStatement *c);
+    void visitParameter(Parameter *p);
 };
 
 #endif

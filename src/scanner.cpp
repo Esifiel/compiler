@@ -599,6 +599,7 @@ char *yytext;
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string>
 #include "parser.hpp"
 
 uint64_t cnt = 0;
@@ -606,8 +607,8 @@ void debug() {
     printf("token %ld:\t%s\n", cnt, yytext);
     cnt++;
 }
-#line 610 "scanner.cpp"
 #line 611 "scanner.cpp"
+#line 612 "scanner.cpp"
 
 #define INITIAL 0
 
@@ -824,10 +825,10 @@ YY_DECL
 		}
 
 	{
-#line 16 "ecc.l"
+#line 17 "ecc.l"
 
 
-#line 831 "scanner.cpp"
+#line 832 "scanner.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -887,19 +888,19 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 18 "ecc.l"
+#line 19 "ecc.l"
 {}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 19 "ecc.l"
+#line 20 "ecc.l"
 {}
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 20 "ecc.l"
+#line 21 "ecc.l"
 {}
 	YY_BREAK
 case 4:
@@ -907,425 +908,429 @@ case 4:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 21 "ecc.l"
+#line 22 "ecc.l"
 {}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "ecc.l"
+#line 23 "ecc.l"
 { debug(); return DELIM; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 23 "ecc.l"
+#line 24 "ecc.l"
 { debug(); return COMMA; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 25 "ecc.l"
+#line 26 "ecc.l"
 { debug(); return AUTO; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 26 "ecc.l"
+#line 27 "ecc.l"
 { debug(); return DOUBLE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 27 "ecc.l"
+#line 28 "ecc.l"
 { debug(); return INT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 28 "ecc.l"
+#line 29 "ecc.l"
 { debug(); return STRUCT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 29 "ecc.l"
+#line 30 "ecc.l"
 { debug(); return BREAK; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 30 "ecc.l"
+#line 31 "ecc.l"
 { debug(); return ELSE; }    
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 31 "ecc.l"
+#line 32 "ecc.l"
 { debug(); return LONG; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 32 "ecc.l"
+#line 33 "ecc.l"
 { debug(); return SWITCH; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 33 "ecc.l"
+#line 34 "ecc.l"
 { debug(); return CASE; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 34 "ecc.l"
+#line 35 "ecc.l"
 { debug(); return ENUM; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 35 "ecc.l"
+#line 36 "ecc.l"
 { debug(); return REGISTER; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 36 "ecc.l"
+#line 37 "ecc.l"
 { debug(); return TYPEDEF; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 37 "ecc.l"
+#line 38 "ecc.l"
 { debug(); return CHAR; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 38 "ecc.l"
+#line 39 "ecc.l"
 { debug(); return EXTERN; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 39 "ecc.l"
+#line 40 "ecc.l"
 { debug(); return RETURN; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 40 "ecc.l"
+#line 41 "ecc.l"
 { debug(); return UNION; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 41 "ecc.l"
+#line 42 "ecc.l"
 { debug(); return CONST; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 42 "ecc.l"
+#line 43 "ecc.l"
 { debug(); return FLOAT; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 43 "ecc.l"
+#line 44 "ecc.l"
 { debug(); return SHORT; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 44 "ecc.l"
+#line 45 "ecc.l"
 { debug(); return UNSIGNED; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 45 "ecc.l"
+#line 46 "ecc.l"
 { debug(); return CONTINUE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 46 "ecc.l"
+#line 47 "ecc.l"
 { debug(); return FOR; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 47 "ecc.l"
+#line 48 "ecc.l"
 { debug(); return SIGNED; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 48 "ecc.l"
+#line 49 "ecc.l"
 { debug(); return VOID; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 49 "ecc.l"
+#line 50 "ecc.l"
 { debug(); return DEFAULT; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 50 "ecc.l"
+#line 51 "ecc.l"
 { debug(); return GOTO; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 51 "ecc.l"
+#line 52 "ecc.l"
 { debug(); return SIZEOF; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 52 "ecc.l"
+#line 53 "ecc.l"
 { debug(); return VOLATILE; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 53 "ecc.l"
+#line 54 "ecc.l"
 { debug(); return DO; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 54 "ecc.l"
+#line 55 "ecc.l"
 { debug(); return IF; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 55 "ecc.l"
+#line 56 "ecc.l"
 { debug(); return STATIC; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 56 "ecc.l"
+#line 57 "ecc.l"
 { debug(); return WHILE; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 58 "ecc.l"
+#line 59 "ecc.l"
 { debug(); return ADD; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 59 "ecc.l"
+#line 60 "ecc.l"
 { debug(); return SUB; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 60 "ecc.l"
+#line 61 "ecc.l"
 { debug(); return MUL; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 61 "ecc.l"
+#line 62 "ecc.l"
 { debug(); return DIV; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 62 "ecc.l"
+#line 63 "ecc.l"
 { debug(); return MOD; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 63 "ecc.l"
+#line 64 "ecc.l"
 { debug(); return AND; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 64 "ecc.l"
+#line 65 "ecc.l"
 { debug(); return OR; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 65 "ecc.l"
+#line 66 "ecc.l"
 { debug(); return NOT; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 66 "ecc.l"
+#line 67 "ecc.l"
 { debug(); return XOR; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 67 "ecc.l"
+#line 68 "ecc.l"
 { debug(); return ANDAND; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 68 "ecc.l"
+#line 69 "ecc.l"
 { debug(); return OROR; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 69 "ecc.l"
+#line 70 "ecc.l"
 { debug(); return ADDASSIGN; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 70 "ecc.l"
+#line 71 "ecc.l"
 { debug(); return SUBASSIGN; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 71 "ecc.l"
+#line 72 "ecc.l"
 { debug(); return MULASSIGN; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 72 "ecc.l"
+#line 73 "ecc.l"
 { debug(); return DIVASSIGN; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 73 "ecc.l"
+#line 74 "ecc.l"
 { debug(); return MODASSIGN; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 74 "ecc.l"
+#line 75 "ecc.l"
 { debug(); return ANDASSIGN; }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 75 "ecc.l"
+#line 76 "ecc.l"
 { debug(); return ORASSIGN; }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 76 "ecc.l"
+#line 77 "ecc.l"
 { debug(); return XORASSIGN; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 77 "ecc.l"
+#line 78 "ecc.l"
 { debug(); return ASSIGN; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 78 "ecc.l"
+#line 79 "ecc.l"
 { debug(); return LT; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 79 "ecc.l"
+#line 80 "ecc.l"
 { debug(); return GT; }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 80 "ecc.l"
+#line 81 "ecc.l"
 { debug(); return LEQ; }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 81 "ecc.l"
+#line 82 "ecc.l"
 { debug(); return GEQ; }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 82 "ecc.l"
+#line 83 "ecc.l"
 { debug(); return NEQ; }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 83 "ecc.l"
+#line 84 "ecc.l"
 { debug(); return EQ; }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 84 "ecc.l"
+#line 85 "ecc.l"
 { debug(); return SL; }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 85 "ecc.l"
+#line 86 "ecc.l"
 { debug(); return SR; }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 86 "ecc.l"
+#line 87 "ecc.l"
 { debug(); return SLASSIGN; }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 87 "ecc.l"
+#line 88 "ecc.l"
 { debug(); return SRASSIGN; }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 89 "ecc.l"
+#line 90 "ecc.l"
 { debug(); return LP; }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 90 "ecc.l"
+#line 91 "ecc.l"
 { debug(); return RP; }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 91 "ecc.l"
+#line 92 "ecc.l"
 { debug(); return LB; }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 92 "ecc.l"
+#line 93 "ecc.l"
 { debug(); return RB; }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 93 "ecc.l"
+#line 94 "ecc.l"
 { debug(); return LC; }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 94 "ecc.l"
+#line 95 "ecc.l"
 { debug(); return RC; }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 96 "ecc.l"
+#line 97 "ecc.l"
 { debug(); return NUMBER; }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 97 "ecc.l"
+#line 98 "ecc.l"
 { debug(); return NUMBER; }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 98 "ecc.l"
+#line 99 "ecc.l"
 { debug(); return NUMBER; }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 99 "ecc.l"
+#line 100 "ecc.l"
 { debug(); return NUMBER; }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 100 "ecc.l"
-{ debug(); return IDENTIFIER; }
+#line 101 "ecc.l"
+{
+                                    debug();
+                                    yylval._string = new string(yytext);
+                                    return IDENTIFIER;
+                                }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 101 "ecc.l"
+#line 106 "ecc.l"
 { debug(); return NUMBER; }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 102 "ecc.l"
+#line 107 "ecc.l"
 {}
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 104 "ecc.l"
+#line 109 "ecc.l"
 {}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 105 "ecc.l"
+#line 110 "ecc.l"
 {}
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 106 "ecc.l"
+#line 111 "ecc.l"
 {}
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 107 "ecc.l"
+#line 112 "ecc.l"
 {}
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 109 "ecc.l"
+#line 114 "ecc.l"
 {}
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 111 "ecc.l"
+#line 116 "ecc.l"
 ECHO;
 	YY_BREAK
-#line 1329 "scanner.cpp"
+#line 1334 "scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2330,5 +2335,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 111 "ecc.l"
+#line 116 "ecc.l"
 

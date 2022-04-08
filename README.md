@@ -1,5 +1,6 @@
 # compiler
-2022 Compile-Principle Project<br>
+2022 Compile-Principle Project
+
 A tiny C compiler (maybe)
 ## Env
 Dependence:
@@ -17,4 +18,5 @@ make
 ```
 ## Reference
 [1] Levine, J., 2009. flex & bison.
+
 [2] ISO/IEC 9899:1999 "Programming languages - C" 
