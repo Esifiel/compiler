@@ -1,4 +1,4 @@
-// traverse AST in pre-order and write to .json file
+// traverse AST in pre-order and write to a legal .json file
 #include "visualizer.hpp"
 #include "../ast/type.h"
 #include "../ast/declaration.h"
@@ -18,98 +18,86 @@ void Visualizer::traverse()
     out << head;
     if (program)
         visitProgram(program);
-    out << tail << endl;
+    out << tail;
 }
 
 void Visualizer::visitProgram(Program *p)
 {
+    out << p->getName() << sub << head;
     if (p->decs)
-    {
-        out << p->getName() << sub;
-        out << head;
         visitDeclarationList(p->decs);
-        out << tail;
-    }
+    out << tail;
 }
 
 void Visualizer::visitDeclarationList(vector<Declaration *> *l)
 {
     for (auto p = l->begin(); p != l->end(); p++)
     {
-        out << (*p)->getName() << sub;
-        out << head;
+        if (p != l->begin())
+            out << sep;
         visitDeclaration(*p);
-        out << tail;
-        out << sep;
     }
 }
 
 void Visualizer::visitDeclaration(Declaration *d)
 {
-    if (d->getName() == "FunctionDeclaration")
+    out << d->getName() << sub << head;
+    if (d->getName() == "\"FunctionDeclaration\"")
         visitFunctionDeclaration((FunctionDeclaration *)d);
-    else if (d->getName() == "VariableDeclaration")
+    else if (d->getName() == "\"VariableDeclaration\"")
         visitVariableDeclaration((VariableDeclaration *)d);
+    out << tail;
 }
 
 void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
 {
-    out << d->type->getName();
-    if (d->type->getName() == "array")
-    {
-        out << sub;
-        out << head;
-        visitType(d->type);
-        out << tail;
-    }
+    visitType(d->type);
     out << sep;
-    out << d->name->getName();
+    visitIdentifier(d->name);
 }
 
 void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
 {
-    out << d->rettype->getName();
-    if (d->rettype->getName() == "array")
-    {
-        out << sub;
-        out << head;
-        visitType(d->rettype);
-        out << tail;
-    }
+    visitType(d->rettype);
     out << sep;
-
-    out << d->name->getName();
+    visitIdentifier(d->name);
     out << sep;
 
     for (auto p = d->params->begin(); p != d->params->end(); p++)
     {
-        out << (*p)->getName() << sub;
-        out << head;
+        if (p != d->params->begin())
+            out << sep;
         visitParameter(*p);
-        out << tail;
-        out << sep;
     }
     out << sep;
-    
+
     visitCompoundStatement(d->stmts);
 }
 
 void Visualizer::visitType(Type *t)
 {
-    if (t->getName() == "array")
+    out << t->getName() << sub << head;
+    if (t->getName() == "\"array\"")
         out << ((ArrayType *)t)->size;
+    out << tail;
 }
 
 void Visualizer::visitIdentifier(Identifier *i)
 {
-}
-
-void Visualizer::visitCompoundStatement(CompoundStatement *c)
-{
+    out << i->getName() << sub << head;
+    out << tail;
 }
 
 void Visualizer::visitParameter(Parameter *p)
 {
+    out << p->getName() << sub << head;
+    out << tail;
+}
+
+void Visualizer::visitCompoundStatement(CompoundStatement *c)
+{
+    out << c->getName() << sub << head;
+    out << tail;
 }
 
 // params : param-list

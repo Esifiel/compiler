@@ -12,7 +12,7 @@ class Program : public Node
 public:
     vector<Declaration *> *decs;
     Program(vector<Declaration *> *l) : decs(l) {}
-    virtual string getName() { return "Program"; }
+    virtual string getName() { return "\"Program\""; }
 };
 
 #endif

@@ -15,7 +15,7 @@ class Declaration : public Node
 {
 public:
     Declaration() {}
-    virtual string getName() { return "Declaration"; }
+    virtual string getName() { return "\"Declaration\""; }
 };
 
 class VariableDeclaration : public Declaration
@@ -24,7 +24,7 @@ public:
     Type *type;
     Identifier *name;
     VariableDeclaration(Type *t, Identifier *n) : type(t), name(n) {}
-    virtual string getName() { return "VariableDeclaration"; }
+    virtual string getName() { return "\"VariableDeclaration\""; }
 };
 
 class TypeDeclaration : public Declaration
@@ -32,7 +32,7 @@ class TypeDeclaration : public Declaration
 public:
     Identifier *name;
     TypeDeclaration(Identifier *v) : name(v) {}
-    virtual string getName() { return "TypeDeclaration"; }
+    virtual string getName() { return "\"TypeDeclaration\""; }
 };
 
 class CompoundStatement;
@@ -45,7 +45,7 @@ public:
     vector<Parameter *> *params;
     CompoundStatement *stmts;
     FunctionDeclaration(Type *t, Identifier *n, vector<Parameter *> *p, CompoundStatement *s) : rettype(t), name(n), params(p), stmts(s) {}
-    virtual string getName() { return "FunctionDeclaration"; }
+    virtual string getName() { return "\"FunctionDeclaration\""; }
 };
 
 #endif

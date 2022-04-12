@@ -10,7 +10,7 @@ class Statement : public Node
 {
 public:
     Statement() {}
-    virtual string getName() { return "Statement"; }
+    virtual string getName() { return "\"Statement\""; }
 };
 
 class Declaration;
@@ -21,7 +21,7 @@ public:
     vector<Declaration *> *decs;
     vector<Statement *> *stmts;
     CompoundStatement(vector<Declaration *> *d, vector<Statement *> *s):decs(d), stmts(s) {}
-    virtual string getName() { return "CompoundStatement"; }
+    virtual string getName() { return "\"CompoundStatement\""; }
 };
 
 #endif

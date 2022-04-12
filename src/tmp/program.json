@@ -1,1 +1,10 @@
-{Program: {FunctionDeclaration: {IntType, Identifier, Parameter: {}, , }, }}
+{
+    "Program": {
+        "FunctionDeclaration": {
+            "IntType": {},
+            "Identifier": {},
+            "Parameter": {},
+            "CompoundStatement": {}
+        }
+    }
+}
