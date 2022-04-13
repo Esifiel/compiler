@@ -1,9 +1,9 @@
-#ifndef _PROGRAM_H_
-#define _PROGRAM_H_
+#ifndef _PROGRAM_HPP_
+#define _PROGRAM_HPP_
 
 #include <vector>
-#include "basic.h"
-#include "declaration.h"
+#include "basic.hpp"
+#include "declaration.hpp"
 
 using namespace std;
 

@@ -50,12 +50,12 @@ extern int yydebug;
 #include <string>
 #include <vector>
 #include <stdint.h>
-#include "ast/basic.h"
-#include "ast/expression.h"
-#include "ast/statement.h"
-#include "ast/declaration.h"
-#include "ast/type.h"
-#include "ast/program.h"
+#include "ast/basic.hpp"
+#include "ast/expression.hpp"
+#include "ast/statement.hpp"
+#include "ast/declaration.hpp"
+#include "ast/type.hpp"
+#include "ast/program.hpp"
 
 using namespace std;
 

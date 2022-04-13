@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ast/program.h"
+#include "ast/program.hpp"
 #include "utils/visualizer.hpp"
 
 using namespace std;

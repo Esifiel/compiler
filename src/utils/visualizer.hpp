@@ -1,7 +1,7 @@
 #ifndef _VISUALIZER_HPP_
 #define _VISUALIZER_HPP_
 
-#include "../ast/program.h"
+#include "../ast/program.hpp"
 #include <fstream>
 #include <iostream>
 

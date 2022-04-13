@@ -1,10 +1,10 @@
-#ifndef _EXPRESSION_H_
-#define _EXPRESSION_H_
+#ifndef _EXPRESSION_HPP_
+#define _EXPRESSION_HPP_
 
 #include <stdint.h>
 #include <string>
-#include "basic.h"
-#include "type.h"
+#include "basic.hpp"
+#include "type.hpp"
 
 using namespace std;
 

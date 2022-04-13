@@ -1,7 +1,7 @@
 // traverse AST in pre-order and write to a legal .json file
 #include "visualizer.hpp"
-#include "../ast/type.h"
-#include "../ast/declaration.h"
+#include "../ast/type.hpp"
+#include "../ast/declaration.hpp"
 #include <string>
 #include <cstdio>
 #include <cstdlib>

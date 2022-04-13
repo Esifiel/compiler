@@ -2,25 +2,31 @@ LEX = flex
 YACC = bison
 CC = g++
 NAME = ecc
+LLVMFLAGS = `llvm-config --cxxflags --ldflags --system-libs --libs core`
 DEPENDENCE = $(shell find . | grep .cpp)
 
 .PHONY: all clean
 
-all: $(NAME)
+all: $(NAME) FORCE
 
 parser.cpp: $(NAME).y FORCE
-	$(YACC) -dv -o parser.cpp $(NAME).y
+	$(YACC) -dv -o $@ $<
 
-scanner.cpp: $(NAME).l FORCE
-	$(LEX) -o scanner.cpp $(NAME).l
+parser.hpp: parser.cpp FORCE
+
+scanner.cpp: $(NAME).l parser.hpp FORCE
+	$(LEX) -o $@ $<
+
+%.o: %.cpp
+	$(CC) -c $(CPPFLAGS) -o $@ $<
 
 $(NAME): $(DEPENDENCE) scanner.cpp parser.cpp FORCE
-	$(CC) -o $(NAME) $(DEPENDENCE)
+	$(CC) -o $(NAME) $(DEPENDENCE) $(LLVMFLAGS)
 	
 	@cat ../test/quicksort.c | ./$(NAME)
 	@cat tmp/program.json
 
-clean: FORCE
+clean:
 	@rm -f $(NAME)
 	@rm -f *.o
 	@rm -f parser.* scanner.c

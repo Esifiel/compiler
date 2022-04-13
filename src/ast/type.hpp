@@ -1,7 +1,7 @@
-#ifndef _TYPE_H_
-#define _TYPE_H_
+#ifndef _TYPE_HPP_
+#define _TYPE_HPP_
 
-#include "basic.h"
+#include "basic.hpp"
 #include <vector>
 
 using namespace std;

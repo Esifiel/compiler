@@ -1,9 +1,9 @@
-#ifndef _STATEMENT_H_
-#define _STATEMENT_H_
+#ifndef _STATEMENT_HPP_
+#define _STATEMENT_HPP_
 
-#include "basic.h"
-#include "expression.h"
-#include "declaration.h"
+#include "basic.hpp"
+#include "expression.hpp"
+#include "declaration.hpp"
 
 using namespace std;
 

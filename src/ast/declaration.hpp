@@ -1,10 +1,10 @@
-#ifndef _DECLARATION_H_
-#define _DECLARATION_H_
+#ifndef _DECLARATION_HPP_
+#define _DECLARATION_HPP_
 
-#include "basic.h"
-#include "expression.h"
-#include "statement.h"
-#include "type.h"
+#include "basic.hpp"
+#include "expression.hpp"
+#include "statement.hpp"
+#include "type.hpp"
 #include <vector>
 #include <stdint.h>
 #include <iostream>
