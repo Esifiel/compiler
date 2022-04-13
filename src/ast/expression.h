@@ -66,8 +66,10 @@ public:
 class Identifier : public Expression
 {
 public:
-    string name;
-    Identifier(const string &v) : name(v) {}
+    string *name;
+    uint64_t idx;
+    Identifier(string *v) : name(v) { idx = -1; }
+    Identifier(string *v, uint64_t i) : name(v), idx(i) {}
     virtual string getName() { return "\"Identifier\""; }
 };
 
@@ -90,4 +92,21 @@ public:
     virtual string getName() { return "\"Assignment\""; }
 };
 
+class FunctionCall : public Expression {
+    public:
+    FunctionCall() {}
+    virtual string getName() { return "\"FunctionCall\""; }
+};
+
+class SimpleExpression : public Expression
+{
+public:
+    SimpleExpression() {}
+    virtual string getName() { return "\"SimpleExpression\""; }
+};
+
 #endif
+
+// simple-expression : additive-expression relop additive-expression
+//     | additive-expression
+//     ;

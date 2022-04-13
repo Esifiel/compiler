@@ -49,6 +49,7 @@ extern int yydebug;
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stdint.h>
 #include "ast/basic.h"
 #include "ast/expression.h"
 #include "ast/statement.h"
@@ -58,10 +59,12 @@ extern int yydebug;
 
 using namespace std;
 
+extern int yylineno;
+extern char *yytext;
 extern int yylex();
 void yyerror(string s);
 
-#line 65 "parser.hpp"
+#line 68 "parser.hpp"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -139,7 +142,8 @@ void yyerror(string s);
     LC = 326,
     RC = 327,
     NUMBER = 328,
-    IDENTIFIER = 329
+    STRING = 329,
+    IDENTIFIER = 330
   };
 #endif
 
@@ -147,36 +151,50 @@ void yyerror(string s);
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 "ecc.y"
+#line 26 "ecc.y"
 
-    char _char;
-    short _short;
-    int _int;
-    long _long;
-    float _float;
-    double _double;
-    string *_string;
+    union {
+        uint8_t charValue;
+        uint16_t shortValue;
+        uint32_t intValue;
+        uint64_t longValue;
+        float floatValue;
+        double doubleValue;
+    } num;
+    string *stringValue;
     
     Node *node;
     Program *program;
-    Declaration *declaration;
+
     Type *type;
+
+    Declaration *declaration;
     VariableDeclaration *variableDeclaration;
     FunctionDeclaration *functionDeclaration;
-    Expression *expression;
-    Statement *statement;
     TypeDeclaration *typeDeclatation;
+
+    Statement *statement;
+    CompoundStatement *compoundStatement;
+    ExpressionStatement *expressionStatement;
+    SelectionStatement *selectionStatement;
+    IterationStatement *iterationStatement;
+    WhileStatement *whileStatement;
+    ForStatement *forStatement;
+    ReturnStatement *returnStatement;
+
+    Expression *expression;
     Identifier *identifier;
     Parameter *param;
-    CompoundStatement *compoundStatement;
+    FunctionCall *functionCall;
 
-    vector<Declaration *> *declarations;
-    vector<VariableDeclaration *> *variableDeclarations;
-    vector<FunctionDeclaration *> *functionDeclarations;
-    vector<Statement *> *statements;
+    vector<Declaration *> *decls;
+    vector<VariableDeclaration *> *vars;
+    vector<FunctionDeclaration *> *funcs;
+    vector<Statement *> *stmts;
     vector<Parameter *> *params;
+    vector<Expression *> *exprs;
 
-#line 180 "parser.hpp"
+#line 198 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

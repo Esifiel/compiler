@@ -7,6 +7,7 @@ Program *program;
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stdint.h>
 #include "ast/basic.h"
 #include "ast/expression.h"
 #include "ast/statement.h"
@@ -16,37 +17,53 @@ Program *program;
 
 using namespace std;
 
+extern int yylineno;
+extern char *yytext;
 extern int yylex();
 void yyerror(string s);
 }
 
 %union {
-    char _char;
-    short _short;
-    int _int;
-    long _long;
-    float _float;
-    double _double;
-    string *_string;
+    union {
+        uint8_t charValue;
+        uint16_t shortValue;
+        uint32_t intValue;
+        uint64_t longValue;
+        float floatValue;
+        double doubleValue;
+    } num;
+    string *stringValue;
     
     Node *node;
     Program *program;
-    Declaration *declaration;
+
     Type *type;
+
+    Declaration *declaration;
     VariableDeclaration *variableDeclaration;
     FunctionDeclaration *functionDeclaration;
-    Expression *expression;
-    Statement *statement;
     TypeDeclaration *typeDeclatation;
+
+    Statement *statement;
+    CompoundStatement *compoundStatement;
+    ExpressionStatement *expressionStatement;
+    SelectionStatement *selectionStatement;
+    IterationStatement *iterationStatement;
+    WhileStatement *whileStatement;
+    ForStatement *forStatement;
+    ReturnStatement *returnStatement;
+
+    Expression *expression;
     Identifier *identifier;
     Parameter *param;
-    CompoundStatement *compoundStatement;
+    FunctionCall *functionCall;
 
-    vector<Declaration *> *declarations;
-    vector<VariableDeclaration *> *variableDeclarations;
-    vector<FunctionDeclaration *> *functionDeclarations;
-    vector<Statement *> *statements;
+    vector<Declaration *> *decls;
+    vector<VariableDeclaration *> *vars;
+    vector<FunctionDeclaration *> *funcs;
+    vector<Statement *> *stmts;
     vector<Parameter *> *params;
+    vector<Expression *> *exprs;
 }
 
 %token  CHAR SHORT INT LONG FLOAT DOUBLE STRUCT ENUM UNION VOID
@@ -57,24 +74,37 @@ void yyerror(string s);
         ANDAND OROR ASSIGN LT GT GEQ LEQ NEQ EQ
 %token  TYPEDEF SIZEOF RETURN
 %token  DELIM COMMA LP RP LB RB LC RC
-
-%token<_int> NUMBER
-%token<_string> IDENTIFIER
+%token<num> NUMBER
+%token<stringValue> STRING IDENTIFIER 
 
 %type<program> program
-%type<declarations> declaration-list local-declarations
-%type<declaration> declaration
+
 %type<type> type-specifier
+
+%type<decls> declaration-list
+%type<declaration> declaration
 %type<variableDeclaration> var-declaration
 %type<functionDeclaration> fun-declaration
+%type<vars> local-declarations
+
+%type<expression> expression
+%type<identifier> id var
 %type<param> param
 %type<params> param-list params
-%type<expression> expression expression-stmt
-%type<statement> statement
-%type<statements> statement-list
-%type<compoundStatement> compound-stmt
-%type<identifier> id
+%type<exprs> expression-list
+%type<functionCall> call
 
+%type<statement> statement
+%type<stmts> statement-list
+%type<compoundStatement> compound-stmt
+%type<expressionStatement> expression-stmt
+%type<selectionStatement> selection-stmt
+%type<iterationStatement> iteration-stmt
+%type<whileStatement> while-stmt
+%type<forStatement> for-stmt
+%type<returnStatement> return-stmt
+
+%type<stringValue> addop mulop
 
 %left ADD SUB MUL DIV
 
@@ -94,10 +124,10 @@ declaration : var-declaration { $$ = $1; }
     ;
 
 var-declaration : type-specifier id DELIM { $$ = new VariableDeclaration($1, $2); }
-    | type-specifier id LB NUMBER RB DELIM { $$ = new VariableDeclaration(new ArrayType($1, $4), $2); }
+    | type-specifier id LB NUMBER RB DELIM { $$ = new VariableDeclaration(new ArrayType($1, $4.longValue), $2); }
     ;
 
-id : IDENTIFIER { $$ = new Identifier(*$1); }
+id : IDENTIFIER { $$ = new Identifier($1); }
     ;
 
 type-specifier : CHAR   { $$ = new CharType(); }
@@ -132,41 +162,52 @@ compound-stmt : LC local-declarations statement-list RC { $$ = new CompoundState
     ;
 
 local-declarations : local-declarations var-declaration { $1->push_back($2); $$ = $1; }
-    | { $$ = new vector<Declaration *>; }
+    | { $$ = new vector<VariableDeclaration *>; }
     ;
 
-statement-list : statement-list statement
-    |
+statement-list : statement-list statement { $1->push_back($2); $$ = $1; }
+    | { $$ = new vector<Statement *>; }
     ;
 
-statement : expression-stmt
-    | compound-stmt
-    | selection-stmt
-    | iteration-stmt
-    | return-stmt
+statement : expression-stmt { $$ = $1; }
+    | compound-stmt { $$ = $1; }
+    | selection-stmt { $$ = $1; }
+    | iteration-stmt { $$ = $1; }
+    | return-stmt { $$ = $1; }
     ;
 
-expression-stmt : expression DELIM
-    | DELIM
+expression-stmt : expression DELIM { $$ = new ExpressionStatement($1); }
+    | DELIM { $$ = new ExpressionStatement(nullptr); }
     ;
 
 selection-stmt : IF LP expression RP statement
     | IF LP expression RP ELSE statement
     ;
 
-iteration-stmt : WHILE LP expression RP statement
+iteration-stmt : while-stmt { $$ = $1; }
+    | for-stmt { $$ = $1; }
     ;
 
-return-stmt : RETURN DELIM
-    | RETURN expression DELIM
+while-stmt : WHILE LP expression RP compound-stmt { $$ = new WhileStatement($3, $5); }
     ;
 
-expression : var ASSIGN expression
+for-stmt : FOR LP expression-list DELIM expression DELIM expression-list RP compound-stmt { $$ = new ForStatement($3, $5, $7, $9); }
+    ;
+
+expression-list : expression-list COMMA expression { $1->push_back($3); $$ = $1; }
+    | expression { $$ = new vector<Expression *>; $$->push_back($1); }
+    ;
+
+return-stmt : RETURN expression-stmt { $$ = new ReturnStatement($2); }
+    ;
+
+expression : var ASSIGN expression { $$ = new Assignment($1, $3); }
     | simple-expression
+    | call
     ;
 
-var : id
-    | id LB expression RB
+var : id { $$ = $1; }
+    | id LB NUMBER RB { $$ = new Identifier($1->name, $3.longValue); }
     ;
 
 simple-expression : additive-expression relop additive-expression
@@ -187,25 +228,24 @@ additive-expression : additive-expression addop term
     | term
     ;
 
-addop : ADD
-    | SUB
+addop : ADD { $$ = new string("+"); }
+    | SUB { $$ = new string("-"); }
     ;
 
 term : term mulop factor
     | factor
     ;
 
-mulop : MUL
-    | DIV
+mulop : MUL { $$ = new string("*"); }
+    | DIV { $$ = new string("/"); }
     ;
 
 factor : LP expression RP
     | var
-    | call
     | NUMBER
     ;
 
-call : id LP args RP
+call : var LP args RP
     ;
 
 args : arg-list
@@ -220,7 +260,6 @@ arg-list : arg-list COMMA expression
 
 void yyerror(string s)
 {
-    cout << "[!] Error, " << s << endl;
-    /* fprintf(stderr, "[!] Error, %s\n", s); */
+    fprintf(stderr, "[!] %s in Line %d: %s\n", s.c_str(), yylineno, yytext);
     exit(1);
 }

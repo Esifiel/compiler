@@ -51,42 +51,8 @@ public:
 #endif
 
 
-// compound-stmt : LC local-declarations statement-list RC
-//     ;
 
-// local-declarations : local-declarations var-declaration
-//     |
-//     ;
 
-// statement-list : statement-list statement
-//     |
-//     ;
-
-// statement : expression-stmt
-//     | compound-stmt
-//     | selection-stmt
-//     | iteration-stmt
-//     | return-stmt
-//     ;
-
-// expression-stmt : expression DELIM
-//     | DELIM
-//     ;
-
-// selection-stmt : IF LP expression RP statement
-//     | IF LP expression RP ELSE statement
-//     ;
-
-// iteration-stmt : WHILE LP expression RP statement
-//     ;
-
-// return-stmt : RETURN DELIM
-//     | RETURN expression DELIM
-//     ;
-
-// expression : var ASSIGN expression
-//     | simple-expression
-//     ;
 
 // var : IDENTIFIER
 //     | IDENTIFIER LB expression RB

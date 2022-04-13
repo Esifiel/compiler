@@ -1,0 +1,1602 @@
+终端机在文法中未使用
+
+    AUTO
+    REGISTER
+    EXTERN
+    CONST
+    UNSIGNED
+    SIGNED
+    VOLATILE
+    STATIC
+    DO
+    BREAK
+    CONTINUE
+    SWITCH
+    CASE
+    DEFAULT
+    GOTO
+    MOD
+    ADDASSIGN
+    SUBASSIGN
+    MULASSIGN
+    DIVASSIGN
+    MODASSIGN
+    AND
+    OR
+    XOR
+    NOT
+    ANDASSIGN
+    ORASSIGN
+    XORASSIGN
+    SL
+    SR
+    SLASSIGN
+    SRASSIGN
+    TYPEDEF
+    SIZEOF
+    STRING
+
+
+语法
+
+    0 $accept: program $end
+
+    1 program: declaration-list
+
+    2 declaration-list: declaration-list declaration
+    3                 | declaration
+
+    4 declaration: var-declaration
+    5            | fun-declaration
+
+    6 var-declaration: type-specifier id DELIM
+    7                | type-specifier id LB NUMBER RB DELIM
+
+    8 id: IDENTIFIER
+
+    9 type-specifier: CHAR
+   10               | SHORT
+   11               | INT
+   12               | LONG
+   13               | FLOAT
+   14               | DOUBLE
+   15               | STRUCT
+   16               | ENUM
+   17               | UNION
+   18               | VOID
+
+   19 fun-declaration: type-specifier id LP params RP compound-stmt
+
+   20 params: param-list
+   21       | VOID
+   22       | %empty
+
+   23 param-list: param-list COMMA param
+   24           | param
+
+   25 param: type-specifier id
+   26      | type-specifier id LB RB
+
+   27 compound-stmt: LC local-declarations statement-list RC
+
+   28 local-declarations: local-declarations var-declaration
+   29                   | %empty
+
+   30 statement-list: statement-list statement
+   31               | %empty
+
+   32 statement: expression-stmt
+   33          | compound-stmt
+   34          | selection-stmt
+   35          | iteration-stmt
+   36          | return-stmt
+
+   37 expression-stmt: expression DELIM
+   38                | DELIM
+
+   39 selection-stmt: IF LP expression RP statement
+   40               | IF LP expression RP ELSE statement
+
+   41 iteration-stmt: while-stmt
+   42               | for-stmt
+
+   43 while-stmt: WHILE LP expression RP compound-stmt
+
+   44 for-stmt: FOR LP expression-list DELIM expression DELIM expression-list RP compound-stmt
+
+   45 expression-list: expression-list COMMA expression
+   46                | expression
+
+   47 return-stmt: RETURN expression-stmt
+
+   48 expression: var ASSIGN expression
+   49           | simple-expression
+   50           | call
+
+   51 var: id
+   52    | id LB NUMBER RB
+
+   53 simple-expression: additive-expression relop additive-expression
+   54                  | additive-expression
+
+   55 relop: LEQ
+   56      | LT
+   57      | GT
+   58      | GEQ
+   59      | EQ
+   60      | NEQ
+   61      | ANDAND
+   62      | OROR
+
+   63 additive-expression: additive-expression addop term
+   64                    | term
+
+   65 addop: ADD
+   66      | SUB
+
+   67 term: term mulop factor
+   68     | factor
+
+   69 mulop: MUL
+   70      | DIV
+
+   71 factor: LP expression RP
+   72       | var
+   73       | NUMBER
+
+   74 call: var LP args RP
+
+   75 args: arg-list
+   76     | %empty
+
+   77 arg-list: arg-list COMMA expression
+   78         | expression
+
+
+终结语词，附有它们出现处的规则
+
+    $end (0) 0
+    error (256)
+    CHAR (258) 9
+    SHORT (259) 10
+    INT (260) 11
+    LONG (261) 12
+    FLOAT (262) 13
+    DOUBLE (263) 14
+    STRUCT (264) 15
+    ENUM (265) 16
+    UNION (266) 17
+    VOID (267) 18 21
+    AUTO (268)
+    REGISTER (269)
+    EXTERN (270)
+    CONST (271)
+    UNSIGNED (272)
+    SIGNED (273)
+    VOLATILE (274)
+    STATIC (275)
+    IF (276) 39 40
+    ELSE (277) 40
+    FOR (278) 44
+    DO (279)
+    WHILE (280) 43
+    BREAK (281)
+    CONTINUE (282)
+    SWITCH (283)
+    CASE (284)
+    DEFAULT (285)
+    GOTO (286)
+    ADD (287) 65
+    SUB (288) 66
+    MUL (289) 69
+    DIV (290) 70
+    MOD (291)
+    ADDASSIGN (292)
+    SUBASSIGN (293)
+    MULASSIGN (294)
+    DIVASSIGN (295)
+    MODASSIGN (296)
+    AND (297)
+    OR (298)
+    XOR (299)
+    NOT (300)
+    ANDASSIGN (301)
+    ORASSIGN (302)
+    XORASSIGN (303)
+    SL (304)
+    SR (305)
+    SLASSIGN (306)
+    SRASSIGN (307)
+    ANDAND (308) 61
+    OROR (309) 62
+    ASSIGN (310) 48
+    LT (311) 56
+    GT (312) 57
+    GEQ (313) 58
+    LEQ (314) 55
+    NEQ (315) 60
+    EQ (316) 59
+    TYPEDEF (317)
+    SIZEOF (318)
+    RETURN (319) 47
+    DELIM (320) 6 7 37 38 44
+    COMMA (321) 23 45 77
+    LP (322) 19 39 40 43 44 71 74
+    RP (323) 19 39 40 43 44 71 74
+    LB (324) 7 26 52
+    RB (325) 7 26 52
+    LC (326) 27
+    RC (327) 27
+    NUMBER <num> (328) 7 52 73
+    STRING <stringValue> (329)
+    IDENTIFIER <stringValue> (330) 8
+
+
+非终结语词，附有它们出现处的规则
+
+    $accept (76)
+        on left: 0
+    program <program> (77)
+        on left: 1
+        on right: 0
+    declaration-list <decls> (78)
+        on left: 2 3
+        on right: 1 2
+    declaration <declaration> (79)
+        on left: 4 5
+        on right: 2 3
+    var-declaration <variableDeclaration> (80)
+        on left: 6 7
+        on right: 4 28
+    id <identifier> (81)
+        on left: 8
+        on right: 6 7 19 25 26 51 52
+    type-specifier <type> (82)
+        on left: 9 10 11 12 13 14 15 16 17 18
+        on right: 6 7 19 25 26
+    fun-declaration <functionDeclaration> (83)
+        on left: 19
+        on right: 5
+    params <params> (84)
+        on left: 20 21 22
+        on right: 19
+    param-list <params> (85)
+        on left: 23 24
+        on right: 20 23
+    param <param> (86)
+        on left: 25 26
+        on right: 23 24
+    compound-stmt <compoundStatement> (87)
+        on left: 27
+        on right: 19 33 43 44
+    local-declarations <vars> (88)
+        on left: 28 29
+        on right: 27 28
+    statement-list <stmts> (89)
+        on left: 30 31
+        on right: 27 30
+    statement <statement> (90)
+        on left: 32 33 34 35 36
+        on right: 30 39 40
+    expression-stmt <expressionStatement> (91)
+        on left: 37 38
+        on right: 32 47
+    selection-stmt <selectionStatement> (92)
+        on left: 39 40
+        on right: 34
+    iteration-stmt <iterationStatement> (93)
+        on left: 41 42
+        on right: 35
+    while-stmt <whileStatement> (94)
+        on left: 43
+        on right: 41
+    for-stmt <forStatement> (95)
+        on left: 44
+        on right: 42
+    expression-list <exprs> (96)
+        on left: 45 46
+        on right: 44 45
+    return-stmt <returnStatement> (97)
+        on left: 47
+        on right: 36
+    expression <expression> (98)
+        on left: 48 49 50
+        on right: 37 39 40 43 44 45 46 48 71 77 78
+    var <identifier> (99)
+        on left: 51 52
+        on right: 48 72 74
+    simple-expression (100)
+        on left: 53 54
+        on right: 49
+    relop (101)
+        on left: 55 56 57 58 59 60 61 62
+        on right: 53
+    additive-expression (102)
+        on left: 63 64
+        on right: 53 54 63
+    addop <stringValue> (103)
+        on left: 65 66
+        on right: 63
+    term (104)
+        on left: 67 68
+        on right: 63 64 67
+    mulop <stringValue> (105)
+        on left: 69 70
+        on right: 67
+    factor (106)
+        on left: 71 72 73
+        on right: 67 68
+    call <functionCall> (107)
+        on left: 74
+        on right: 50
+    args (108)
+        on left: 75 76
+        on right: 74
+    arg-list (109)
+        on left: 77 78
+        on right: 75 77
+
+
+状态 0
+
+    0 $accept: . program $end
+
+    CHAR    偏移，并进入状态 1
+    SHORT   偏移，并进入状态 2
+    INT     偏移，并进入状态 3
+    LONG    偏移，并进入状态 4
+    FLOAT   偏移，并进入状态 5
+    DOUBLE  偏移，并进入状态 6
+    STRUCT  偏移，并进入状态 7
+    ENUM    偏移，并进入状态 8
+    UNION   偏移，并进入状态 9
+    VOID    偏移，并进入状态 10
+
+    program           转到状态 11
+    declaration-list  转到状态 12
+    declaration       转到状态 13
+    var-declaration   转到状态 14
+    type-specifier    转到状态 15
+    fun-declaration   转到状态 16
+
+
+状态 1
+
+    9 type-specifier: CHAR .
+
+    $default  使用规则 9 以归约 (type-specifier)
+
+
+状态 2
+
+   10 type-specifier: SHORT .
+
+    $default  使用规则 10 以归约 (type-specifier)
+
+
+状态 3
+
+   11 type-specifier: INT .
+
+    $default  使用规则 11 以归约 (type-specifier)
+
+
+状态 4
+
+   12 type-specifier: LONG .
+
+    $default  使用规则 12 以归约 (type-specifier)
+
+
+状态 5
+
+   13 type-specifier: FLOAT .
+
+    $default  使用规则 13 以归约 (type-specifier)
+
+
+状态 6
+
+   14 type-specifier: DOUBLE .
+
+    $default  使用规则 14 以归约 (type-specifier)
+
+
+状态 7
+
+   15 type-specifier: STRUCT .
+
+    $default  使用规则 15 以归约 (type-specifier)
+
+
+状态 8
+
+   16 type-specifier: ENUM .
+
+    $default  使用规则 16 以归约 (type-specifier)
+
+
+状态 9
+
+   17 type-specifier: UNION .
+
+    $default  使用规则 17 以归约 (type-specifier)
+
+
+状态 10
+
+   18 type-specifier: VOID .
+
+    $default  使用规则 18 以归约 (type-specifier)
+
+
+状态 11
+
+    0 $accept: program . $end
+
+    $end  偏移，并进入状态 17
+
+
+状态 12
+
+    1 program: declaration-list .
+    2 declaration-list: declaration-list . declaration
+
+    CHAR    偏移，并进入状态 1
+    SHORT   偏移，并进入状态 2
+    INT     偏移，并进入状态 3
+    LONG    偏移，并进入状态 4
+    FLOAT   偏移，并进入状态 5
+    DOUBLE  偏移，并进入状态 6
+    STRUCT  偏移，并进入状态 7
+    ENUM    偏移，并进入状态 8
+    UNION   偏移，并进入状态 9
+    VOID    偏移，并进入状态 10
+
+    $default  使用规则 1 以归约 (program)
+
+    declaration      转到状态 18
+    var-declaration  转到状态 14
+    type-specifier   转到状态 15
+    fun-declaration  转到状态 16
+
+
+状态 13
+
+    3 declaration-list: declaration .
+
+    $default  使用规则 3 以归约 (declaration-list)
+
+
+状态 14
+
+    4 declaration: var-declaration .
+
+    $default  使用规则 4 以归约 (declaration)
+
+
+状态 15
+
+    6 var-declaration: type-specifier . id DELIM
+    7                | type-specifier . id LB NUMBER RB DELIM
+   19 fun-declaration: type-specifier . id LP params RP compound-stmt
+
+    IDENTIFIER  偏移，并进入状态 19
+
+    id  转到状态 20
+
+
+状态 16
+
+    5 declaration: fun-declaration .
+
+    $default  使用规则 5 以归约 (declaration)
+
+
+状态 17
+
+    0 $accept: program $end .
+
+    $default  接受
+
+
+状态 18
+
+    2 declaration-list: declaration-list declaration .
+
+    $default  使用规则 2 以归约 (declaration-list)
+
+
+状态 19
+
+    8 id: IDENTIFIER .
+
+    $default  使用规则 8 以归约 (id)
+
+
+状态 20
+
+    6 var-declaration: type-specifier id . DELIM
+    7                | type-specifier id . LB NUMBER RB DELIM
+   19 fun-declaration: type-specifier id . LP params RP compound-stmt
+
+    DELIM  偏移，并进入状态 21
+    LP     偏移，并进入状态 22
+    LB     偏移，并进入状态 23
+
+
+状态 21
+
+    6 var-declaration: type-specifier id DELIM .
+
+    $default  使用规则 6 以归约 (var-declaration)
+
+
+状态 22
+
+   19 fun-declaration: type-specifier id LP . params RP compound-stmt
+
+    CHAR    偏移，并进入状态 1
+    SHORT   偏移，并进入状态 2
+    INT     偏移，并进入状态 3
+    LONG    偏移，并进入状态 4
+    FLOAT   偏移，并进入状态 5
+    DOUBLE  偏移，并进入状态 6
+    STRUCT  偏移，并进入状态 7
+    ENUM    偏移，并进入状态 8
+    UNION   偏移，并进入状态 9
+    VOID    偏移，并进入状态 24
+
+    $default  使用规则 22 以归约 (params)
+
+    type-specifier  转到状态 25
+    params          转到状态 26
+    param-list      转到状态 27
+    param           转到状态 28
+
+
+状态 23
+
+    7 var-declaration: type-specifier id LB . NUMBER RB DELIM
+
+    NUMBER  偏移，并进入状态 29
+
+
+状态 24
+
+   18 type-specifier: VOID .
+   21 params: VOID .
+
+    RP        使用规则 21 以归约 (params)
+    $default  使用规则 18 以归约 (type-specifier)
+
+
+状态 25
+
+   25 param: type-specifier . id
+   26      | type-specifier . id LB RB
+
+    IDENTIFIER  偏移，并进入状态 19
+
+    id  转到状态 30
+
+
+状态 26
+
+   19 fun-declaration: type-specifier id LP params . RP compound-stmt
+
+    RP  偏移，并进入状态 31
+
+
+状态 27
+
+   20 params: param-list .
+   23 param-list: param-list . COMMA param
+
+    COMMA  偏移，并进入状态 32
+
+    $default  使用规则 20 以归约 (params)
+
+
+状态 28
+
+   24 param-list: param .
+
+    $default  使用规则 24 以归约 (param-list)
+
+
+状态 29
+
+    7 var-declaration: type-specifier id LB NUMBER . RB DELIM
+
+    RB  偏移，并进入状态 33
+
+
+状态 30
+
+   25 param: type-specifier id .
+   26      | type-specifier id . LB RB
+
+    LB  偏移，并进入状态 34
+
+    $default  使用规则 25 以归约 (param)
+
+
+状态 31
+
+   19 fun-declaration: type-specifier id LP params RP . compound-stmt
+
+    LC  偏移，并进入状态 35
+
+    compound-stmt  转到状态 36
+
+
+状态 32
+
+   23 param-list: param-list COMMA . param
+
+    CHAR    偏移，并进入状态 1
+    SHORT   偏移，并进入状态 2
+    INT     偏移，并进入状态 3
+    LONG    偏移，并进入状态 4
+    FLOAT   偏移，并进入状态 5
+    DOUBLE  偏移，并进入状态 6
+    STRUCT  偏移，并进入状态 7
+    ENUM    偏移，并进入状态 8
+    UNION   偏移，并进入状态 9
+    VOID    偏移，并进入状态 10
+
+    type-specifier  转到状态 25
+    param           转到状态 37
+
+
+状态 33
+
+    7 var-declaration: type-specifier id LB NUMBER RB . DELIM
+
+    DELIM  偏移，并进入状态 38
+
+
+状态 34
+
+   26 param: type-specifier id LB . RB
+
+    RB  偏移，并进入状态 39
+
+
+状态 35
+
+   27 compound-stmt: LC . local-declarations statement-list RC
+
+    $default  使用规则 29 以归约 (local-declarations)
+
+    local-declarations  转到状态 40
+
+
+状态 36
+
+   19 fun-declaration: type-specifier id LP params RP compound-stmt .
+
+    $default  使用规则 19 以归约 (fun-declaration)
+
+
+状态 37
+
+   23 param-list: param-list COMMA param .
+
+    $default  使用规则 23 以归约 (param-list)
+
+
+状态 38
+
+    7 var-declaration: type-specifier id LB NUMBER RB DELIM .
+
+    $default  使用规则 7 以归约 (var-declaration)
+
+
+状态 39
+
+   26 param: type-specifier id LB RB .
+
+    $default  使用规则 26 以归约 (param)
+
+
+状态 40
+
+   27 compound-stmt: LC local-declarations . statement-list RC
+   28 local-declarations: local-declarations . var-declaration
+
+    CHAR    偏移，并进入状态 1
+    SHORT   偏移，并进入状态 2
+    INT     偏移，并进入状态 3
+    LONG    偏移，并进入状态 4
+    FLOAT   偏移，并进入状态 5
+    DOUBLE  偏移，并进入状态 6
+    STRUCT  偏移，并进入状态 7
+    ENUM    偏移，并进入状态 8
+    UNION   偏移，并进入状态 9
+    VOID    偏移，并进入状态 10
+
+    $default  使用规则 31 以归约 (statement-list)
+
+    var-declaration  转到状态 41
+    type-specifier   转到状态 42
+    statement-list   转到状态 43
+
+
+状态 41
+
+   28 local-declarations: local-declarations var-declaration .
+
+    $default  使用规则 28 以归约 (local-declarations)
+
+
+状态 42
+
+    6 var-declaration: type-specifier . id DELIM
+    7                | type-specifier . id LB NUMBER RB DELIM
+
+    IDENTIFIER  偏移，并进入状态 19
+
+    id  转到状态 44
+
+
+状态 43
+
+   27 compound-stmt: LC local-declarations statement-list . RC
+   30 statement-list: statement-list . statement
+
+    IF          偏移，并进入状态 45
+    FOR         偏移，并进入状态 46
+    WHILE       偏移，并进入状态 47
+    RETURN      偏移，并进入状态 48
+    DELIM       偏移，并进入状态 49
+    LP          偏移，并进入状态 50
+    LC          偏移，并进入状态 35
+    RC          偏移，并进入状态 51
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    compound-stmt        转到状态 54
+    statement            转到状态 55
+    expression-stmt      转到状态 56
+    selection-stmt       转到状态 57
+    iteration-stmt       转到状态 58
+    while-stmt           转到状态 59
+    for-stmt             转到状态 60
+    return-stmt          转到状态 61
+    expression           转到状态 62
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 44
+
+    6 var-declaration: type-specifier id . DELIM
+    7                | type-specifier id . LB NUMBER RB DELIM
+
+    DELIM  偏移，并进入状态 21
+    LB     偏移，并进入状态 23
+
+
+状态 45
+
+   39 selection-stmt: IF . LP expression RP statement
+   40               | IF . LP expression RP ELSE statement
+
+    LP  偏移，并进入状态 69
+
+
+状态 46
+
+   44 for-stmt: FOR . LP expression-list DELIM expression DELIM expression-list RP compound-stmt
+
+    LP  偏移，并进入状态 70
+
+
+状态 47
+
+   43 while-stmt: WHILE . LP expression RP compound-stmt
+
+    LP  偏移，并进入状态 71
+
+
+状态 48
+
+   47 return-stmt: RETURN . expression-stmt
+
+    DELIM       偏移，并进入状态 49
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression-stmt      转到状态 72
+    expression           转到状态 62
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 49
+
+   38 expression-stmt: DELIM .
+
+    $default  使用规则 38 以归约 (expression-stmt)
+
+
+状态 50
+
+   71 factor: LP . expression RP
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression           转到状态 73
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 51
+
+   27 compound-stmt: LC local-declarations statement-list RC .
+
+    $default  使用规则 27 以归约 (compound-stmt)
+
+
+状态 52
+
+   73 factor: NUMBER .
+
+    $default  使用规则 73 以归约 (factor)
+
+
+状态 53
+
+   51 var: id .
+   52    | id . LB NUMBER RB
+
+    LB  偏移，并进入状态 74
+
+    $default  使用规则 51 以归约 (var)
+
+
+状态 54
+
+   33 statement: compound-stmt .
+
+    $default  使用规则 33 以归约 (statement)
+
+
+状态 55
+
+   30 statement-list: statement-list statement .
+
+    $default  使用规则 30 以归约 (statement-list)
+
+
+状态 56
+
+   32 statement: expression-stmt .
+
+    $default  使用规则 32 以归约 (statement)
+
+
+状态 57
+
+   34 statement: selection-stmt .
+
+    $default  使用规则 34 以归约 (statement)
+
+
+状态 58
+
+   35 statement: iteration-stmt .
+
+    $default  使用规则 35 以归约 (statement)
+
+
+状态 59
+
+   41 iteration-stmt: while-stmt .
+
+    $default  使用规则 41 以归约 (iteration-stmt)
+
+
+状态 60
+
+   42 iteration-stmt: for-stmt .
+
+    $default  使用规则 42 以归约 (iteration-stmt)
+
+
+状态 61
+
+   36 statement: return-stmt .
+
+    $default  使用规则 36 以归约 (statement)
+
+
+状态 62
+
+   37 expression-stmt: expression . DELIM
+
+    DELIM  偏移，并进入状态 75
+
+
+状态 63
+
+   48 expression: var . ASSIGN expression
+   72 factor: var .
+   74 call: var . LP args RP
+
+    ASSIGN  偏移，并进入状态 76
+    LP      偏移，并进入状态 77
+
+    $default  使用规则 72 以归约 (factor)
+
+
+状态 64
+
+   49 expression: simple-expression .
+
+    $default  使用规则 49 以归约 (expression)
+
+
+状态 65
+
+   53 simple-expression: additive-expression . relop additive-expression
+   54                  | additive-expression .
+   63 additive-expression: additive-expression . addop term
+
+    ADD     偏移，并进入状态 78
+    SUB     偏移，并进入状态 79
+    ANDAND  偏移，并进入状态 80
+    OROR    偏移，并进入状态 81
+    LT      偏移，并进入状态 82
+    GT      偏移，并进入状态 83
+    GEQ     偏移，并进入状态 84
+    LEQ     偏移，并进入状态 85
+    NEQ     偏移，并进入状态 86
+    EQ      偏移，并进入状态 87
+
+    $default  使用规则 54 以归约 (simple-expression)
+
+    relop  转到状态 88
+    addop  转到状态 89
+
+
+状态 66
+
+   64 additive-expression: term .
+   67 term: term . mulop factor
+
+    MUL  偏移，并进入状态 90
+    DIV  偏移，并进入状态 91
+
+    $default  使用规则 64 以归约 (additive-expression)
+
+    mulop  转到状态 92
+
+
+状态 67
+
+   68 term: factor .
+
+    $default  使用规则 68 以归约 (term)
+
+
+状态 68
+
+   50 expression: call .
+
+    $default  使用规则 50 以归约 (expression)
+
+
+状态 69
+
+   39 selection-stmt: IF LP . expression RP statement
+   40               | IF LP . expression RP ELSE statement
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression           转到状态 93
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 70
+
+   44 for-stmt: FOR LP . expression-list DELIM expression DELIM expression-list RP compound-stmt
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression-list      转到状态 94
+    expression           转到状态 95
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 71
+
+   43 while-stmt: WHILE LP . expression RP compound-stmt
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression           转到状态 96
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 72
+
+   47 return-stmt: RETURN expression-stmt .
+
+    $default  使用规则 47 以归约 (return-stmt)
+
+
+状态 73
+
+   71 factor: LP expression . RP
+
+    RP  偏移，并进入状态 97
+
+
+状态 74
+
+   52 var: id LB . NUMBER RB
+
+    NUMBER  偏移，并进入状态 98
+
+
+状态 75
+
+   37 expression-stmt: expression DELIM .
+
+    $default  使用规则 37 以归约 (expression-stmt)
+
+
+状态 76
+
+   48 expression: var ASSIGN . expression
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression           转到状态 99
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 77
+
+   74 call: var LP . args RP
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    $default  使用规则 76 以归约 (args)
+
+    id                   转到状态 53
+    expression           转到状态 100
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+    args                 转到状态 101
+    arg-list             转到状态 102
+
+
+状态 78
+
+   65 addop: ADD .
+
+    $default  使用规则 65 以归约 (addop)
+
+
+状态 79
+
+   66 addop: SUB .
+
+    $default  使用规则 66 以归约 (addop)
+
+
+状态 80
+
+   61 relop: ANDAND .
+
+    $default  使用规则 61 以归约 (relop)
+
+
+状态 81
+
+   62 relop: OROR .
+
+    $default  使用规则 62 以归约 (relop)
+
+
+状态 82
+
+   56 relop: LT .
+
+    $default  使用规则 56 以归约 (relop)
+
+
+状态 83
+
+   57 relop: GT .
+
+    $default  使用规则 57 以归约 (relop)
+
+
+状态 84
+
+   58 relop: GEQ .
+
+    $default  使用规则 58 以归约 (relop)
+
+
+状态 85
+
+   55 relop: LEQ .
+
+    $default  使用规则 55 以归约 (relop)
+
+
+状态 86
+
+   60 relop: NEQ .
+
+    $default  使用规则 60 以归约 (relop)
+
+
+状态 87
+
+   59 relop: EQ .
+
+    $default  使用规则 59 以归约 (relop)
+
+
+状态 88
+
+   53 simple-expression: additive-expression relop . additive-expression
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    var                  转到状态 103
+    additive-expression  转到状态 104
+    term                 转到状态 66
+    factor               转到状态 67
+
+
+状态 89
+
+   63 additive-expression: additive-expression addop . term
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id      转到状态 53
+    var     转到状态 103
+    term    转到状态 105
+    factor  转到状态 67
+
+
+状态 90
+
+   69 mulop: MUL .
+
+    $default  使用规则 69 以归约 (mulop)
+
+
+状态 91
+
+   70 mulop: DIV .
+
+    $default  使用规则 70 以归约 (mulop)
+
+
+状态 92
+
+   67 term: term mulop . factor
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id      转到状态 53
+    var     转到状态 103
+    factor  转到状态 106
+
+
+状态 93
+
+   39 selection-stmt: IF LP expression . RP statement
+   40               | IF LP expression . RP ELSE statement
+
+    RP  偏移，并进入状态 107
+
+
+状态 94
+
+   44 for-stmt: FOR LP expression-list . DELIM expression DELIM expression-list RP compound-stmt
+   45 expression-list: expression-list . COMMA expression
+
+    DELIM  偏移，并进入状态 108
+    COMMA  偏移，并进入状态 109
+
+
+状态 95
+
+   46 expression-list: expression .
+
+    $default  使用规则 46 以归约 (expression-list)
+
+
+状态 96
+
+   43 while-stmt: WHILE LP expression . RP compound-stmt
+
+    RP  偏移，并进入状态 110
+
+
+状态 97
+
+   71 factor: LP expression RP .
+
+    $default  使用规则 71 以归约 (factor)
+
+
+状态 98
+
+   52 var: id LB NUMBER . RB
+
+    RB  偏移，并进入状态 111
+
+
+状态 99
+
+   48 expression: var ASSIGN expression .
+
+    $default  使用规则 48 以归约 (expression)
+
+
+状态 100
+
+   78 arg-list: expression .
+
+    $default  使用规则 78 以归约 (arg-list)
+
+
+状态 101
+
+   74 call: var LP args . RP
+
+    RP  偏移，并进入状态 112
+
+
+状态 102
+
+   75 args: arg-list .
+   77 arg-list: arg-list . COMMA expression
+
+    COMMA  偏移，并进入状态 113
+
+    $default  使用规则 75 以归约 (args)
+
+
+状态 103
+
+   72 factor: var .
+
+    $default  使用规则 72 以归约 (factor)
+
+
+状态 104
+
+   53 simple-expression: additive-expression relop additive-expression .
+   63 additive-expression: additive-expression . addop term
+
+    ADD  偏移，并进入状态 78
+    SUB  偏移，并进入状态 79
+
+    $default  使用规则 53 以归约 (simple-expression)
+
+    addop  转到状态 89
+
+
+状态 105
+
+   63 additive-expression: additive-expression addop term .
+   67 term: term . mulop factor
+
+    MUL  偏移，并进入状态 90
+    DIV  偏移，并进入状态 91
+
+    $default  使用规则 63 以归约 (additive-expression)
+
+    mulop  转到状态 92
+
+
+状态 106
+
+   67 term: term mulop factor .
+
+    $default  使用规则 67 以归约 (term)
+
+
+状态 107
+
+   39 selection-stmt: IF LP expression RP . statement
+   40               | IF LP expression RP . ELSE statement
+
+    IF          偏移，并进入状态 45
+    ELSE        偏移，并进入状态 114
+    FOR         偏移，并进入状态 46
+    WHILE       偏移，并进入状态 47
+    RETURN      偏移，并进入状态 48
+    DELIM       偏移，并进入状态 49
+    LP          偏移，并进入状态 50
+    LC          偏移，并进入状态 35
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    compound-stmt        转到状态 54
+    statement            转到状态 115
+    expression-stmt      转到状态 56
+    selection-stmt       转到状态 57
+    iteration-stmt       转到状态 58
+    while-stmt           转到状态 59
+    for-stmt             转到状态 60
+    return-stmt          转到状态 61
+    expression           转到状态 62
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 108
+
+   44 for-stmt: FOR LP expression-list DELIM . expression DELIM expression-list RP compound-stmt
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression           转到状态 116
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 109
+
+   45 expression-list: expression-list COMMA . expression
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression           转到状态 117
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 110
+
+   43 while-stmt: WHILE LP expression RP . compound-stmt
+
+    LC  偏移，并进入状态 35
+
+    compound-stmt  转到状态 118
+
+
+状态 111
+
+   52 var: id LB NUMBER RB .
+
+    $default  使用规则 52 以归约 (var)
+
+
+状态 112
+
+   74 call: var LP args RP .
+
+    $default  使用规则 74 以归约 (call)
+
+
+状态 113
+
+   77 arg-list: arg-list COMMA . expression
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression           转到状态 119
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 114
+
+   40 selection-stmt: IF LP expression RP ELSE . statement
+
+    IF          偏移，并进入状态 45
+    FOR         偏移，并进入状态 46
+    WHILE       偏移，并进入状态 47
+    RETURN      偏移，并进入状态 48
+    DELIM       偏移，并进入状态 49
+    LP          偏移，并进入状态 50
+    LC          偏移，并进入状态 35
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    compound-stmt        转到状态 54
+    statement            转到状态 120
+    expression-stmt      转到状态 56
+    selection-stmt       转到状态 57
+    iteration-stmt       转到状态 58
+    while-stmt           转到状态 59
+    for-stmt             转到状态 60
+    return-stmt          转到状态 61
+    expression           转到状态 62
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 115
+
+   39 selection-stmt: IF LP expression RP statement .
+
+    $default  使用规则 39 以归约 (selection-stmt)
+
+
+状态 116
+
+   44 for-stmt: FOR LP expression-list DELIM expression . DELIM expression-list RP compound-stmt
+
+    DELIM  偏移，并进入状态 121
+
+
+状态 117
+
+   45 expression-list: expression-list COMMA expression .
+
+    $default  使用规则 45 以归约 (expression-list)
+
+
+状态 118
+
+   43 while-stmt: WHILE LP expression RP compound-stmt .
+
+    $default  使用规则 43 以归约 (while-stmt)
+
+
+状态 119
+
+   77 arg-list: arg-list COMMA expression .
+
+    $default  使用规则 77 以归约 (arg-list)
+
+
+状态 120
+
+   40 selection-stmt: IF LP expression RP ELSE statement .
+
+    $default  使用规则 40 以归约 (selection-stmt)
+
+
+状态 121
+
+   44 for-stmt: FOR LP expression-list DELIM expression DELIM . expression-list RP compound-stmt
+
+    LP          偏移，并进入状态 50
+    NUMBER      偏移，并进入状态 52
+    IDENTIFIER  偏移，并进入状态 19
+
+    id                   转到状态 53
+    expression-list      转到状态 122
+    expression           转到状态 95
+    var                  转到状态 63
+    simple-expression    转到状态 64
+    additive-expression  转到状态 65
+    term                 转到状态 66
+    factor               转到状态 67
+    call                 转到状态 68
+
+
+状态 122
+
+   44 for-stmt: FOR LP expression-list DELIM expression DELIM expression-list . RP compound-stmt
+   45 expression-list: expression-list . COMMA expression
+
+    COMMA  偏移，并进入状态 109
+    RP     偏移，并进入状态 123
+
+
+状态 123
+
+   44 for-stmt: FOR LP expression-list DELIM expression DELIM expression-list RP . compound-stmt
+
+    LC  偏移，并进入状态 35
+
+    compound-stmt  转到状态 124
+
+
+状态 124
+
+   44 for-stmt: FOR LP expression-list DELIM expression DELIM expression-list RP compound-stmt .
+
+    $default  使用规则 44 以归约 (for-stmt)

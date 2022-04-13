@@ -9,7 +9,7 @@ DEPENDENCE = $(shell find . | grep .cpp)
 all: $(NAME)
 
 parser.cpp: $(NAME).y FORCE
-	$(YACC) -d -o parser.cpp $(NAME).y
+	$(YACC) -dv -o parser.cpp $(NAME).y
 
 scanner.cpp: $(NAME).l FORCE
 	$(LEX) -o scanner.cpp $(NAME).l

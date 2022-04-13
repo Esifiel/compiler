@@ -5,14 +5,16 @@
 #include <string>
 #include "parser.hpp"
 
+// print out token scanned
 uint64_t cnt = 0;
 void debug() {
-    printf("token %ld:\t%s\n", cnt, yytext);
+    printf("token %lu:\t%s\n", cnt, yytext);
     cnt++;
 }
 %}
 
 %option noyywrap
+%option yylineno
 
 %%
 
@@ -94,17 +96,41 @@ void debug() {
 "{"                             { debug(); return LC; }
 "}"                             { debug(); return RC; }
 
--?(0|([1-9][0-9]*))             { debug(); return NUMBER; }
--?0[0-7]*                       { debug(); return NUMBER; }
--?0[xX][0-9a-fA-F]+             { debug(); return NUMBER; }
--?(0|([1-9][0-9]*))(\.[0-9]+)?  { debug(); return NUMBER; }
+-?(0|([1-9][0-9]*))             {
+                                    debug();
+                                    yylval.num.longValue = atoll(yytext);
+                                    return NUMBER;
+                                }
+-?0[0-7]*                       {
+                                    debug();
+                                    yylval.num.longValue = strtol(yytext, NULL, 8);
+                                    return NUMBER;
+                                }
+-?0[xX][0-9a-fA-F]+             {
+                                    debug();
+                                    yylval.num.longValue = strtol(yytext, NULL, 16);
+                                    return NUMBER;
+                                }
+-?(0|([1-9][0-9]*))(\.[0-9]+)?  {
+                                    debug();
+                                    yylval.num.doubleValue = atof(yytext);
+                                    return NUMBER;
+                                }
 [A-Za-z_][A-Za-z0-9_]*          {
                                     debug();
-                                    yylval._string = new string(yytext);
+                                    yylval.stringValue = new string(yytext);
                                     return IDENTIFIER;
                                 }
-\'.\'                           { debug(); return NUMBER; }
-\".*\"                          {}
+\'.\'                           {
+                                    debug();
+                                    yylval.num.charValue = *yytext;
+                                    return NUMBER;
+                                }
+\".*\"                          {
+                                    debug();
+                                    yylval.stringValue = new string(yytext);
+                                    return STRING;
+                                }
                             
 "#if"                           {}
 "#else"                         {}

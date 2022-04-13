@@ -1,40 +1,47 @@
 // #include <stdio.h>
 
 // void quicksort(int *A, int len)
-// {
-//     if (len < 2)
-//         return;
-//     int pivot = A[len / 2];
-//     int i, j;
-//     for (i = 0, j = len - 1;; i++, j--)
-//     {
-//         while (A[i] < pivot)
-//             i++;
-//         while (A[j] > pivot)
-//             j--;
-//         if (i >= j)
-//             break;
-//         int temp = A[i];
-//         A[i] = A[j];
-//         A[j] = temp;
-//     }
-//     quicksort(A, i);
-//     quicksort(A + i, len - i);
-// }
+void quicksort(int len)
+{
+    int i;
+    int j;
+
+    if (len < 2)
+        return;
+    // int pivot = A[len / 2];
+    for (i = 0, j = len - 1; 1; i = i + 1, j = j - 1)
+    {
+    //     while (A[i] < pivot)
+    //         i++;
+    //     while (A[j] > pivot)
+    //         j--;
+    //     if (i >= j)
+    //         break;
+    //     int temp = A[i];
+    //     A[i] = A[j];
+    //     A[j] = temp;
+    }
+    // quicksort(A, i);
+    // quicksort(A + i, len - i);
+}
 
 int main(void)
 {
-    int a;
-    double b;
-    char c;
     // int a[10010] = {0};
-    // int n;
+    int n;
     // scanf("%d", &n);
-    // for (int i = 0; i < n; i++)
-    //     scanf("%d", &a[i]);
+    int i;
+    for (i = 0; i < n; i = i + 1)
+    {
+        // scanf("%d", &a[i]);
+    } 
     // quicksort(a, n);
-    // for (int i = 0; i < n; i++)
-    //     printf("%d\n", a[i]);
+    quicksort(n);
+    for (i = 0; i < n; i = i + 1)
+    {
+        // printf("%d\n", a[i]);
+    }
+    
 
     return 0;
 }
