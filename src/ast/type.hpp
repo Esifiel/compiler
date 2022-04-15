@@ -6,92 +6,94 @@
 
 using namespace std;
 
-class Type : public Node
+class CodeGenContext;
+
+class TypeSpecifier : public Node
 {
 public:
     string name;
-    Type(const string &v) : name(v) {}
-    ~Type() {}
-    virtual string getName() { return "\"Type\""; }
+    TypeSpecifier(const string &v) : name(v) {}
+    ~TypeSpecifier() {}
+    virtual string getName() { return "\"TypeSpecifier\""; }
 };
 
-class CharType : public Type
+class CharType : public TypeSpecifier
 {
 public:
-    CharType() : Type("char") {}
+    CharType() : TypeSpecifier("char") {}
     ~CharType() {}
     string getName() { return "\"CharType\""; }
 };
 
-class ShortType : public Type
+class ShortType : public TypeSpecifier
 {
 public:
-    ShortType() : Type("short") {}
+    ShortType() : TypeSpecifier("short") {}
     virtual string getName() { return "\"ShortType\""; }
 };
 
-class IntType : public Type
+class IntType : public TypeSpecifier
 {
 public:
-    IntType() : Type("int") {}
+    IntType() : TypeSpecifier("int") {}
     virtual string getName() { return "\"IntType\""; }
 };
 
-class LongType : public Type
+class LongType : public TypeSpecifier
 {
 public:
-    LongType() : Type("long") {}
+    LongType() : TypeSpecifier("long") {}
     virtual string getName() { return "\"LongType\""; }
 };
 
-class FloatType : public Type
+class FloatType : public TypeSpecifier
 {
 public:
-    FloatType() : Type("float") {}
+    FloatType() : TypeSpecifier("float") {}
     virtual string getName() { return "\"FloatType\""; }
 };
 
-class DoubleType : public Type
+class DoubleType : public TypeSpecifier
 {
 public:
-    DoubleType() : Type("double") {}
+    DoubleType() : TypeSpecifier("double") {}
     virtual string getName() { return "\"DoubleType\""; }
 };
 
-class VoidType : public Type
+class VoidType : public TypeSpecifier
 {
 public:
-    VoidType() : Type("void") {}
+    VoidType() : TypeSpecifier("void") {}
     virtual string getName() { return "\"VoidType\""; }
 };
 
-class StructType: public Type
+class StructType: public TypeSpecifier
 {
     public:
-    StructType() : Type("struct") {}
+    StructType() : TypeSpecifier("struct") {}
     virtual string getName() { return "\"StructType\""; }
 };
 
-class EnumType: public Type
+class EnumType: public TypeSpecifier
 {
     public:
-    EnumType() : Type("enum") {}
+    EnumType() : TypeSpecifier("enum") {}
     virtual string getName() { return "\"EnumType\""; }
 };
 
-class UnionType: public Type
+class UnionType: public TypeSpecifier
 {
     public:
-    UnionType() : Type("union") {}
+    UnionType() : TypeSpecifier("union") {}
     virtual string getName() { return "\"UnionType\""; }
 };
 
-class ArrayType : public Type
+class ArrayType : public TypeSpecifier
 {
 public:
     uint64_t size;
-    vector<Type *> elements;
-    ArrayType(Type *t, uint64_t s) : Type("array"), size(s) {}
+    vector<TypeSpecifier *> elements;
+    ArrayType(TypeSpecifier *t, uint64_t s) : TypeSpecifier("array"), size(s) {}
     virtual string getName() { return "\"ArrayType\""; }
 };
 

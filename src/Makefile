@@ -3,7 +3,7 @@ YACC = bison
 CC = g++
 NAME = ecc
 LLVMFLAGS = `llvm-config --cxxflags --ldflags --system-libs --libs core`
-DEPENDENCE = $(shell find . | grep .cpp)
+DEPENDENCE = $(shell find . | grep .cpp$)
 
 .PHONY: all clean
 
@@ -24,7 +24,7 @@ $(NAME): $(DEPENDENCE) scanner.cpp parser.cpp FORCE
 	$(CC) -o $(NAME) $(DEPENDENCE) $(LLVMFLAGS)
 	
 	@cat ../test/quicksort.c | ./$(NAME)
-	@cat tmp/program.json
+	@cat tmp/ast.json
 
 clean:
 	@rm -f $(NAME)

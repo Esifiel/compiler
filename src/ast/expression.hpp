@@ -8,6 +8,8 @@
 
 using namespace std;
 
+class CodeGenContext;
+
 class Expression : public Node
 {
 public:
@@ -76,10 +78,10 @@ public:
 class Parameter : public Expression
 {
 public:
-    Type *type;
+    TypeSpecifier *type;
     Identifier *name;
-    Parameter(Type *t) : type(t) {}
-    Parameter(Type *t, Identifier *n) : type(t), name(n) {}
+    Parameter(TypeSpecifier *t) : type(t) {}
+    Parameter(TypeSpecifier *t, Identifier *n) : type(t), name(n) {}
     virtual string getName() { return "\"Parameter\""; }
 };
 
@@ -105,8 +107,10 @@ public:
     virtual string getName() { return "\"SimpleExpression\""; }
 };
 
-#endif
+class AdditiveExpression : public Expression {
+    public:
+    AdditiveExpression() {}
+    virtual string getName() { return "\"AdditiveExpression\""; }
+};
 
-// simple-expression : additive-expression relop additive-expression
-//     | additive-expression
-//     ;
+#endif

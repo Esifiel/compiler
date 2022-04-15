@@ -166,7 +166,7 @@ union YYSTYPE
     Node *node;
     Program *program;
 
-    Type *type;
+    TypeSpecifier *type;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;

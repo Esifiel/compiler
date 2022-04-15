@@ -37,7 +37,7 @@ void yyerror(string s);
     Node *node;
     Program *program;
 
-    Type *type;
+    TypeSpecifier *type;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -203,7 +203,6 @@ return-stmt : RETURN expression-stmt { $$ = new ReturnStatement($2); }
 
 expression : var ASSIGN expression { $$ = new Assignment($1, $3); }
     | simple-expression
-    | call
     ;
 
 var : id { $$ = $1; }
@@ -242,6 +241,7 @@ mulop : MUL { $$ = new string("*"); }
 
 factor : LP expression RP
     | var
+    | call
     | NUMBER
     ;
 

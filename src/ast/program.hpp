@@ -7,12 +7,15 @@
 
 using namespace std;
 
+class CodeGenerator;
+
 class Program : public Node
 {
 public:
     vector<Declaration *> *decs;
     Program(vector<Declaration *> *l) : decs(l) {}
     virtual string getName() { return "\"Program\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
 };
 
 #endif

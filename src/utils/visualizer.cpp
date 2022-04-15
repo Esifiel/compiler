@@ -10,94 +10,128 @@ using namespace std;
 
 string head = "{";
 string tail = "}";
-string sub = ": ";
+string sub = ": [";
+string subend = "]";
 string sep = ", ";
 
 void Visualizer::traverse()
 {
-    out << head;
-    if (program)
-        visitProgram(program);
-    out << tail;
+    visitProgram(program);
 }
 
 void Visualizer::visitProgram(Program *p)
 {
-    out << p->getName() << sub << head;
-    if (p->decs)
-        visitDeclarationList(p->decs);
-    out << tail;
+    if (p)
+    {
+        out << head << p->getName() << sub;
+        if (p->decs)
+            visitDeclarationList(p->decs);
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitDeclarationList(vector<Declaration *> *l)
 {
-    for (auto p = l->begin(); p != l->end(); p++)
+    if (l)
     {
-        if (p != l->begin())
-            out << sep;
-        visitDeclaration(*p);
+        for (auto p = l->begin(); p != l->end(); p++)
+        {
+            if (p != l->begin())
+                out << sep;
+            visitDeclaration(*p);
+        }
     }
 }
 
 void Visualizer::visitDeclaration(Declaration *d)
 {
-    out << d->getName() << sub << head;
-    if (d->getName() == "\"FunctionDeclaration\"")
-        visitFunctionDeclaration((FunctionDeclaration *)d);
-    else if (d->getName() == "\"VariableDeclaration\"")
-        visitVariableDeclaration((VariableDeclaration *)d);
-    out << tail;
+    if (d)
+    {
+        out << head << d->getName() << sub;
+        if (d->getName() == "\"FunctionDeclaration\"")
+            visitFunctionDeclaration((FunctionDeclaration *)d);
+        else if (d->getName() == "\"VariableDeclaration\"")
+            visitVariableDeclaration((VariableDeclaration *)d);
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
 {
-    visitType(d->type);
-    out << sep;
-    visitIdentifier(d->name);
+    if (d)
+    {
+        visitType(d->type);
+        out << sep;
+        visitIdentifier(d->name);
+    }
 }
 
 void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
 {
-    visitType(d->rettype);
-    out << sep;
-    visitIdentifier(d->name);
-    out << sep;
-
-    for (auto p = d->params->begin(); p != d->params->end(); p++)
+    if (d)
     {
-        if (p != d->params->begin())
-            out << sep;
-        visitParameter(*p);
-    }
-    out << sep;
+        visitType(d->rettype);
+        out << sep;
+        visitIdentifier(d->name);
+        out << sep;
 
-    visitCompoundStatement(d->stmts);
+        for (auto p = d->params->begin(); p != d->params->end(); p++)
+        {
+            if (p != d->params->begin())
+                out << sep;
+            visitParameter(*p);
+        }
+        out << sep;
+
+        visitCompoundStatement(d->stmts);
+    }
 }
 
-void Visualizer::visitType(Type *t)
+void Visualizer::visitType(TypeSpecifier *t)
 {
-    out << t->getName() << sub << head;
-    if (t->getName() == "\"array\"")
-        out << ((ArrayType *)t)->size;
-    out << tail;
+    if (t)
+    {
+        out << head << t->getName() << sub;
+        if (t->getName() == "\"array\"")
+            out << ((ArrayType *)t)->size;
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitIdentifier(Identifier *i)
 {
-    out << i->getName() << sub << head;
-    out << tail;
+    if (i)
+    {
+        out << head << i->getName() << sub;
+        visitString(i->name);
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitParameter(Parameter *p)
 {
-    out << p->getName() << sub << head;
-    out << tail;
+    if (p)
+    {
+        out << head << p->getName() << sub;
+        visitType(p->type);
+        visitIdentifier(p->name);
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitCompoundStatement(CompoundStatement *c)
 {
-    out << c->getName() << sub << head;
-    out << tail;
+    if (c)
+    {
+        out << head << c->getName() << sub;
+        out << subend << tail;
+    }
+}
+
+void Visualizer::visitString(string *s)
+{
+    if(s)
+        out << "\"" << *s << "\"";
 }
 
 // params : param-list

@@ -11,6 +11,8 @@
 
 using namespace std;
 
+class CodeGenContext;
+
 class Declaration : public Node
 {
 public:
@@ -21,9 +23,9 @@ public:
 class VariableDeclaration : public Declaration
 {
 public:
-    Type *type;
+    TypeSpecifier *type;
     Identifier *name;
-    VariableDeclaration(Type *t, Identifier *n) : type(t), name(n) {}
+    VariableDeclaration(TypeSpecifier *t, Identifier *n) : type(t), name(n) {}
     virtual string getName() { return "\"VariableDeclaration\""; }
 };
 
@@ -40,67 +42,12 @@ class CompoundStatement;
 class FunctionDeclaration : public Declaration
 {
 public:
-    Type *rettype;
+    TypeSpecifier *rettype;
     Identifier *name;
     vector<Parameter *> *params;
     CompoundStatement *stmts;
-    FunctionDeclaration(Type *t, Identifier *n, vector<Parameter *> *p, CompoundStatement *s) : rettype(t), name(n), params(p), stmts(s) {}
+    FunctionDeclaration(TypeSpecifier *t, Identifier *n, vector<Parameter *> *p, CompoundStatement *s) : rettype(t), name(n), params(p), stmts(s) {}
     virtual string getName() { return "\"FunctionDeclaration\""; }
 };
 
 #endif
-
-
-
-
-
-// var : IDENTIFIER
-//     | IDENTIFIER LB expression RB
-//     ;
-
-// simple-expression : additive-expression relop additive-expression
-//     | additive-expression
-//     ;
-
-// relop : LEQ
-//     | LT
-//     | GT
-//     | GEQ
-//     | EQ
-//     | NEQ
-//     | ANDAND
-//     | OROR
-//     ;
-
-// additive-expression : additive-expression addop term
-//     | term
-//     ;
-
-// addop : ADD
-//     | SUB
-//     ;
-
-// term : term mulop factor
-//     | factor
-//     ;
-
-// mulop : MUL
-//     | DIV
-//     ;
-
-// factor : LP expression RP
-//     | var
-//     | call
-//     | NUMBER
-//     ;
-
-// call : IDENTIFIER LP args RP
-//     ;
-
-// args : arg-list
-//     |
-//     ;
-
-// arg-list : arg-list COMMA expression
-//     | expression
-//     ;

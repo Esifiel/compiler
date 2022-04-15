@@ -1,9 +1,9 @@
 #ifndef _VISUALIZER_HPP_
 #define _VISUALIZER_HPP_
 
-#include "../ast/program.hpp"
 #include <fstream>
 #include <iostream>
+#include "../ast/program.hpp"
 
 class Visualizer
 {
@@ -28,10 +28,11 @@ private:
     void visitDeclaration(Declaration *d);
     void visitVariableDeclaration(VariableDeclaration *d);
     void visitFunctionDeclaration(FunctionDeclaration *d);
-    void visitType(Type *t);
+    void visitType(TypeSpecifier *t);
     void visitIdentifier(Identifier *i);
     void visitCompoundStatement(CompoundStatement *c);
     void visitParameter(Parameter *p);
+    void visitString(string *s);
 };
 
 #endif

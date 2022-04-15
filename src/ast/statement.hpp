@@ -7,6 +7,8 @@
 
 using namespace std;
 
+class CodeGenContext;
+
 class Statement : public Node
 {
 public:

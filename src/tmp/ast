@@ -1,0 +1,17 @@
+// Visualization of the Abstract Syntax Tree
+digraph AST {
+	Program [label=Program]
+	FunctionDeclaration [label=FunctionDeclaration]
+	Program -> FunctionDeclaration
+	IntType [label=IntType]
+	FunctionDeclaration -> IntType
+	Identifier [label=Identifier]
+	FunctionDeclaration -> Identifier
+	Identifier -> main
+	Parameter [label=Parameter]
+	FunctionDeclaration -> Parameter
+	VoidType [label=VoidType]
+	Parameter -> VoidType
+	CompoundStatement [label=CompoundStatement]
+	FunctionDeclaration -> CompoundStatement
+}

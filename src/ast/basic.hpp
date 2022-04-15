@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class CodeGenContext;
+class CodeGenerator;
 
 class Node
 {
@@ -14,7 +14,7 @@ public:
     Node() {}
     virtual ~Node() {}
     virtual string getName() = 0;
-    virtual llvm::Value *codeGen(CodeGenContext &context) { return nullptr; };
+    virtual llvm::Value *codeGen(CodeGenerator &context) { return nullptr; };
 };
 
 #endif
