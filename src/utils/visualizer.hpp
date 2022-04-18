@@ -20,6 +20,7 @@ public:
         out.close();
     }
 
+    // traverse AST in pre-order and write to a legal .json file
     void traverse();
 
 private:
@@ -33,6 +34,15 @@ private:
     void visitCompoundStatement(CompoundStatement *c);
     void visitParameter(Parameter *p);
     void visitString(string *s);
+    void visitStatement(Statement *s);
+    void visitExpressionStatement(ExpressionStatement *e);
+    void visitSelectionStatement(SelectionStatement *s);
+    void visitIterationStatement(IterationStatement *i);
+    void visitReturnStatement(ReturnStatement *r);
+    void visitExpression(Expression *e);
+    void visitWhileStatement(WhileStatement *w);
+    void visitForStatement(ForStatement *f);
+    void visitAssignment(Assignment *a);
 };
 
 #endif

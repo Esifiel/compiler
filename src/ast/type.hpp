@@ -6,14 +6,13 @@
 
 using namespace std;
 
-class CodeGenContext;
+class CodeGenerator;
 
 class TypeSpecifier : public Node
 {
 public:
     string name;
     TypeSpecifier(const string &v) : name(v) {}
-    ~TypeSpecifier() {}
     virtual string getName() { return "\"TypeSpecifier\""; }
 };
 
@@ -21,7 +20,6 @@ class CharType : public TypeSpecifier
 {
 public:
     CharType() : TypeSpecifier("char") {}
-    ~CharType() {}
     string getName() { return "\"CharType\""; }
 };
 
@@ -67,23 +65,23 @@ public:
     virtual string getName() { return "\"VoidType\""; }
 };
 
-class StructType: public TypeSpecifier
+class StructType : public TypeSpecifier
 {
-    public:
+public:
     StructType() : TypeSpecifier("struct") {}
     virtual string getName() { return "\"StructType\""; }
 };
 
-class EnumType: public TypeSpecifier
+class EnumType : public TypeSpecifier
 {
-    public:
+public:
     EnumType() : TypeSpecifier("enum") {}
     virtual string getName() { return "\"EnumType\""; }
 };
 
-class UnionType: public TypeSpecifier
+class UnionType : public TypeSpecifier
 {
-    public:
+public:
     UnionType() : TypeSpecifier("union") {}
     virtual string getName() { return "\"UnionType\""; }
 };

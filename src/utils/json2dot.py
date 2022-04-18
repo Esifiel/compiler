@@ -2,20 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from graphviz import Digraph
-from graphviz import Source
-import os, json
-
-os.chdir(os.path.dirname(__file__))
-
-dot = Digraph(
-    name="AST",
-    comment="Visualization of the Abstract Syntax Tree",
-    filename="ast",
-    directory="../tmp",
-    format="png",
-    engine="dot",
-    encoding="utf8",
-)
+import os, json, sys
 
 nodes = []
 
@@ -24,7 +11,7 @@ def json2dot(parent, key, vlist):
     
     label = key
     if label in nodes:
-        label += len(nodes)
+        label += str(len(nodes))
     nodes.append(label)
     dot.node(label, key)
     
@@ -43,8 +30,22 @@ def json2dot(parent, key, vlist):
             dot.edge(label, name)
         else:
             raise Exception("Cannot confirm type of %s" % str(dic))
-                    
-ast = json.loads(open("../tmp/ast.json", "r").read())
+
+if len(sys.argv) <= 1:
+    print("Usage: python3 json2dot.py <json_path>")
+    exit(1)
+    
+ast = json.loads(open(sys.argv[1], "r").read())
 root = "Program"
+dot = Digraph(
+    name="AST",
+    comment="Visualization of the Abstract Syntax Tree",
+    filename="ast.dot",
+    directory=os.getcwd() + "/tmp",
+    format="png",
+    engine="dot",
+)
+dot.graph_attr['rankdir'] = 'LR'
+
 json2dot(None, root, ast[root])
 dot.view()

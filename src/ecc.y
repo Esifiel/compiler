@@ -24,14 +24,7 @@ void yyerror(string s);
 }
 
 %union {
-    union {
-        uint8_t charValue;
-        uint16_t shortValue;
-        uint32_t intValue;
-        uint64_t longValue;
-        float floatValue;
-        double doubleValue;
-    } num;
+    union union_num num;
     string *stringValue;
     
     Node *node;
@@ -91,8 +84,9 @@ void yyerror(string s);
 %type<identifier> id var
 %type<param> param
 %type<params> param-list params
-%type<exprs> expression-list
+%type<exprs> expression-list args arg-list
 %type<functionCall> call
+%type<expression> simple-expression additive-expression term factor
 
 %type<statement> statement
 %type<stmts> statement-list
@@ -104,9 +98,9 @@ void yyerror(string s);
 %type<forStatement> for-stmt
 %type<returnStatement> return-stmt
 
-%type<stringValue> addop mulop
+%type<stringValue> addop mulop relop
 
-%left ADD SUB MUL DIV
+%left ADD SUB MUL DIV MOD
 
 %start program
 
@@ -177,7 +171,7 @@ statement : expression-stmt { $$ = $1; }
     ;
 
 expression-stmt : expression DELIM { $$ = new ExpressionStatement($1); }
-    | DELIM { $$ = new ExpressionStatement(nullptr); }
+    | DELIM { $$ = new ExpressionStatement(); }
     ;
 
 selection-stmt : IF LP expression RP statement
@@ -202,58 +196,60 @@ return-stmt : RETURN expression-stmt { $$ = new ReturnStatement($2); }
     ;
 
 expression : var ASSIGN expression { $$ = new Assignment($1, $3); }
-    | simple-expression
+    | simple-expression { $$ = $1; }
     ;
 
 var : id { $$ = $1; }
     | id LB NUMBER RB { $$ = new Identifier($1->name, $3.longValue); }
     ;
 
-simple-expression : additive-expression relop additive-expression
-    | additive-expression
+simple-expression : additive-expression relop additive-expression { $$ = new SimpleExpression($1, $2, $3); }
+    | additive-expression { $$ = $1; }
     ;
 
-relop : LEQ
-    | LT
-    | GT
-    | GEQ
-    | EQ
-    | NEQ
-    | ANDAND
-    | OROR
+relop : LEQ { $$ = new string("<="); }
+    | LT { $$ = new string("<"); }
+    | GT { $$ = new string(">"); }
+    | GEQ { $$ = new string(">="); }
+    | EQ { $$ = new string("=="); }
+    | NEQ { $$ = new string("!="); }
+    | ANDAND { $$ = new string("&&"); }
+    | OROR { $$ = new string("||"); }
     ;
 
-additive-expression : additive-expression addop term
-    | term
+additive-expression : additive-expression addop term { $$ = new AdditiveExpression($1, $2, $3); }
+    | term { $$ = $1; }
     ;
 
 addop : ADD { $$ = new string("+"); }
     | SUB { $$ = new string("-"); }
     ;
 
-term : term mulop factor
-    | factor
+// what type is it
+term : term mulop factor { $$ = new SimpleExpression($1, $2, $3); }
+    | factor { $$ = $1; }
     ;
 
 mulop : MUL { $$ = new string("*"); }
     | DIV { $$ = new string("/"); }
+    | MOD { $$ = new string("%"); }
     ;
 
-factor : LP expression RP
-    | var
-    | call
-    | NUMBER
+factor : LP expression RP { $$ = $2; }
+    | var { $$ = $1; }
+    | call { $$ = $1; }
+    | NUMBER { $$ = new Number($1); }
     ;
 
-call : var LP args RP
+call : var LP args RP { $$ = new FunctionalCall($1, $3); }
     ;
 
-args : arg-list
-    |
+args : arg-list { $$ = $1; }
+    | { $$ = new vector<Expression *>; }
     ;
 
-arg-list : arg-list COMMA expression
-    | expression
+arg-list : arg-list COMMA expression { $1->push_back($3); $$ = $1; }
+    | expression { $$ = new vector<Expression *>; $$->push_back($1); }
     ;
 
 %%

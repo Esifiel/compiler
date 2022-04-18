@@ -1,1 +1,1 @@
-{"Program": [{"FunctionDeclaration": [{"IntType": []}, {"Identifier": ["main"]}, {"Parameter": [{"VoidType": []}]}, {"CompoundStatement": []}]}]}
+{"Program": [{"FunctionDeclaration": [{"IntType": []}, {"Identifier": ["main"]}, {"Parameter": [{"VoidType": []}]}, {"CompoundStatement": [{"VariableDeclaration": [{"IntType": []}, {"Identifier": ["sum"]}]}, {"VariableDeclaration": [{"IntType": []}, {"Identifier": ["i"]}]}, {"ExpressionStatement": [{"Assignment": [{"Identifier": ["sum"]}, ]}]}, {"ForStatement": []}, {"ReturnStatement": [{"ExpressionStatement": []}]}]}]}]}

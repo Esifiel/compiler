@@ -1,4 +1,3 @@
-// traverse AST in pre-order and write to a legal .json file
 #include "visualizer.hpp"
 #include "../ast/type.hpp"
 #include "../ast/declaration.hpp"
@@ -47,12 +46,10 @@ void Visualizer::visitDeclaration(Declaration *d)
 {
     if (d)
     {
-        out << head << d->getName() << sub;
         if (d->getName() == "\"FunctionDeclaration\"")
             visitFunctionDeclaration((FunctionDeclaration *)d);
         else if (d->getName() == "\"VariableDeclaration\"")
             visitVariableDeclaration((VariableDeclaration *)d);
-        out << subend << tail;
     }
 }
 
@@ -60,9 +57,11 @@ void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
 {
     if (d)
     {
+        out << head << d->getName() << sub;
         visitType(d->type);
         out << sep;
         visitIdentifier(d->name);
+        out << subend << tail;
     }
 }
 
@@ -70,11 +69,11 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
 {
     if (d)
     {
+        out << head << d->getName() << sub;
         visitType(d->rettype);
         out << sep;
         visitIdentifier(d->name);
         out << sep;
-
         for (auto p = d->params->begin(); p != d->params->end(); p++)
         {
             if (p != d->params->begin())
@@ -82,8 +81,8 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
             visitParameter(*p);
         }
         out << sep;
-
         visitCompoundStatement(d->stmts);
+        out << subend << tail;
     }
 }
 
@@ -119,66 +118,118 @@ void Visualizer::visitParameter(Parameter *p)
     }
 }
 
+void Visualizer::visitString(string *s)
+{
+    if (s)
+        out << "\"" << *s << "\"";
+}
+
 void Visualizer::visitCompoundStatement(CompoundStatement *c)
 {
     if (c)
     {
         out << head << c->getName() << sub;
+        for (auto p = c->vardecs->begin(); p != c->vardecs->end(); p++)
+        {
+            if (p != c->vardecs->begin())
+                out << sep;
+            visitDeclaration(*p);
+        }
+        out << sep;
+        for (auto p = c->stmts->begin(); p != c->stmts->end(); p++)
+        {
+            if (p != c->stmts->begin())
+                out << sep;
+            visitStatement(*p);
+        }
         out << subend << tail;
     }
 }
 
-void Visualizer::visitString(string *s)
+void Visualizer::visitStatement(Statement *s)
 {
-    if(s)
-        out << "\"" << *s << "\"";
+    if (s)
+    {
+        if (s->getName() == "\"ExpressionStatement\"")
+            visitExpressionStatement((ExpressionStatement *)s);
+        else if (s->getName() == "\"CompoundStatement\"")
+            visitCompoundStatement((CompoundStatement *)s);
+        else if (s->getName() == "\"SelectionStatement\"")
+            visitSelectionStatement((SelectionStatement *)s);
+        else if (s->getName() == "\"WhileStatement\"")
+            visitWhileStatement((WhileStatement *)s);
+        else if (s->getName() == "\"ForStatement\"")
+            visitForStatement((ForStatement *)s);
+        else if (s->getName() == "\"ReturnStatement\"")
+            visitReturnStatement((ReturnStatement *)s);
+    }
 }
 
-// params : param-list
-//     | VOID { $$ = new vector<Parameter *>; $$->push_back(new Parameter(new VoidType())); }
-//     |
-//     ;
+void Visualizer::visitExpressionStatement(ExpressionStatement *e)
+{
+    if (e)
+    {
+        out << head << e->getName() << sub;
+        visitExpression(e->expr);
+        out << subend << tail;
+    }
+}
 
-// param-list : param-list COMMA param
-//     | param
-//     ;
+void Visualizer::visitSelectionStatement(SelectionStatement *s)
+{
+    // selection-stmt : IF LP expression RP statement
+    //     | IF LP expression RP ELSE statement
+    //     ;
+}
 
-// param : type-specifier IDENTIFIER
-//     | type-specifier IDENTIFIER LB RB
-//     ;
+void Visualizer::visitReturnStatement(ReturnStatement *r)
+{
+    if (r)
+    {
+        out << head << r->getName() << sub;
+        visitExpressionStatement(r->res);
+        out << subend << tail;
+    }
+}
 
-// compound-stmt : LC local-declarations statement-list RC
-//     ;
+void Visualizer::visitExpression(Expression *e)
+{
+    if (e)
+    {   cout <<e->getName() <<endl;
+        if (e->getName() == "\"Assignment\"")
+            visitAssignment((Assignment *)e);
+    }
+}
 
-// local-declarations : local-declarations var-declaration
-//     |
-//     ;
+void Visualizer::visitWhileStatement(WhileStatement *w)
+{
+    if (w)
+    {
+        out << head << w->getName() << sub;
+        out << subend << tail;
+    }
+}
 
-// statement-list : statement-list statement
-//     |
-//     ;
+void Visualizer::visitForStatement(ForStatement *f)
+{
+    if (f)
+    {
+        out << head << f->getName() << sub;
+        out << subend << tail;
+    }
+}
 
-// statement : expression-stmt
-//     | compound-stmt
-//     | selection-stmt
-//     | iteration-stmt
-//     | return-stmt
-//     ;
-
-// expression-stmt : expression DELIM
-//     | DELIM
-//     ;
-
-// selection-stmt : IF LP expression RP statement
-//     | IF LP expression RP ELSE statement
-//     ;
-
-// iteration-stmt : WHILE LP expression RP statement
-//     ;
-
-// return-stmt : RETURN DELIM
-//     | RETURN expression DELIM
-//     ;
+void Visualizer::visitAssignment(Assignment *a)
+{
+    if (a)
+    {
+        out << head << a->getName() << sub;
+        visitIdentifier(a->lv);
+        out << sep;
+        visitExpression(a->rv);
+        out << subend << tail;
+    }
+}
 
 // expression : var ASSIGN expression
 //     | simple-expression

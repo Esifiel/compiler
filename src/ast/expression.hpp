@@ -17,52 +17,28 @@ public:
     virtual string getName() { return "\"Expression\""; }
 };
 
-class Char : public Expression
+union union_num
 {
-public:
-    int8_t val;
-    Char(int8_t v) : val(v) {}
-    virtual string getName() { return "\"Char\""; }
+    uint8_t charValue;
+    uint16_t shortValue;
+    uint32_t intValue;
+    uint64_t longValue;
+    float_t floatValue;
+    double_t doubleValue;
 };
 
-class Short : public Expression
+class Number : public Expression
 {
 public:
-    int16_t val;
-    Short(int16_t v) : val(v) {}
-    virtual string getName() { return "\"Short\""; }
-};
-
-class Int : public Expression
-{
-public:
-    int32_t val;
-    Int(int32_t v) : val(v) {}
-    virtual string getName() { return "\"Int\""; }
-};
-
-class Long : public Expression
-{
-public:
-    int64_t val;
-    Long(int64_t v) : val(v) {}
-    virtual string getName() { return "\"Long\""; }
-};
-
-class Float : public Expression
-{
-public:
-    float val;
-    Float(float v) : val(v) {}
-    virtual string getName() { return "\"Float\""; }
-};
-
-class Double : public Expression
-{
-public:
-    double val;
-    Double(double v) : val(v) {}
+    uint8_t buf[8];
+    Number(union union_num u) { memcpy(buf, &u, 8); }
     virtual string getName() { return "\"Double\""; }
+    uint8_t byteView() { return *(uint8_t *)buf; }
+    uint16_t shortView() { return *(uint16_t *)buf; }
+    uint32_t intView() { return *(uint32_t *)buf; }
+    uint64_t longView() { return *(uint64_t *)buf; }
+    float_t floatView() { return *(float_t *)buf; }
+    double_t doubleView() { return *(double_t *)buf; }
 };
 
 class Identifier : public Expression
@@ -94,22 +70,42 @@ public:
     virtual string getName() { return "\"Assignment\""; }
 };
 
-class FunctionCall : public Expression {
-    public:
-    FunctionCall() {}
+class FunctionCall : public Expression
+{
+public:
+    string *name;
+    vector<Expression *> *varlist;
+    FunctionCall(string *n, vector<Expression *> *l) : name(n), varlist(l) {}
     virtual string getName() { return "\"FunctionCall\""; }
 };
 
 class SimpleExpression : public Expression
 {
 public:
-    SimpleExpression() {}
+    Expression *left;
+    string *op;
+    Expression *right;
+    SimpleExpression(Expression *l) : left(l)
+    {
+        op = nullptr;
+        right = nullptr;
+    }
+    SimpleExpression(Expression *l, string *o, Expression *r) : left(l), op(o), right(r) {}
     virtual string getName() { return "\"SimpleExpression\""; }
 };
 
-class AdditiveExpression : public Expression {
-    public:
-    AdditiveExpression() {}
+class AdditiveExpression : public Expression
+{
+public:
+    Expression *left;
+    string *op;
+    Expression *right;
+    AdditiveExpression(Expression *l) : left(l)
+    {
+        op = nullptr;
+        right = nullptr;
+    }
+    AdditiveExpression(Expression *l, string *o, Expression *r) : left(l), op(o), right(r) {}
     virtual string getName() { return "\"AdditiveExpression\""; }
 };
 

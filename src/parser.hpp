@@ -153,14 +153,7 @@ union YYSTYPE
 {
 #line 26 "ecc.y"
 
-    union {
-        uint8_t charValue;
-        uint16_t shortValue;
-        uint32_t intValue;
-        uint64_t longValue;
-        float floatValue;
-        double doubleValue;
-    } num;
+    union union_num num;
     string *stringValue;
     
     Node *node;
@@ -194,7 +187,7 @@ union YYSTYPE
     vector<Parameter *> *params;
     vector<Expression *> *exprs;
 
-#line 198 "parser.hpp"
+#line 191 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

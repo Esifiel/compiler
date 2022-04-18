@@ -31,6 +31,7 @@ class ExpressionStatement : public Statement
 {
 public:
     Expression *expr;
+    ExpressionStatement() { expr = nullptr; }
     ExpressionStatement(Expression *e) : expr(e) {}
     virtual string getName() { return "\"ExpressionStatement\""; }
 };
@@ -67,7 +68,7 @@ public:
     vector<Expression *> *init;
     vector<Expression *> *end;
     ForStatement(vector<Expression *> *i, Expression *c, vector<Expression *> *e, CompoundStatement *s) : init(i), IterationStatement(c, s), end(e) {}
-    virtual string getName() { return "\"WhileStatement\""; }
+    virtual string getName() { return "\"ForStatement\""; }
 };
 
 class ReturnStatement : public Statement
@@ -75,6 +76,7 @@ class ReturnStatement : public Statement
 public:
     ExpressionStatement *res;
     ReturnStatement(ExpressionStatement *r) : res(r) {}
+    virtual string getName() { return "\"ReturnStatement\""; }
 };
 
 #endif

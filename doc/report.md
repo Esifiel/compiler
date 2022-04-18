@@ -16,6 +16,12 @@
 
 ### 四、语义分析
 
+### 五、生成目标代码
+
+在LLVM的文档中可以找到llvm::Function的继承图：
+
+![](./img/classllvm_1_1Function__inherit__graph.png)
+
 ### 七、总结
 
 在本实验中我设计完成了一个C语言子集的编译器，目前支持：

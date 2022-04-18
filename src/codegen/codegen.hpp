@@ -24,6 +24,7 @@
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <iostream>
 #include <map>
+#include <stack>
 
 using namespace llvm;
 using namespace std;
@@ -36,26 +37,10 @@ public:
     Module *module;
     IRBuilder<> builder;
     map<string, Value *> symtable;
+    stack<map<string, Value *>> env;
 
     // initialize the context
-    CodeGenerator() : builder(ctx)
-    {
-        module = new Module("main", ctx);
-    }
-    // GenericValue runCode()
-    // {
-    //     Constant *c = TheModule.getOrInsertFunction("foo", llvm::Type::getVoidTy(context), llvm::Type::getVoidTy(TheContext), NULL);
-    //     Function* foo = cast<Function>(c);
-    //     foo->setCallingConv(CallingConv::C);
-
-    //     cout << "Running code..." << endl;
-    //     ExecutionEngine *engine = EngineBuilder(TheModule).create();
-    //     engine->finalizeObject();
-    //     vector<GenericValue> noargs;
-    //     GenericValue v = engine->runFunction(mainFunction, noargs);
-    //     std::cout << "Code was run.\n";
-    //     return v;
-    // }
+    CodeGenerator() : builder(ctx) { module = new Module("main", ctx); }
 };
 
 #endif
