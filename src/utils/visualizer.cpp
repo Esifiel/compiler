@@ -74,6 +74,7 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
         out << sep;
         visitIdentifier(d->name);
         out << sep;
+
         for (auto p = d->params->begin(); p != d->params->end(); p++)
         {
             if (p != d->params->begin())
@@ -113,6 +114,8 @@ void Visualizer::visitParameter(Parameter *p)
     {
         out << head << p->getName() << sub;
         visitType(p->type);
+        if (p->name)
+            out << sep;
         visitIdentifier(p->name);
         out << subend << tail;
     }
@@ -135,7 +138,8 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
                 out << sep;
             visitDeclaration(*p);
         }
-        out << sep;
+        if (c->stmts->size() > 0)
+            out << sep;
         for (auto p = c->stmts->begin(); p != c->stmts->end(); p++)
         {
             if (p != c->stmts->begin())
@@ -195,9 +199,14 @@ void Visualizer::visitReturnStatement(ReturnStatement *r)
 void Visualizer::visitExpression(Expression *e)
 {
     if (e)
-    {   cout <<e->getName() <<endl;
+    {
         if (e->getName() == "\"Assignment\"")
             visitAssignment((Assignment *)e);
+        else if (e->getName() == "\"Number\"")
+            visitNumber((Number *)e);
+        // else if (e->getName() == "\"Assignment\"")
+        // else if (e->getName() == "\"Assignment\"")
+        // else if (e->getName() == "\"Assignment\"")
     }
 }
 
@@ -231,6 +240,39 @@ void Visualizer::visitAssignment(Assignment *a)
     }
 }
 
+void Visualizer::visitNumber(Number *n)
+{
+    if (n)
+    {
+        out << head << n->getName() << sub;
+        switch (n->type)
+        {
+        case TYPE_CHAR:
+            out << n->charView();
+            break;
+        case TYPE_SHORT:
+            out << n->shortView();
+            break;
+        case TYPE_INT:
+            out << n->intView();
+            break;
+        case TYPE_LONG:
+            out << n->longView();
+            break;
+        case TYPE_FLOAT:
+            out << n->floatView();
+            break;
+        case TYPE_DOUBLE:
+            out << n->doubleView();
+            break;
+        default:
+            out << "Unknown number type";
+            break;
+        }
+        out << subend << tail;
+    }
+}
+
 // expression : var ASSIGN expression
 //     | simple-expression
 //     ;
@@ -243,30 +285,12 @@ void Visualizer::visitAssignment(Assignment *a)
 //     | additive-expression
 //     ;
 
-// relop : LEQ
-//     | LT
-//     | GT
-//     | GEQ
-//     | EQ
-//     | NEQ
-//     | ANDAND
-//     | OROR
-//     ;
-
 // additive-expression : additive-expression addop term
 //     | term
 //     ;
 
-// addop : ADD
-//     | SUB
-//     ;
-
 // term : term mulop factor
 //     | factor
-//     ;
-
-// mulop : MUL
-//     | DIV
 //     ;
 
 // factor : LP expression RP

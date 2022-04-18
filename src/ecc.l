@@ -99,22 +99,22 @@ void debug() {
 -?(0|([1-9][0-9]*))             {
                                     debug();
                                     yylval.num.longValue = atoll(yytext);
-                                    return NUMBER;
+                                    return NUMLONG;
                                 }
 -?0[0-7]*                       {
                                     debug();
                                     yylval.num.longValue = strtol(yytext, NULL, 8);
-                                    return NUMBER;
+                                    return NUMLONG;
                                 }
 -?0[xX][0-9a-fA-F]+             {
                                     debug();
                                     yylval.num.longValue = strtol(yytext, NULL, 16);
-                                    return NUMBER;
+                                    return NUMLONG;
                                 }
 -?(0|([1-9][0-9]*))(\.[0-9]+)?  {
                                     debug();
                                     yylval.num.doubleValue = atof(yytext);
-                                    return NUMBER;
+                                    return NUMDOUBLE;
                                 }
 [A-Za-z_][A-Za-z0-9_]*          {
                                     debug();
@@ -124,7 +124,7 @@ void debug() {
 \'.\'                           {
                                     debug();
                                     yylval.num.charValue = *yytext;
-                                    return NUMBER;
+                                    return NUMCHAR;
                                 }
 \".*\"                          {
                                     debug();

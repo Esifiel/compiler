@@ -23,13 +23,14 @@ def json2dot(parent, key, vlist):
             child = list(dic.keys())[0]
             vlist = dic[child]
             json2dot(label, child, vlist)
-        elif isinstance(dic, str):
-            name = dic
-            if name in nodes:
-                name += str(len(nodes))
-            dot.edge(label, name)
         else:
-            raise Exception("Cannot confirm type of %s" % str(dic))
+            name = str(dic)
+            sub_label = name
+            if sub_label in nodes:
+                sub_label += str(len(nodes))
+            nodes.append(sub_label)
+            dot.node(sub_label, name)
+            dot.edge(label, sub_label)
 
 if len(sys.argv) <= 1:
     print("Usage: python3 json2dot.py <json_path>")

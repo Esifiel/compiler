@@ -50,6 +50,7 @@ void yyerror(string s);
     Identifier *identifier;
     Parameter *param;
     FunctionCall *functionCall;
+    Number *number;
 
     vector<Declaration *> *decls;
     vector<VariableDeclaration *> *vars;
@@ -67,7 +68,7 @@ void yyerror(string s);
         ANDAND OROR ASSIGN LT GT GEQ LEQ NEQ EQ
 %token  TYPEDEF SIZEOF RETURN
 %token  DELIM COMMA LP RP LB RB LC RC
-%token<num> NUMBER
+%token<num> NUMCHAR NUMSHORT NUMINT NUMLONG NUMFLOAT NUMDOUBLE
 %token<stringValue> STRING IDENTIFIER 
 
 %type<program> program
@@ -87,6 +88,7 @@ void yyerror(string s);
 %type<exprs> expression-list args arg-list
 %type<functionCall> call
 %type<expression> simple-expression additive-expression term factor
+%type<number> number
 
 %type<statement> statement
 %type<stmts> statement-list
@@ -118,7 +120,7 @@ declaration : var-declaration { $$ = $1; }
     ;
 
 var-declaration : type-specifier id DELIM { $$ = new VariableDeclaration($1, $2); }
-    | type-specifier id LB NUMBER RB DELIM { $$ = new VariableDeclaration(new ArrayType($1, $4.longValue), $2); }
+    | type-specifier id LB number RB DELIM { $$ = new VariableDeclaration(new ArrayType($1, $4->longView()), $2); }
     ;
 
 id : IDENTIFIER { $$ = new Identifier($1); }
@@ -145,7 +147,7 @@ params : param-list { $$ = $1; }
     ;
 
 param-list : param-list COMMA param { $1->push_back($3); $$ = $1; }
-    | param { $$ = new vector<Parameter *>; }
+    | param { $$ = new vector<Parameter *>; $$->push_back($1); }
     ;
 
 param : type-specifier id { $$ = new Parameter($1, $2); }
@@ -200,7 +202,7 @@ expression : var ASSIGN expression { $$ = new Assignment($1, $3); }
     ;
 
 var : id { $$ = $1; }
-    | id LB NUMBER RB { $$ = new Identifier($1->name, $3.longValue); }
+    | id LB number RB { $$ = new Identifier($1->name, $3->longView()); }
     ;
 
 simple-expression : additive-expression relop additive-expression { $$ = new SimpleExpression($1, $2, $3); }
@@ -225,7 +227,6 @@ addop : ADD { $$ = new string("+"); }
     | SUB { $$ = new string("-"); }
     ;
 
-// what type is it
 term : term mulop factor { $$ = new SimpleExpression($1, $2, $3); }
     | factor { $$ = $1; }
     ;
@@ -238,10 +239,10 @@ mulop : MUL { $$ = new string("*"); }
 factor : LP expression RP { $$ = $2; }
     | var { $$ = $1; }
     | call { $$ = $1; }
-    | NUMBER { $$ = new Number($1); }
+    | number { $$ = $1; }
     ;
 
-call : var LP args RP { $$ = new FunctionalCall($1, $3); }
+call : var LP args RP { $$ = new FunctionCall($1, $3); }
     ;
 
 args : arg-list { $$ = $1; }
@@ -250,6 +251,14 @@ args : arg-list { $$ = $1; }
 
 arg-list : arg-list COMMA expression { $1->push_back($3); $$ = $1; }
     | expression { $$ = new vector<Expression *>; $$->push_back($1); }
+    ;
+
+number : NUMCHAR { $$ = new Number($1, TYPE_CHAR); }
+    | NUMSHORT { $$ = new Number($1, TYPE_SHORT); }
+    | NUMINT { $$ = new Number($1, TYPE_INT); }
+    | NUMLONG { $$ = new Number($1, TYPE_LONG); }
+    | NUMFLOAT { $$ = new Number($1, TYPE_FLOAT); }
+    | NUMDOUBLE { $$ = new Number($1, TYPE_DOUBLE); }
     ;
 
 %%

@@ -43,6 +43,7 @@ private:
     void visitWhileStatement(WhileStatement *w);
     void visitForStatement(ForStatement *f);
     void visitAssignment(Assignment *a);
+    void visitNumber(Number *n);
 };
 
 #endif

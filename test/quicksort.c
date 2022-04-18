@@ -1,13 +1,13 @@
 // #include <stdio.h>
 
-// // void quicksort(int *A, int len)
-// void quicksort(int len)
-// {
-//     int i;
-//     int j;
+// void quicksort(int *A, int len)
+void quicksort(int len)
+{
+    int i;
+    int j;
 
-//     if (len < 2)
-//         return;
+    // if (len < 2)
+    //     return;
 // //     // int pivot = A[len / 2];
 // //     for (i = 0, j = len - 1; 1; i = i + 1, j = j - 1)
 // //     {
@@ -23,7 +23,7 @@
 // //     }
 // //     // quicksort(A, i);
 // //     // quicksort(A + i, len - i);
-// }
+}
 
 int main(void)
 {

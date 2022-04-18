@@ -12,6 +12,7 @@ class Node
 {
 public:
     Node() {}
+    virtual ~Node() {}
     virtual string getName() = 0;
     virtual llvm::Value *codeGen(CodeGenerator &context) { return nullptr; };
 };

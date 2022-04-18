@@ -27,13 +27,24 @@ union union_num
     double_t doubleValue;
 };
 
+enum val_type
+{
+    TYPE_CHAR,
+    TYPE_SHORT,
+    TYPE_INT,
+    TYPE_LONG,
+    TYPE_FLOAT,
+    TYPE_DOUBLE
+};
+
 class Number : public Expression
 {
 public:
     uint8_t buf[8];
-    Number(union union_num u) { memcpy(buf, &u, 8); }
-    virtual string getName() { return "\"Double\""; }
-    uint8_t byteView() { return *(uint8_t *)buf; }
+    enum val_type type;
+    Number(union union_num u, enum val_type t) : type(t) { memcpy(buf, &u, 8); }
+    virtual string getName() { return "\"Number\""; }
+    uint8_t charView() { return *(uint8_t *)buf; }
     uint16_t shortView() { return *(uint16_t *)buf; }
     uint32_t intView() { return *(uint32_t *)buf; }
     uint64_t longView() { return *(uint64_t *)buf; }
@@ -73,9 +84,9 @@ public:
 class FunctionCall : public Expression
 {
 public:
-    string *name;
+    Identifier *name;
     vector<Expression *> *varlist;
-    FunctionCall(string *n, vector<Expression *> *l) : name(n), varlist(l) {}
+    FunctionCall(Identifier *n, vector<Expression *> *l) : name(n), varlist(l) {}
     virtual string getName() { return "\"FunctionCall\""; }
 };
 
