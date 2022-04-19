@@ -33,7 +33,7 @@ private:
     void visitIdentifier(Identifier *i);
     void visitCompoundStatement(CompoundStatement *c);
     void visitParameter(Parameter *p);
-    void visitString(string *s);
+    void visitString(String *s);
     void visitStatement(Statement *s);
     void visitExpressionStatement(ExpressionStatement *e);
     void visitSelectionStatement(SelectionStatement *s);

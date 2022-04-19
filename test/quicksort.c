@@ -53,5 +53,7 @@ int main(void)
     }
     quicksort(3);
 
+    printf("%d\n", sum);
+
     return 0;
 }

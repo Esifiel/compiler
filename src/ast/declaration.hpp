@@ -17,6 +17,7 @@ class Declaration : public Node
 {
 public:
     Declaration() {}
+
     virtual string getName() { return "\"Declaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) { return nullptr; };
 };
@@ -26,7 +27,9 @@ class VariableDeclaration : public Declaration
 public:
     TypeSpecifier *type;
     Identifier *name;
+
     VariableDeclaration(TypeSpecifier *t, Identifier *n) : type(t), name(n) {}
+
     virtual string getName() { return "\"VariableDeclaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
 };
@@ -35,7 +38,9 @@ class TypeDeclaration : public Declaration
 {
 public:
     Identifier *name;
+
     TypeDeclaration(Identifier *v) : name(v) {}
+
     virtual string getName() { return "\"TypeDeclaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
 };
@@ -49,7 +54,9 @@ public:
     Identifier *name;
     vector<Parameter *> *params;
     CompoundStatement *stmts;
+
     FunctionDeclaration(TypeSpecifier *t, Identifier *n, vector<Parameter *> *p, CompoundStatement *s) : rettype(t), name(n), params(p), stmts(s) {}
+    
     virtual string getName() { return "\"FunctionDeclaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
 };

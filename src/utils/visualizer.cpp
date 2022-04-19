@@ -93,7 +93,7 @@ void Visualizer::visitType(TypeSpecifier *t)
     {
         out << head << t->getName() << sub;
         if (t->getName() == "\"array\"")
-            out << ((ArrayType *)t)->size;
+            out << ((ArrayListType *)t)->size;
         out << subend << tail;
     }
 }
@@ -101,11 +101,7 @@ void Visualizer::visitType(TypeSpecifier *t)
 void Visualizer::visitIdentifier(Identifier *i)
 {
     if (i)
-    {
-        out << head << i->getName() << sub;
-        visitString(i->name);
-        out << subend << tail;
-    }
+        out << head << i->getName() << sub << "\"" + *i->name + "\"" << subend << tail;
 }
 
 void Visualizer::visitParameter(Parameter *p)
@@ -121,10 +117,10 @@ void Visualizer::visitParameter(Parameter *p)
     }
 }
 
-void Visualizer::visitString(string *s)
+void Visualizer::visitString(String *s)
 {
     if (s)
-        out << "\"" << *s << "\"";
+        out << head << s->getName() << sub << s->val << subend << tail;
 }
 
 void Visualizer::visitCompoundStatement(CompoundStatement *c)
@@ -138,7 +134,7 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
                 out << sep;
             visitDeclaration(*p);
         }
-        if (c->stmts->size() > 0)
+        if (c->vardecs->size() > 0 && c->stmts->size() > 0)
             out << sep;
         for (auto p = c->stmts->begin(); p != c->stmts->end(); p++)
         {
@@ -216,6 +212,10 @@ void Visualizer::visitExpression(Expression *e)
             visitFunctionCall((FunctionCall *)e);
         else if (e->getName() == "\"SimpleExpression\"")
             visitSimpleExpression((SimpleExpression *)e);
+        else if (e->getName() == "\"Identifier\"")
+            visitIdentifier((Identifier *)e);
+        else if (e->getName() == "\"String\"")
+            visitString((String *)e);
     }
 }
 
@@ -233,6 +233,26 @@ void Visualizer::visitForStatement(ForStatement *f)
     if (f)
     {
         out << head << f->getName() << sub;
+        for(auto p = f->init->begin(); p != f->init->end(); p++)
+        {
+            if(p != f->init->begin())
+                out << sep;
+            visitExpression(*p);
+        }
+        if(f->init->size() > 0 && f->cond)
+            out << sep;
+        visitExpression(f->cond);
+        if((f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
+            out << sep;
+        for(auto p = f->end->begin(); p != f->end->end(); p++)
+        {
+            if(p != f->end->begin())
+                out << sep;
+            visitExpression(*p);
+        }
+        if((f->stmts && f->end->size() > 0) || (f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
+            out << sep;
+        visitCompoundStatement(f->stmts);
         out << subend << tail;
     }
 }
@@ -256,22 +276,22 @@ void Visualizer::visitNumber(Number *n)
         out << head << n->getName() << sub;
         switch (n->type)
         {
-        case TYPE_CHAR:
+        case VAL_CHAR:
             out << n->charView();
             break;
-        case TYPE_SHORT:
+        case VAL_SHORT:
             out << n->shortView();
             break;
-        case TYPE_INT:
+        case VAL_INT:
             out << n->intView();
             break;
-        case TYPE_LONG:
+        case VAL_LONG:
             out << n->longView();
             break;
-        case TYPE_FLOAT:
+        case VAL_FLOAT:
             out << n->floatView();
             break;
-        case TYPE_DOUBLE:
+        case VAL_DOUBLE:
             out << n->doubleView();
             break;
         default:
@@ -305,33 +325,13 @@ void Visualizer::visitSimpleExpression(SimpleExpression *e)
     if (e)
     {
         out << head << e->getName() << sub;
-
+        visitExpression(e->left);
         if (e->left)
-        {
-            if (e->left->getName() == "\"SimpleExpression\"")
-                visitSimpleExpression((SimpleExpression *)e->left);
-            else if (e->left->getName() == "\"FunctionCall\"")
-                visitFunctionCall((FunctionCall *)e->left);
-            else if (e->left->getName() == "\"Identifier\"")
-                visitIdentifier((Identifier *)e->left);
-            else if (e->left->getName() == "\"Number\"")
-                visitNumber((Number *)e->left);
-        }
-
-        out << sep << head << "\"op\"" << sub << "\"" + *(e->op) + "\"" << subend << tail << sep;
-
+            out << sep;
+        out << head << "\"op\"" << sub << "\"" + *(e->op) + "\"" << subend << tail;
         if (e->right)
-        {
-            if (e->right->getName() == "\"SimpleExpression\"")
-                visitSimpleExpression((SimpleExpression *)e->right);
-            else if (e->right->getName() == "\"FunctionCall\"")
-                visitFunctionCall((FunctionCall *)e->right);
-            else if (e->right->getName() == "\"Identifier\"")
-                visitIdentifier((Identifier *)e->right);
-            else if (e->right->getName() == "\"Number\"")
-                visitNumber((Number *)e->right);
-        }
-
+            out << sep;
+        visitExpression(e->right);
         out << subend << tail;
     }
 }

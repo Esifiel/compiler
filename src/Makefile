@@ -8,7 +8,11 @@ OBJECTS =	./main.o \
 			./parser.o \
 			./codegen/program.o \
 			./codegen/declaration.o \
-			./utils/visualizer.o \
+			./codegen/type.o \
+			./codegen/expression.o \
+			./codegen/statement.o \
+			./utils/visualizer.o
+TARGET = `llvm-config --host-target`
 
 .PHONY: all
 
@@ -26,10 +30,10 @@ scanner.cpp: $(NAME).l parser.hpp
 	$(CC) -c $(LLVMFLAGS) -o $@ $<
 
 $(NAME): $(OBJECTS) FORCE
-	$(CC) -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
+	$(CC) -g -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
 	@cat ../test/quicksort.c | ./$(NAME)
-	@clang ./test.bc -o ./test
+	@clang --target=$(TARGET) ./test.bc -o ./test 
 
 clean:
 	@rm -f $(NAME)
@@ -37,5 +41,6 @@ clean:
 	@rm -f parser.* scanner.*
 	@rm -f tmp/*
 	@rm -f test*
+	@rm -f .gdb_history 
 
 FORCE:

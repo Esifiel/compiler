@@ -26,7 +26,7 @@ int main(int argc, char *argv[], char **envp)
     system((string("python3 utils/json2dot.py ") + filepath).c_str());
     cout << "[+] visualization done." << endl;
 
-    // emit tagret code
+    // init llvm
     InitializeAllTargetInfos();
     InitializeAllTargets();
     InitializeAllTargetMCs();
@@ -34,14 +34,18 @@ int main(int argc, char *argv[], char **envp)
     InitializeAllAsmPrinters();
 
     CodeGenerator generator;
+    // set host target
+    generator.module->setTargetTriple(sys::getDefaultTargetTriple());
+    // emit tagret code
     program->codeGen(generator);
     generator.dump();
 
+    // save the llvm bit code
     error_code ec;
     raw_fd_ostream os("./test.bc", ec, sys::fs::F_None);
     WriteBitcodeToFile(*generator.module, os);
     os.flush();
-    
+
     cout << "[+] target code generated." << endl;
 
     return 0;

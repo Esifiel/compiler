@@ -242,6 +242,7 @@ factor : LP expression RP { $$ = $2; }
     | var { $$ = $1; }
     | call { $$ = $1; }
     | number { $$ = $1; }
+    | STRING { $$ = new String(*yylval.stringValue); }
     ;
 
 call : var LP args RP { $$ = new FunctionCall($1, $3); }
