@@ -3,6 +3,8 @@
 Program *program;
 %}
 
+%expect 1
+
 %code requires {
 #include <iostream>
 #include <string>
@@ -176,8 +178,8 @@ expression-stmt : expression DELIM { $$ = new ExpressionStatement($1); }
     | DELIM { $$ = new ExpressionStatement(); }
     ;
 
-selection-stmt : IF LP expression RP statement
-    | IF LP expression RP ELSE statement
+selection-stmt : IF LP expression RP statement { $$ = new SelectionStatement($3, $5); }
+    | IF LP expression RP statement ELSE statement { $$ = new SelectionStatement($3, $5, $7); }
     ;
 
 iteration-stmt : while-stmt { $$ = $1; }
@@ -219,7 +221,7 @@ relop : LEQ { $$ = new string("<="); }
     | OROR { $$ = new string("||"); }
     ;
 
-additive-expression : additive-expression addop term { $$ = new AdditiveExpression($1, $2, $3); }
+additive-expression : additive-expression addop term { $$ = new SimpleExpression($1, $2, $3); }
     | term { $$ = $1; }
     ;
 

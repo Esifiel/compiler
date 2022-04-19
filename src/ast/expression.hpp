@@ -105,19 +105,4 @@ public:
     virtual string getName() { return "\"SimpleExpression\""; }
 };
 
-class AdditiveExpression : public Expression
-{
-public:
-    Expression *left;
-    string *op;
-    Expression *right;
-    AdditiveExpression(Expression *l) : left(l)
-    {
-        op = nullptr;
-        right = nullptr;
-    }
-    AdditiveExpression(Expression *l, string *o, Expression *r) : left(l), op(o), right(r) {}
-    virtual string getName() { return "\"AdditiveExpression\""; }
-};
-
 #endif

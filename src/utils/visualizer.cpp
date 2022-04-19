@@ -181,9 +181,17 @@ void Visualizer::visitExpressionStatement(ExpressionStatement *e)
 
 void Visualizer::visitSelectionStatement(SelectionStatement *s)
 {
-    // selection-stmt : IF LP expression RP statement
-    //     | IF LP expression RP ELSE statement
-    //     ;
+    if (s)
+    {
+        out << head << s->getName() << sub;
+        visitExpression(s->cond);
+        out << sep;
+        visitStatement(s->stmt);
+        if (s->elsepart)
+            out << sep;
+        visitStatement(s->elsepart);
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitReturnStatement(ReturnStatement *r)
@@ -204,9 +212,10 @@ void Visualizer::visitExpression(Expression *e)
             visitAssignment((Assignment *)e);
         else if (e->getName() == "\"Number\"")
             visitNumber((Number *)e);
-        // else if (e->getName() == "\"Assignment\"")
-        // else if (e->getName() == "\"Assignment\"")
-        // else if (e->getName() == "\"Assignment\"")
+        else if (e->getName() == "\"FunctionCall\"")
+            visitFunctionCall((FunctionCall *)e);
+        else if (e->getName() == "\"SimpleExpression\"")
+            visitSimpleExpression((SimpleExpression *)e);
     }
 }
 
@@ -273,39 +282,56 @@ void Visualizer::visitNumber(Number *n)
     }
 }
 
-// expression : var ASSIGN expression
-//     | simple-expression
-//     ;
+void Visualizer::visitFunctionCall(FunctionCall *f)
+{
+    if (f)
+    {
+        out << head << f->getName() << sub;
+        visitIdentifier(f->name);
+        if (f->varlist->size() > 0)
+            out << sep;
+        for (auto p = f->varlist->begin(); p != f->varlist->end(); p++)
+        {
+            if (p != f->varlist->begin())
+                out << sep;
+            visitExpression(*p);
+        }
+        out << subend << tail;
+    }
+}
 
-// var : IDENTIFIER
-//     | IDENTIFIER LB expression RB
-//     ;
+void Visualizer::visitSimpleExpression(SimpleExpression *e)
+{
+    if (e)
+    {
+        out << head << e->getName() << sub;
 
-// simple-expression : additive-expression relop additive-expression
-//     | additive-expression
-//     ;
+        if (e->left)
+        {
+            if (e->left->getName() == "\"SimpleExpression\"")
+                visitSimpleExpression((SimpleExpression *)e->left);
+            else if (e->left->getName() == "\"FunctionCall\"")
+                visitFunctionCall((FunctionCall *)e->left);
+            else if (e->left->getName() == "\"Identifier\"")
+                visitIdentifier((Identifier *)e->left);
+            else if (e->left->getName() == "\"Number\"")
+                visitNumber((Number *)e->left);
+        }
 
-// additive-expression : additive-expression addop term
-//     | term
-//     ;
+        out << sep << head << "\"op\"" << sub << "\"" + *(e->op) + "\"" << subend << tail << sep;
 
-// term : term mulop factor
-//     | factor
-//     ;
+        if (e->right)
+        {
+            if (e->right->getName() == "\"SimpleExpression\"")
+                visitSimpleExpression((SimpleExpression *)e->right);
+            else if (e->right->getName() == "\"FunctionCall\"")
+                visitFunctionCall((FunctionCall *)e->right);
+            else if (e->right->getName() == "\"Identifier\"")
+                visitIdentifier((Identifier *)e->right);
+            else if (e->right->getName() == "\"Number\"")
+                visitNumber((Number *)e->right);
+        }
 
-// factor : LP expression RP
-//     | var
-//     | call
-//     | NUMBER
-//     ;
-
-// call : IDENTIFIER LP args RP
-//     ;
-
-// args : arg-list
-//     |
-//     ;
-
-// arg-list : arg-list COMMA expression
-//     | expression
-//     ;
+        out << subend << tail;
+    }
+}

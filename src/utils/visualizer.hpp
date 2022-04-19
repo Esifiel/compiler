@@ -44,6 +44,8 @@ private:
     void visitForStatement(ForStatement *f);
     void visitAssignment(Assignment *a);
     void visitNumber(Number *n);
+    void visitFunctionCall(FunctionCall *f);
+    void visitSimpleExpression(SimpleExpression *e);
 };
 
 #endif

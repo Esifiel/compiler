@@ -1,13 +1,15 @@
 // #include <stdio.h>
 
 // void quicksort(int *A, int len)
-void quicksort(int len)
+long quicksort(int len)
 {
     int i;
     int j;
 
-    // if (len < 2)
-    //     return;
+    if (len < 2)
+        return len;
+    else
+        return 666;
 // //     // int pivot = A[len / 2];
 // //     for (i = 0, j = len - 1; 1; i = i + 1, j = j - 1)
 // //     {
@@ -49,6 +51,7 @@ int main(void)
     {
         sum = sum + i;
     }
+    quicksort(3);
 
     return 0;
 }

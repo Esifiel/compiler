@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class CodeGenContext;
+class CodeGenerator;
 
 class Statement : public Node
 {
@@ -42,6 +42,7 @@ public:
     Expression *cond;
     Statement *stmt;
     Statement *elsepart;
+    SelectionStatement(Expression *c, Statement *s) : cond(c), stmt(s), elsepart(nullptr) {}
     SelectionStatement(Expression *c, Statement *s, Statement *el) : cond(c), stmt(s), elsepart(el) {}
     virtual string getName() { return "\"SelectionStatement\""; }
 };
