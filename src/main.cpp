@@ -6,6 +6,7 @@
 #include "codegen/codegen.hpp"
 #include "utils/visualizer.hpp"
 
+using namespace llvm;
 using namespace std;
 
 extern int yyparse();
@@ -17,7 +18,7 @@ int main(int argc, char *argv[], char **envp)
     yyparse();
     cout << "[+] parse done." << endl;
     
-    // do visualization (json and png)
+    // do visualization (output json and png)
     string filepath = "./tmp/ast.json";
     Visualizer *v = new Visualizer(program, filepath);
     v->traverse();
@@ -26,8 +27,21 @@ int main(int argc, char *argv[], char **envp)
     cout << "[+] visualization done." << endl;
 
     // emit tagret code
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmParsers();
+    InitializeAllAsmPrinters();
+
     CodeGenerator generator;
     program->codeGen(generator);
+    generator.dump();
+
+    error_code ec;
+    raw_fd_ostream os("./test.bc", ec, sys::fs::F_None);
+    WriteBitcodeToFile(*generator.module, os);
+    os.flush();
+    
     cout << "[+] target code generated." << endl;
 
     return 0;

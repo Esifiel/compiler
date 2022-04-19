@@ -33,6 +33,7 @@ using namespace std;
 class CodeGenerator
 {
 public:
+    // basic data structure
     LLVMContext ctx;
     Module *module;
     IRBuilder<> builder;
@@ -41,6 +42,8 @@ public:
 
     // initialize the context
     CodeGenerator() : builder(ctx) { module = new Module("main", ctx); }
+    ~CodeGenerator() {}
+    void dump() { module->print(outs(), nullptr); }
 };
 
 #endif

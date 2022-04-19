@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class CodeGenContext;
+class CodeGenerator;
 
 class Expression : public Node
 {

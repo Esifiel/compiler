@@ -29,11 +29,13 @@ $(NAME): $(OBJECTS) FORCE
 	$(CC) -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
 	@cat ../test/quicksort.c | ./$(NAME)
+	@clang ./test.bc -o ./test
 
 clean:
 	@rm -f $(NAME)
 	@rm -f *.o utils/*.o codegen/*.o
 	@rm -f parser.* scanner.*
 	@rm -f tmp/*
+	@rm -f test*
 
 FORCE:
