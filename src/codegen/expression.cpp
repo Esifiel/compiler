@@ -3,46 +3,23 @@
 
 Value *Number::codeGen(CodeGenerator &ctx)
 {
-    // switch (type)
-    // {
-    // case VAL_CHAR:
-    //     return ConstantInt::get(Type::getInt8Ty(ctx.ctx), charView());
-    // case VAL_SHORT:
-    //     return ConstantInt::get(Type::getInt16Ty(ctx.ctx), shortView());
-    // case VAL_INT:
-    //     return ConstantInt::get(Type::getInt32Ty(ctx.ctx), intView());
-    // case VAL_LONG:
-    //     return ConstantInt::get(Type::getInt64Ty(ctx.ctx), longView());
-    // case VAL_FLOAT:
-    //     return ConstantFP::get(Type::getFloatTy(ctx.ctx), floatView());
-    // case VAL_DOUBLE:
-    //     return ConstantFP::get(Type::getDoubleTy(ctx.ctx), doubleView());
-    // default:
-    //     return nullptr;
-    // }
-    Type *rettype = ctx.curFunction->getReturnType();
-    if (rettype->isIntegerTy())
+    switch (type)
     {
-        switch (rettype->getIntegerBitWidth())
-        {
-        case 8:
-            return ConstantInt::get(Type::getInt8Ty(ctx.ctx), charView());
-        case 16:
-            return ConstantInt::get(Type::getInt16Ty(ctx.ctx), shortView());
-        case 32:
-            return ConstantInt::get(Type::getInt32Ty(ctx.ctx), intView());
-        case 64:
-            return ConstantInt::get(Type::getInt64Ty(ctx.ctx), longView());
-        default:
-            return nullptr;
-        }
-    }
-    else if (rettype->isFloatTy())
+    case VAL_CHAR:
+        return ConstantInt::get(Type::getInt8Ty(ctx.ctx), charView());
+    case VAL_SHORT:
+        return ConstantInt::get(Type::getInt16Ty(ctx.ctx), shortView());
+    case VAL_INT:
+        return ConstantInt::get(Type::getInt32Ty(ctx.ctx), intView());
+    case VAL_LONG:
+        return ConstantInt::get(Type::getInt64Ty(ctx.ctx), longView());
+    case VAL_FLOAT:
         return ConstantFP::get(Type::getFloatTy(ctx.ctx), floatView());
-    else if (rettype->isFloatTy())
+    case VAL_DOUBLE:
         return ConstantFP::get(Type::getDoubleTy(ctx.ctx), doubleView());
-    else
+    default:
         return nullptr;
+    }
 }
 
 Value *String::codeGen(CodeGenerator &ctx)
@@ -62,6 +39,7 @@ Value *Parameter::codeGen(CodeGenerator &ctx)
 
 Value *Assignment::codeGen(CodeGenerator &ctx)
 {
+    
     return nullptr;
 }
 

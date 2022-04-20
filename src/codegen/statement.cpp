@@ -34,6 +34,7 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
 Value *ReturnStatement::codeGen(CodeGenerator &ctx)
 {
     if(res->expr)
+    // TODO: need a type conversion
         ctx.builder.CreateRet(res->codeGen(ctx));
     else
         ctx.builder.CreateRetVoid();

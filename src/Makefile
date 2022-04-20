@@ -16,7 +16,7 @@ TARGET = `llvm-config --host-target`
 
 .PHONY: all
 
-all: $(NAME)
+all: $(NAME) FORCE
 
 parser.cpp: $(NAME).y
 	$(YACC) -dv -o $@ $<

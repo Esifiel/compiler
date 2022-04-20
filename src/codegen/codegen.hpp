@@ -23,6 +23,7 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <iostream>
+#include <cstdlib>
 #include <map>
 #include <stack>
 
@@ -39,17 +40,35 @@ public:
     IRBuilder<> builder;
     // auxiliary
     Function *curFunction;
-    // map<string, Value *> symtable;
-    // stack<map<string, Value *> *> env;
+    map<string, Function *> functions;
+    map<string, Value *> locals;
+    map<string, Value *> globals;
+    bool isglobal;
 
     // initialize the context
     CodeGenerator() : builder(ctx)
     {
         module = new Module("main", ctx);
         curFunction = nullptr;
+        isglobal = false;
     }
     ~CodeGenerator() {}
-    void dump() { module->print(outs(), nullptr); }
+
+    // utils
+    void dump()
+    {
+        cout << "--------------------IR begin--------------------" << endl;
+        module->print(outs(), nullptr);
+        cout << "--------------------IR end---------------------" << endl;
+    }
+    void error(string msg)
+    {
+        cerr << "\033[31m" << "error: " << "\033[0m" << msg << endl;
+        exit(1);
+    }
+    void warning()
+    {
+    }
 };
 
 #endif

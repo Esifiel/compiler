@@ -1,5 +1,7 @@
 // #include <stdio.h>
 
+int a;
+
 // void quicksort(int *A, int len)
 long quicksort(int len)
 {
