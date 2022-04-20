@@ -7,8 +7,9 @@ Value *Program::codeGen(CodeGenerator &ctx)
 {
     for (auto p = decs->begin(); p != decs->end(); p++)
     {
-        cout << "program" << endl;
-        (*p)->codeGen(ctx);
+        Value *ret = (*p)->codeGen(ctx);
+        if ((*p)->getName() == "\"FunctionDeclaration\"")
+            verifyFunction(*(Function *)ret, &errs());
     }
 
     return nullptr;

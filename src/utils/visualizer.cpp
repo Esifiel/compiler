@@ -233,24 +233,24 @@ void Visualizer::visitForStatement(ForStatement *f)
     if (f)
     {
         out << head << f->getName() << sub;
-        for(auto p = f->init->begin(); p != f->init->end(); p++)
+        for (auto p = f->init->begin(); p != f->init->end(); p++)
         {
-            if(p != f->init->begin())
+            if (p != f->init->begin())
                 out << sep;
             visitExpression(*p);
         }
-        if(f->init->size() > 0 && f->cond)
+        if (f->init->size() > 0 && f->cond)
             out << sep;
         visitExpression(f->cond);
-        if((f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
+        if ((f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
             out << sep;
-        for(auto p = f->end->begin(); p != f->end->end(); p++)
+        for (auto p = f->end->begin(); p != f->end->end(); p++)
         {
-            if(p != f->end->begin())
+            if (p != f->end->begin())
                 out << sep;
             visitExpression(*p);
         }
-        if((f->stmts && f->end->size() > 0) || (f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
+        if ((f->stmts && f->end->size() > 0) || (f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
             out << sep;
         visitCompoundStatement(f->stmts);
         out << subend << tail;
@@ -328,7 +328,52 @@ void Visualizer::visitSimpleExpression(SimpleExpression *e)
         visitExpression(e->left);
         if (e->left)
             out << sep;
-        out << head << "\"op\"" << sub << "\"" + *(e->op) + "\"" << subend << tail;
+        out << head << "\"op\"" << sub << "\"";
+        switch (e->op)
+        {
+        case OP_EQ:
+            out << "==";
+            break;
+        case OP_LT:
+            out << "<";
+            break;
+        case OP_GT:
+            out << ">";
+            break;
+        case OP_LEQ:
+            out << "<=";
+            break;
+        case OP_GEQ:
+            out << ">=";
+            break;
+        case OP_NEQ:
+            out << "!=";
+            break;
+        case OP_ANDAND:
+            out << "&&";
+            break;
+        case OP_OROR:
+            out << "||";
+            break;
+        case OP_ADD:
+            out << "+";
+            break;
+        case OP_SUB:
+            out << "-";
+            break;
+        case OP_MUL:
+            out << "*";
+            break;
+        case OP_DIV:
+            out << "/";
+            break;
+        case OP_MOD:
+            out << "%";
+            break;
+        default:
+            break;
+        }
+        out << "\"" << subend << tail;
         if (e->right)
             out << sep;
         visitExpression(e->right);

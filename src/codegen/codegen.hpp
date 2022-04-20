@@ -33,15 +33,21 @@ using namespace std;
 class CodeGenerator
 {
 public:
-    // basic data structure
+    // necessary data structure
     LLVMContext ctx;
     Module *module;
     IRBuilder<> builder;
-    map<string, Value *> symtable;
-    stack<map<string, Value *>> env;
+    // auxiliary
+    Function *curFunction;
+    // map<string, Value *> symtable;
+    // stack<map<string, Value *> *> env;
 
     // initialize the context
-    CodeGenerator() : builder(ctx) { module = new Module("main", ctx); }
+    CodeGenerator() : builder(ctx)
+    {
+        module = new Module("main", ctx);
+        curFunction = nullptr;
+    }
     ~CodeGenerator() {}
     void dump() { module->print(outs(), nullptr); }
 };

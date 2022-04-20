@@ -38,7 +38,9 @@ int main(int argc, char *argv[], char **envp)
     generator.module->setTargetTriple(sys::getDefaultTargetTriple());
     // emit tagret code
     program->codeGen(generator);
+    cout << "-----------------------------------------------------" << endl;
     generator.dump();
+    cout << "-----------------------------------------------------" << endl;
 
     // save the llvm bit code
     error_code ec;

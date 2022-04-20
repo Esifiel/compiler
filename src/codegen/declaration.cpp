@@ -4,7 +4,9 @@
 
 Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
 {
-    return nullptr;
+    Value *v = ctx.builder.CreateAlloca(type->getType(ctx), 0, (*name->name).c_str());
+    (v);
+
 }
 
 Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
@@ -14,18 +16,22 @@ Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
 
 Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 {
+    // create ret value type
     auto functype = FunctionType::get(rettype->getType(ctx), false);
-    cout << "function" << endl;
+    // create function
     auto func = Function::Create(functype, llvm::Function::ExternalLinkage, *name->name, *ctx.module);
-    cout << "function" << endl;
+    ctx.curFunction = func;
+    // create entry block for the function
     auto block = BasicBlock::Create(ctx.module->getContext(), "entry", func);
-    cout << "function" << endl;
+    // set up the builder insertion
     ctx.builder.SetInsertPoint(block);
 
-    cout << "function" << endl;
     stmts->codeGen(ctx);
 
-    verifyFunction(*func, &errs());
+    if(rettype->type == TYPE_VOID)
+        ctx.builder.CreateRetVoid();
 
-    return nullptr;
+    ctx.curFunction = nullptr;
+
+    return func;
 }

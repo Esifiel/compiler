@@ -6,10 +6,11 @@ long quicksort(int len)
     int i;
     int j;
 
-    if (len < 2)
-        return len;
-    else
-        return 666;
+    return 1;
+    // if (len < 2)
+    //     return len;
+    // else
+    //     return 666;
 // //     // int pivot = A[len / 2];
 // //     for (i = 0, j = len - 1; 1; i = i + 1, j = j - 1)
 // //     {

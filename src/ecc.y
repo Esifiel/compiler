@@ -28,6 +28,7 @@ void yyerror(string s);
 %union {
     union union_num num;
     string *stringValue;
+    enum op_type op;
     
     Node *node;
     Program *program;
@@ -102,7 +103,7 @@ void yyerror(string s);
 %type<forStatement> for-stmt
 %type<returnStatement> return-stmt
 
-%type<stringValue> addop mulop relop
+%type<op> relop addop mulop
 
 %left ADD SUB MUL DIV MOD
 
@@ -122,7 +123,7 @@ declaration : var-declaration { $$ = $1; }
     ;
 
 var-declaration : type-specifier id DELIM { $$ = new VariableDeclaration($1, $2); }
-    | type-specifier id LB number RB DELIM { $$ = new VariableDeclaration(new ArrayType($1, $4->longView()), $2); }
+    | type-specifier id LB number RB DELIM { $$ = new VariableDeclaration(new ArrayListType($1, $4->longView()), $2); }
     ;
 
 id : IDENTIFIER { $$ = new Identifier($1); }
@@ -153,7 +154,7 @@ param-list : param-list COMMA param { $1->push_back($3); $$ = $1; }
     ;
 
 param : type-specifier id { $$ = new Parameter($1, $2); }
-    | type-specifier id LB RB { $$ = new Parameter(new ArrayType($1, 0), $2); }
+    | type-specifier id LB RB { $$ = new Parameter(new ArrayListType($1, 0), $2); }
     ;
 
 compound-stmt : LC local-declarations statement-list RC { $$ = new CompoundStatement($2, $3); }
@@ -211,31 +212,31 @@ simple-expression : additive-expression relop additive-expression { $$ = new Sim
     | additive-expression { $$ = $1; }
     ;
 
-relop : LEQ { $$ = new string("<="); }
-    | LT { $$ = new string("<"); }
-    | GT { $$ = new string(">"); }
-    | GEQ { $$ = new string(">="); }
-    | EQ { $$ = new string("=="); }
-    | NEQ { $$ = new string("!="); }
-    | ANDAND { $$ = new string("&&"); }
-    | OROR { $$ = new string("||"); }
+relop : LEQ { $$ = OP_LEQ; }
+    | LT { $$ = OP_LT; }
+    | GT { $$ = OP_GT; }
+    | GEQ { $$ = OP_GEQ; }
+    | EQ { $$ = OP_EQ; }
+    | NEQ { $$ = OP_NEQ; }
+    | ANDAND { $$ = OP_ANDAND; }
+    | OROR { $$ = OP_OROR; }
     ;
 
 additive-expression : additive-expression addop term { $$ = new SimpleExpression($1, $2, $3); }
     | term { $$ = $1; }
     ;
 
-addop : ADD { $$ = new string("+"); }
-    | SUB { $$ = new string("-"); }
+addop : ADD { $$ = OP_ADD; }
+    | SUB { $$ = OP_SUB; }
     ;
 
 term : term mulop factor { $$ = new SimpleExpression($1, $2, $3); }
     | factor { $$ = $1; }
     ;
 
-mulop : MUL { $$ = new string("*"); }
-    | DIV { $$ = new string("/"); }
-    | MOD { $$ = new string("%"); }
+mulop : MUL { $$ = OP_MUL; }
+    | DIV { $$ = OP_DIV; }
+    | MOD { $$ = OP_MOD; }
     ;
 
 factor : LP expression RP { $$ = $2; }
@@ -256,12 +257,12 @@ arg-list : arg-list COMMA expression { $1->push_back($3); $$ = $1; }
     | expression { $$ = new vector<Expression *>; $$->push_back($1); }
     ;
 
-number : NUMCHAR { $$ = new Number($1, TYPE_CHAR); }
-    | NUMSHORT { $$ = new Number($1, TYPE_SHORT); }
-    | NUMINT { $$ = new Number($1, TYPE_INT); }
-    | NUMLONG { $$ = new Number($1, TYPE_LONG); }
-    | NUMFLOAT { $$ = new Number($1, TYPE_FLOAT); }
-    | NUMDOUBLE { $$ = new Number($1, TYPE_DOUBLE); }
+number : NUMCHAR { $$ = new Number($1, VAL_CHAR); }
+    | NUMSHORT { $$ = new Number($1, VAL_SHORT); }
+    | NUMINT { $$ = new Number($1, VAL_INT); }
+    | NUMLONG { $$ = new Number($1, VAL_LONG); }
+    | NUMFLOAT { $$ = new Number($1, VAL_FLOAT); }
+    | NUMDOUBLE { $$ = new Number($1, VAL_DOUBLE); }
     ;
 
 %%

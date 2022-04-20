@@ -145,6 +145,8 @@ public:
                 return ctx.builder.getFloatTy();
             case TYPE_DOUBLE:
                 return ctx.builder.getDoubleTy();
+            default:
+                return nullptr;
         }
     }
 };

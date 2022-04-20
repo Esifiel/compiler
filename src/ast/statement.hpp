@@ -66,7 +66,6 @@ public:
     IterationStatement(Expression *c, CompoundStatement *s) : cond(c), stmts(s) {}
     
     virtual string getName() { return "\"IterationStatement\""; }
-    virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
 class WhileStatement : public IterationStatement

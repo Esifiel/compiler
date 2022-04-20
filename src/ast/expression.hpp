@@ -3,12 +3,10 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 #include "basic.hpp"
-#include "type.hpp"
 
 using namespace std;
-
-class CodeGenerator;
 
 class Expression : public Node
 {
@@ -16,7 +14,6 @@ public:
     Expression() {}
 
     virtual string getName() { return "\"Expression\""; }
-    virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
 union union_num
@@ -38,6 +35,8 @@ enum val_type
     VAL_FLOAT,
     VAL_DOUBLE
 };
+
+class CodeGenerator;
 
 class Number : public Expression
 {
@@ -82,6 +81,8 @@ public:
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
+class TypeSpecifier;
+
 class Parameter : public Expression
 {
 public:
@@ -119,19 +120,36 @@ public:
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
+enum op_type {
+    NONE,
+    OP_EQ,
+    OP_LT,
+    OP_GT,
+    OP_LEQ,
+    OP_GEQ,
+    OP_NEQ,
+    OP_ANDAND,
+    OP_OROR,
+    OP_ADD,
+    OP_SUB,
+    OP_MUL,
+    OP_DIV,
+    OP_MOD
+};
+
 class SimpleExpression : public Expression
 {
 public:
     Expression *left;
-    string *op;
+    enum op_type op;
     Expression *right;
 
     SimpleExpression(Expression *l) : left(l)
     {
-        op = nullptr;
+        op = NONE;
         right = nullptr;
     }
-    SimpleExpression(Expression *l, string *o, Expression *r) : left(l), op(o), right(r) {}
+    SimpleExpression(Expression *l, enum op_type o, Expression *r) : left(l), op(o), right(r) {}
 
     virtual string getName() { return "\"SimpleExpression\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
