@@ -1,6 +1,8 @@
 #ifndef _CODEGEN_HPP_
 #define _CODEGEN_HPP_
 
+#pragma once
+
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/STLExtras.h>
 #include <llvm/IR/BasicBlock.h>
@@ -45,13 +47,7 @@ public:
     map<string, Value *> globals;
     bool isglobal;
 
-    // initialize the context
-    CodeGenerator() : builder(ctx)
-    {
-        module = new Module("main", ctx);
-        curFunction = nullptr;
-        isglobal = false;
-    }
+    CodeGenerator();
     ~CodeGenerator() {}
 
     // debug utils
@@ -59,12 +55,10 @@ public:
     void error(string msg);
     void warning();
 
-    // simplified type casting
     Value *CreateCast(Value *V, Type *DestTy);
-    // search for variables
     Value *GetVar(string name);
-    // multi types compare instruction
-    Value *CreateCmp(Value *a, Value *b);
+    Function *GetFunction(string name);
+    Value *CreateBinaryExpr(Value *a, Value *b, enum op_type op);
 };
 
 #endif

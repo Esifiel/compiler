@@ -49,7 +49,7 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     ctx.functions[*name->name] = func;
 
     // create entry block for the function
-    BasicBlock *block = BasicBlock::Create(ctx.module->getContext(), "entry", func);
+    BasicBlock *block = BasicBlock::Create(ctx.ctx, "entry", func);
     // set up the builder insertion
     ctx.builder.SetInsertPoint(block);
 

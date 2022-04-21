@@ -30,29 +30,31 @@ Value *WhileStatement::codeGen(CodeGenerator &ctx)
 
 Value *ForStatement::codeGen(CodeGenerator &ctx)
 {
-    // create 3 basic blocks
+    // create basic blocks
     BasicBlock *forinit = BasicBlock::Create(ctx.ctx, "forinit", ctx.curFunction);
+    BasicBlock *forcond = BasicBlock::Create(ctx.ctx, "forcond", ctx.curFunction);
     BasicBlock *forloop = BasicBlock::Create(ctx.ctx, "forloop", ctx.curFunction);
     BasicBlock *forout = BasicBlock::Create(ctx.ctx, "forout", ctx.curFunction);
+    ctx.builder.CreateBr(forinit);
 
     // init expr
     ctx.builder.SetInsertPoint(forinit);
     for(auto p = init->begin(); p != init->end(); p++)
         (*p)->codeGen(ctx);
+    ctx.builder.CreateBr(forcond);
+
+    // conditional branch: true -> go on forloop, false -> go to forout
+    ctx.builder.SetInsertPoint(forcond);
+    Value *condVal = cond->codeGen(ctx);
+    ctx.builder.CreateCondBr(condVal, forloop, forout);
 
     // loop start
     ctx.builder.SetInsertPoint(forloop);
     stmts->codeGen(ctx);
-
-    ctx.dump();
-
     // round end
     for(auto p = end->begin(); p != end->end(); p++)
         (*p)->codeGen(ctx);
-
-    // conditional branch: true -> go on forloop, false -> go to forout
-    Value *condVal = cond->codeGen(ctx);
-    ctx.builder.CreateCondBr(condVal, forloop, forout);
+    ctx.builder.CreateBr(forcond);
 
     ctx.builder.SetInsertPoint(forout);
 

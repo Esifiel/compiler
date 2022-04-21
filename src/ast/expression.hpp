@@ -1,6 +1,8 @@
 #ifndef _EXPRESSION_HPP_
 #define _EXPRESSION_HPP_
 
+#pragma once
+
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -122,6 +124,7 @@ public:
 
 enum op_type {
     NONE,
+
     OP_EQ,
     OP_LT,
     OP_GT,
@@ -130,6 +133,12 @@ enum op_type {
     OP_NEQ,
     OP_ANDAND,
     OP_OROR,
+
+    OP_AND,
+    OP_OR,
+    OP_NOT,
+    OP_XOR,
+    
     OP_ADD,
     OP_SUB,
     OP_MUL,

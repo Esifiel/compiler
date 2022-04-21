@@ -82,7 +82,8 @@
         "__string": "cpp",
         "__threading_support": "cpp",
         "shared_mutex": "cpp",
-        "__memory": "cpp"
+        "__memory": "cpp",
+        "*.def": "cpp"
     },
     "python.formatting.provider": "autopep8",
     "python.linting.enabled": false

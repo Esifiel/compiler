@@ -106,8 +106,8 @@ digraph AST {
 	Identifier50 -> i51
 	op [label=op]
 	SimpleExpression -> op
-	"<" [label="<"]
-	op -> "<"
+	"<=" [label="<="]
+	op -> "<="
 	Number54 [label=Number]
 	SimpleExpression -> Number54
 	100 [label=100]
@@ -126,8 +126,8 @@ digraph AST {
 	Identifier60 -> i61
 	op62 [label=op]
 	SimpleExpression59 -> op62
-	"+" [label="+"]
-	op62 -> "+"
+	"%" [label="%"]
+	op62 -> "%"
 	Number64 [label=Number]
 	SimpleExpression59 -> Number64
 	1 [label=1]
@@ -150,8 +150,8 @@ digraph AST {
 	Identifier72 -> sum73
 	op74 [label=op]
 	SimpleExpression71 -> op74
-	"+75" [label="+"]
-	op74 -> "+75"
+	"%75" [label="%"]
+	op74 -> "%75"
 	Identifier76 [label=Identifier]
 	SimpleExpression71 -> Identifier76
 	i77 [label=i]

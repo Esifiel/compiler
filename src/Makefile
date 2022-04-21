@@ -43,10 +43,8 @@ $(NAME): $(OBJECTS) FORCE
 	
 	@cat ../test/quicksort.c | ./$(NAME)
 	@clang --target=$(TARGET) ./test.bc -o ./test 
-	@cd tmp
-	@opt -dot-cfg ../test.ll
-	@for i in `find . | grep .dot$`; do (dot $i -Tpng -o $i.png); done
-	@cd ..
+	@cd tmp && opt -dot-cfg ../test.ll
+	@cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
 
 clean:
 	@rm -f $(NAME)

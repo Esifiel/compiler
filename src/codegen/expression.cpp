@@ -1,6 +1,7 @@
 #include "../ast/expression.hpp"
 #include "codegen.hpp"
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -54,7 +55,13 @@ Value *Assignment::codeGen(CodeGenerator &ctx)
 
 Value *FunctionCall::codeGen(CodeGenerator &ctx)
 {
-    return nullptr;
+    // set the params
+    vector<Value *> args;
+    for(auto p = varlist->begin(); p != varlist->end(); p++)
+        args.push_back((*p)->codeGen(ctx));
+    
+    // build a call instruction
+    return ctx.builder.CreateCall(ctx.GetFunction(*name->name), args);
 }
 
 Value *SimpleExpression::codeGen(CodeGenerator &ctx)
@@ -65,22 +72,5 @@ Value *SimpleExpression::codeGen(CodeGenerator &ctx)
     else
         return lv;
 
-    switch (op)
-    {
-    case OP_EQ:
-        return ctx.CreateCmp(lv, rv);
-    case OP_LT:
-        return ctx.CreateCmp(lv, rv);
-    case OP_GT:
-    case OP_LEQ:
-    case OP_GEQ:
-    case OP_NEQ:
-    case OP_ANDAND:
-    case OP_OROR:
-        break;
-    default:
-        return nullptr;
-    }
-
-    ctx.builder.CreateFCmpULT(Variable, ConstantFP::get(TheContext, APFloat(10.0)), "cmptmp");
+    return ctx.CreateBinaryExpr(lv, rv, op);
 }
