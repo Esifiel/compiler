@@ -92,7 +92,6 @@ public:
 class ReturnStatement : public Statement
 {
 public:
-    TypeSpecifier *type;
     ExpressionStatement *res;
 
     ReturnStatement(ExpressionStatement *r) : res(r) {}

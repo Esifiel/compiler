@@ -40,11 +40,14 @@ int main(int argc, char *argv[], char **envp)
     program->codeGen(generator);
     generator.dump();
 
-    // save the llvm bit code
+    // save the llvm bit code and plaintext IR
     error_code ec;
-    raw_fd_ostream os("./test.bc", ec, sys::fs::F_None);
-    WriteBitcodeToFile(*generator.module, os);
-    os.flush();
+    raw_fd_ostream bc("./test.bc", ec, sys::fs::F_None);
+    WriteBitcodeToFile(*generator.module, bc);
+    bc.flush();
+    raw_fd_ostream ll("./test.ll", ec, sys::fs::F_None);
+    generator.module->print(ll, nullptr);
+    ll.flush();
 
     cout << "[+] target code generated." << endl;
 

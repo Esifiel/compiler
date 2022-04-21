@@ -54,21 +54,17 @@ public:
     }
     ~CodeGenerator() {}
 
-    // utils
-    void dump()
-    {
-        cout << "--------------------IR begin--------------------" << endl;
-        module->print(outs(), nullptr);
-        cout << "--------------------IR end---------------------" << endl;
-    }
-    void error(string msg)
-    {
-        cerr << "\033[31m" << "error: " << "\033[0m" << msg << endl;
-        exit(1);
-    }
-    void warning()
-    {
-    }
+    // debug utils
+    void dump();
+    void error(string msg);
+    void warning();
+
+    // simplified type casting
+    Value *CreateCast(Value *V, Type *DestTy);
+    // search for variables
+    Value *GetVar(string name);
+    // multi types compare instruction
+    Value *CreateCmp(Value *a, Value *b);
 };
 
 #endif

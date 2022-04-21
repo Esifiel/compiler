@@ -3,12 +3,11 @@
 int a;
 
 // void quicksort(int *A, int len)
-long quicksort(int len)
+void quicksort(int len)
 {
     int i;
     int j;
-
-    return 1;
+    
     // if (len < 2)
     //     return len;
     // else

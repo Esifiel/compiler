@@ -1,5 +1,8 @@
 #include "../ast/expression.hpp"
 #include "codegen.hpp"
+#include <string>
+
+using namespace std;
 
 Value *Number::codeGen(CodeGenerator &ctx)
 {
@@ -29,7 +32,9 @@ Value *String::codeGen(CodeGenerator &ctx)
 
 Value *Identifier::codeGen(CodeGenerator &ctx)
 {
-    return nullptr;
+    string varname = *name;
+    Value *var = ctx.GetVar(varname);
+    return ctx.builder.CreateLoad(var);
 }
 
 Value *Parameter::codeGen(CodeGenerator &ctx)
@@ -39,8 +44,12 @@ Value *Parameter::codeGen(CodeGenerator &ctx)
 
 Value *Assignment::codeGen(CodeGenerator &ctx)
 {
-    
-    return nullptr;
+    string varname = *lv->name;
+    Value *var = ctx.GetVar(varname);
+    Value *newval = ctx.CreateCast(rv->codeGen(ctx), ((AllocaInst *)var)->getAllocatedType());
+    // do a store operations
+    ctx.builder.CreateStore(newval, var);
+    return newval;
 }
 
 Value *FunctionCall::codeGen(CodeGenerator &ctx)
@@ -50,26 +59,28 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
 
 Value *SimpleExpression::codeGen(CodeGenerator &ctx)
 {
-    // Value *lv = left->codeGen(), *rv = nullptr;
-    // if (right)
-    //     rv = right->codeGen();
-    // else
-    //     return lv;
+    Value *lv = left->codeGen(ctx), *rv = nullptr;
+    if (right)
+        rv = right->codeGen(ctx);
+    else
+        return lv;
 
-    // switch (op)
-    // {
-    // case OP_EQ:
-    //     return
-    // case OP_LT:
+    switch (op)
+    {
+    case OP_EQ:
+        return ctx.CreateCmp(lv, rv);
+    case OP_LT:
+        return ctx.CreateCmp(lv, rv);
+    case OP_GT:
+    case OP_LEQ:
+    case OP_GEQ:
+    case OP_NEQ:
+    case OP_ANDAND:
+    case OP_OROR:
+        break;
+    default:
+        return nullptr;
+    }
 
-    // case OP_GT:
-    // case OP_LEQ:
-    // case OP_GEQ:
-    // case OP_NEQ:
-    // case OP_ANDAND:
-    // case OP_OROR:
-    //     break;
-    // default:
-    //     return nullptr;
-    // }
+    ctx.builder.CreateFCmpULT(Variable, ConstantFP::get(TheContext, APFloat(10.0)), "cmptmp");
 }

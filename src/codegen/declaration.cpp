@@ -4,6 +4,7 @@
 
 Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
 {
+    string varname = *name->name;
     if (ctx.isglobal)
     {
         // global variable
@@ -13,15 +14,19 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             false, // not constant
             GlobalValue::PrivateLinkage,
             0,
-            *name->name
+            varname
         );
         // initialize to 0
         v->setInitializer(ConstantInt::get(type->getType(ctx), 0));
+        ctx.globals[varname] = v;
         return v;
     }
     else
+    {
         // allocate space for new local variable
-        return ctx.builder.CreateAlloca(type->getType(ctx), 0, (*name->name).c_str());
+        ctx.locals[varname] = ctx.builder.CreateAlloca(type->getType(ctx), 0, varname.c_str());
+        return ctx.locals[varname];
+    }
 }
 
 Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
@@ -36,14 +41,15 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
         ctx.error(string("redefinition of function '") + *name->name + string("'"));
 
     // create ret value type
-    auto functype = FunctionType::get(rettype->getType(ctx), false);
+    FunctionType *functype = FunctionType::get(rettype->getType(ctx), false);
     // create function
-    auto func = Function::Create(functype, llvm::Function::ExternalLinkage, *name->name, *ctx.module);
+    Function *func = Function::Create(functype, llvm::Function::ExternalLinkage, *name->name, *ctx.module);
     // add to map and mark as current
     ctx.curFunction = func;
     ctx.functions[*name->name] = func;
+
     // create entry block for the function
-    auto block = BasicBlock::Create(ctx.module->getContext(), "entry", func);
+    BasicBlock *block = BasicBlock::Create(ctx.module->getContext(), "entry", func);
     // set up the builder insertion
     ctx.builder.SetInsertPoint(block);
 
@@ -54,6 +60,7 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
         ctx.builder.CreateRetVoid();
 
     ctx.curFunction = nullptr;
+    ctx.locals.clear();
 
     return func;
 }

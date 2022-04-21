@@ -11,12 +11,21 @@ OBJECTS =	./main.o \
 			./codegen/type.o \
 			./codegen/expression.o \
 			./codegen/statement.o \
+			./codegen/codegen.o \
 			./utils/visualizer.o
+HEADS = 	./ast/basic.hpp \
+			./ast/declaration.hpp \
+			./ast/expression.hpp \
+			./ast/program.hpp \
+			./ast/statement.hpp \
+			./ast/type.hpp \
+			./codegen/codegen.hpp \
+			./utils/visualizer.hpp
 TARGET = `llvm-config --host-target`
 
 .PHONY: all
 
-all: $(NAME) FORCE
+all: $(NAME)
 
 parser.cpp: $(NAME).y
 	$(YACC) -dv -o $@ $<
@@ -34,6 +43,10 @@ $(NAME): $(OBJECTS) FORCE
 	
 	@cat ../test/quicksort.c | ./$(NAME)
 	@clang --target=$(TARGET) ./test.bc -o ./test 
+	@cd tmp
+	@opt -dot-cfg ../test.ll
+	@for i in `find . | grep .dot$`; do (dot $i -Tpng -o $i.png); done
+	@cd ..
 
 clean:
 	@rm -f $(NAME)

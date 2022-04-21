@@ -55,18 +55,8 @@ public:
     vector<Parameter *> *params;
     CompoundStatement *stmts;
 
-    FunctionDeclaration(TypeSpecifier *t, Identifier *n, vector<Parameter *> *p, CompoundStatement *s) : rettype(t), name(n), params(p), stmts(s) {
-        // correct the ret val type
-        for(auto p = s->stmts->begin(); p != s->stmts->end(); p++)
-        {
-            if((*p)->getName() == "\"ReturnStatement\"")
-            {
-                ReturnStatement *tmp = (ReturnStatement *)(*p);
-                tmp->type = rettype;
-            }
-        }
-    }
-    
+    FunctionDeclaration(TypeSpecifier *t, Identifier *n, vector<Parameter *> *p, CompoundStatement *s) : rettype(t), name(n), params(p), stmts(s) {}
+
     virtual string getName() { return "\"FunctionDeclaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
 };

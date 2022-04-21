@@ -12,8 +12,8 @@ digraph AST {
 	Identifier -> a
 	FunctionDeclaration [label=FunctionDeclaration]
 	Program -> FunctionDeclaration
-	LongType [label=LongType]
-	FunctionDeclaration -> LongType
+	VoidType [label=VoidType]
+	FunctionDeclaration -> VoidType
 	Identifier7 [label=Identifier]
 	FunctionDeclaration -> Identifier7
 	quicksort [label=quicksort]
@@ -44,163 +44,155 @@ digraph AST {
 	VariableDeclaration18 -> Identifier20
 	j [label=j]
 	Identifier20 -> j
-	ReturnStatement [label=ReturnStatement]
-	CompoundStatement -> ReturnStatement
-	ExpressionStatement [label=ExpressionStatement]
-	ReturnStatement -> ExpressionStatement
-	Number [label=Number]
-	ExpressionStatement -> Number
-	1 [label=1]
-	Number -> 1
-	FunctionDeclaration26 [label=FunctionDeclaration]
-	Program -> FunctionDeclaration26
-	IntType27 [label=IntType]
-	FunctionDeclaration26 -> IntType27
-	Identifier28 [label=Identifier]
-	FunctionDeclaration26 -> Identifier28
+	FunctionDeclaration22 [label=FunctionDeclaration]
+	Program -> FunctionDeclaration22
+	IntType23 [label=IntType]
+	FunctionDeclaration22 -> IntType23
+	Identifier24 [label=Identifier]
+	FunctionDeclaration22 -> Identifier24
 	main [label=main]
-	Identifier28 -> main
-	Parameter30 [label=Parameter]
-	FunctionDeclaration26 -> Parameter30
-	VoidType [label=VoidType]
-	Parameter30 -> VoidType
-	CompoundStatement32 [label=CompoundStatement]
-	FunctionDeclaration26 -> CompoundStatement32
+	Identifier24 -> main
+	Parameter26 [label=Parameter]
+	FunctionDeclaration22 -> Parameter26
+	VoidType27 [label=VoidType]
+	Parameter26 -> VoidType27
+	CompoundStatement28 [label=CompoundStatement]
+	FunctionDeclaration22 -> CompoundStatement28
+	VariableDeclaration29 [label=VariableDeclaration]
+	CompoundStatement28 -> VariableDeclaration29
+	IntType30 [label=IntType]
+	VariableDeclaration29 -> IntType30
+	Identifier31 [label=Identifier]
+	VariableDeclaration29 -> Identifier31
+	sum [label=sum]
+	Identifier31 -> sum
 	VariableDeclaration33 [label=VariableDeclaration]
-	CompoundStatement32 -> VariableDeclaration33
+	CompoundStatement28 -> VariableDeclaration33
 	IntType34 [label=IntType]
 	VariableDeclaration33 -> IntType34
 	Identifier35 [label=Identifier]
 	VariableDeclaration33 -> Identifier35
-	sum [label=sum]
-	Identifier35 -> sum
-	VariableDeclaration37 [label=VariableDeclaration]
-	CompoundStatement32 -> VariableDeclaration37
-	IntType38 [label=IntType]
-	VariableDeclaration37 -> IntType38
-	Identifier39 [label=Identifier]
-	VariableDeclaration37 -> Identifier39
-	i40 [label=i]
-	Identifier39 -> i40
-	ExpressionStatement41 [label=ExpressionStatement]
-	CompoundStatement32 -> ExpressionStatement41
+	i36 [label=i]
+	Identifier35 -> i36
+	ExpressionStatement [label=ExpressionStatement]
+	CompoundStatement28 -> ExpressionStatement
 	Assignment [label=Assignment]
-	ExpressionStatement41 -> Assignment
-	Identifier43 [label=Identifier]
-	Assignment -> Identifier43
-	sum44 [label=sum]
-	Identifier43 -> sum44
-	Number45 [label=Number]
-	Assignment -> Number45
+	ExpressionStatement -> Assignment
+	Identifier39 [label=Identifier]
+	Assignment -> Identifier39
+	sum40 [label=sum]
+	Identifier39 -> sum40
+	Number [label=Number]
+	Assignment -> Number
 	0 [label=0]
-	Number45 -> 0
+	Number -> 0
 	ForStatement [label=ForStatement]
-	CompoundStatement32 -> ForStatement
-	Assignment48 [label=Assignment]
-	ForStatement -> Assignment48
-	Identifier49 [label=Identifier]
-	Assignment48 -> Identifier49
-	i50 [label=i]
-	Identifier49 -> i50
-	Number51 [label=Number]
-	Assignment48 -> Number51
-	052 [label=0]
-	Number51 -> 052
+	CompoundStatement28 -> ForStatement
+	Assignment44 [label=Assignment]
+	ForStatement -> Assignment44
+	Identifier45 [label=Identifier]
+	Assignment44 -> Identifier45
+	i46 [label=i]
+	Identifier45 -> i46
+	Number47 [label=Number]
+	Assignment44 -> Number47
+	048 [label=0]
+	Number47 -> 048
 	SimpleExpression [label=SimpleExpression]
 	ForStatement -> SimpleExpression
-	Identifier54 [label=Identifier]
-	SimpleExpression -> Identifier54
-	i55 [label=i]
-	Identifier54 -> i55
+	Identifier50 [label=Identifier]
+	SimpleExpression -> Identifier50
+	i51 [label=i]
+	Identifier50 -> i51
 	op [label=op]
 	SimpleExpression -> op
 	"<" [label="<"]
 	op -> "<"
-	Number58 [label=Number]
-	SimpleExpression -> Number58
+	Number54 [label=Number]
+	SimpleExpression -> Number54
 	100 [label=100]
-	Number58 -> 100
-	Assignment60 [label=Assignment]
-	ForStatement -> Assignment60
-	Identifier61 [label=Identifier]
-	Assignment60 -> Identifier61
-	i62 [label=i]
-	Identifier61 -> i62
-	SimpleExpression63 [label=SimpleExpression]
-	Assignment60 -> SimpleExpression63
-	Identifier64 [label=Identifier]
-	SimpleExpression63 -> Identifier64
-	i65 [label=i]
-	Identifier64 -> i65
-	op66 [label=op]
-	SimpleExpression63 -> op66
+	Number54 -> 100
+	Assignment56 [label=Assignment]
+	ForStatement -> Assignment56
+	Identifier57 [label=Identifier]
+	Assignment56 -> Identifier57
+	i58 [label=i]
+	Identifier57 -> i58
+	SimpleExpression59 [label=SimpleExpression]
+	Assignment56 -> SimpleExpression59
+	Identifier60 [label=Identifier]
+	SimpleExpression59 -> Identifier60
+	i61 [label=i]
+	Identifier60 -> i61
+	op62 [label=op]
+	SimpleExpression59 -> op62
 	"+" [label="+"]
-	op66 -> "+"
-	Number68 [label=Number]
-	SimpleExpression63 -> Number68
-	169 [label=1]
-	Number68 -> 169
-	CompoundStatement70 [label=CompoundStatement]
-	ForStatement -> CompoundStatement70
-	ExpressionStatement71 [label=ExpressionStatement]
-	CompoundStatement70 -> ExpressionStatement71
-	Assignment72 [label=Assignment]
-	ExpressionStatement71 -> Assignment72
-	Identifier73 [label=Identifier]
-	Assignment72 -> Identifier73
-	sum74 [label=sum]
-	Identifier73 -> sum74
-	SimpleExpression75 [label=SimpleExpression]
-	Assignment72 -> SimpleExpression75
+	op62 -> "+"
+	Number64 [label=Number]
+	SimpleExpression59 -> Number64
+	1 [label=1]
+	Number64 -> 1
+	CompoundStatement66 [label=CompoundStatement]
+	ForStatement -> CompoundStatement66
+	ExpressionStatement67 [label=ExpressionStatement]
+	CompoundStatement66 -> ExpressionStatement67
+	Assignment68 [label=Assignment]
+	ExpressionStatement67 -> Assignment68
+	Identifier69 [label=Identifier]
+	Assignment68 -> Identifier69
+	sum70 [label=sum]
+	Identifier69 -> sum70
+	SimpleExpression71 [label=SimpleExpression]
+	Assignment68 -> SimpleExpression71
+	Identifier72 [label=Identifier]
+	SimpleExpression71 -> Identifier72
+	sum73 [label=sum]
+	Identifier72 -> sum73
+	op74 [label=op]
+	SimpleExpression71 -> op74
+	"+75" [label="+"]
+	op74 -> "+75"
 	Identifier76 [label=Identifier]
-	SimpleExpression75 -> Identifier76
-	sum77 [label=sum]
-	Identifier76 -> sum77
-	op78 [label=op]
-	SimpleExpression75 -> op78
-	"+79" [label="+"]
-	op78 -> "+79"
-	Identifier80 [label=Identifier]
-	SimpleExpression75 -> Identifier80
-	i81 [label=i]
-	Identifier80 -> i81
-	ExpressionStatement82 [label=ExpressionStatement]
-	CompoundStatement32 -> ExpressionStatement82
+	SimpleExpression71 -> Identifier76
+	i77 [label=i]
+	Identifier76 -> i77
+	ExpressionStatement78 [label=ExpressionStatement]
+	CompoundStatement28 -> ExpressionStatement78
 	FunctionCall [label=FunctionCall]
-	ExpressionStatement82 -> FunctionCall
-	Identifier84 [label=Identifier]
-	FunctionCall -> Identifier84
-	quicksort85 [label=quicksort]
-	Identifier84 -> quicksort85
-	Number86 [label=Number]
-	FunctionCall -> Number86
+	ExpressionStatement78 -> FunctionCall
+	Identifier80 [label=Identifier]
+	FunctionCall -> Identifier80
+	quicksort81 [label=quicksort]
+	Identifier80 -> quicksort81
+	Number82 [label=Number]
+	FunctionCall -> Number82
 	3 [label=3]
-	Number86 -> 3
-	ExpressionStatement88 [label=ExpressionStatement]
-	CompoundStatement32 -> ExpressionStatement88
-	FunctionCall89 [label=FunctionCall]
-	ExpressionStatement88 -> FunctionCall89
-	Identifier90 [label=Identifier]
-	FunctionCall89 -> Identifier90
+	Number82 -> 3
+	ExpressionStatement84 [label=ExpressionStatement]
+	CompoundStatement28 -> ExpressionStatement84
+	FunctionCall85 [label=FunctionCall]
+	ExpressionStatement84 -> FunctionCall85
+	Identifier86 [label=Identifier]
+	FunctionCall85 -> Identifier86
 	printf [label=printf]
-	Identifier90 -> printf
+	Identifier86 -> printf
 	String [label=String]
-	FunctionCall89 -> String
+	FunctionCall85 -> String
 	"%d
 " [label="%d
 "]
 	String -> "%d
 "
-	Identifier94 [label=Identifier]
-	FunctionCall89 -> Identifier94
-	sum95 [label=sum]
-	Identifier94 -> sum95
-	ReturnStatement96 [label=ReturnStatement]
-	CompoundStatement32 -> ReturnStatement96
-	ExpressionStatement97 [label=ExpressionStatement]
-	ReturnStatement96 -> ExpressionStatement97
-	Number98 [label=Number]
-	ExpressionStatement97 -> Number98
-	099 [label=0]
-	Number98 -> 099
+	Identifier90 [label=Identifier]
+	FunctionCall85 -> Identifier90
+	sum91 [label=sum]
+	Identifier90 -> sum91
+	ReturnStatement [label=ReturnStatement]
+	CompoundStatement28 -> ReturnStatement
+	ExpressionStatement93 [label=ExpressionStatement]
+	ReturnStatement -> ExpressionStatement93
+	Number94 [label=Number]
+	ExpressionStatement93 -> Number94
+	095 [label=0]
+	Number94 -> 095
 }
