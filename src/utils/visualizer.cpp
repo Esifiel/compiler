@@ -33,11 +33,11 @@ void Visualizer::visitDeclarationList(vector<Declaration *> *l)
 {
     if (l)
     {
-        for (auto p = l->begin(); p != l->end(); p++)
+        for (auto &p : *l)
         {
-            if (p != l->begin())
+            if (p != (*l)[0])
                 out << sep;
-            visitDeclaration(*p);
+            visitDeclaration(p);
         }
     }
 }
@@ -75,13 +75,14 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
         visitIdentifier(d->name);
         out << sep;
 
-        for (auto p = d->params->begin(); p != d->params->end(); p++)
+        for (auto &p : *d->params)
         {
-            if (p != d->params->begin())
+            if (p != (*d->params)[0])
                 out << sep;
-            visitParameter(*p);
+            visitParameter(p);
         }
-        out << sep;
+        if (d->params->size() != 0)
+            out << sep;
         visitCompoundStatement(d->stmts);
         out << subend << tail;
     }
@@ -117,10 +118,15 @@ void Visualizer::visitParameter(Parameter *p)
     }
 }
 
+void replace(string &src, string sub, string tar);
 void Visualizer::visitString(String *s)
 {
     if (s)
-        out << head << s->getName() << sub << s->val << subend << tail;
+    {
+        string output = "\"" + s->val + "\"";
+        replace(output, "\n", "\\n");
+        out << head << s->getName() << sub << output << subend << tail;
+    }
 }
 
 void Visualizer::visitCompoundStatement(CompoundStatement *c)
@@ -128,19 +134,19 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
     if (c)
     {
         out << head << c->getName() << sub;
-        for (auto p = c->vardecs->begin(); p != c->vardecs->end(); p++)
+        for (auto &p : *c->vardecs)
         {
-            if (p != c->vardecs->begin())
+            if (p != (*c->vardecs)[0])
                 out << sep;
-            visitDeclaration(*p);
+            visitDeclaration(p);
         }
         if (c->vardecs->size() > 0 && c->stmts->size() > 0)
             out << sep;
-        for (auto p = c->stmts->begin(); p != c->stmts->end(); p++)
+        for (auto &p : *c->stmts)
         {
-            if (p != c->stmts->begin())
+            if (p != (*c->stmts)[0])
                 out << sep;
-            visitStatement(*p);
+            visitStatement(p);
         }
         out << subend << tail;
     }
@@ -233,22 +239,22 @@ void Visualizer::visitForStatement(ForStatement *f)
     if (f)
     {
         out << head << f->getName() << sub;
-        for (auto p = f->init->begin(); p != f->init->end(); p++)
+        for (auto &p : *f->init)
         {
-            if (p != f->init->begin())
+            if (p != (*f->init)[0])
                 out << sep;
-            visitExpression(*p);
+            visitExpression(p);
         }
         if (f->init->size() > 0 && f->cond)
             out << sep;
         visitExpression(f->cond);
         if ((f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
             out << sep;
-        for (auto p = f->end->begin(); p != f->end->end(); p++)
+        for (auto &p : *f->end)
         {
-            if (p != f->end->begin())
+            if (p != (*f->end)[0])
                 out << sep;
-            visitExpression(*p);
+            visitExpression(p);
         }
         if ((f->stmts && f->end->size() > 0) || (f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
             out << sep;
@@ -310,11 +316,11 @@ void Visualizer::visitFunctionCall(FunctionCall *f)
         visitIdentifier(f->name);
         if (f->varlist->size() > 0)
             out << sep;
-        for (auto p = f->varlist->begin(); p != f->varlist->end(); p++)
+        for (auto &p : *f->varlist)
         {
-            if (p != f->varlist->begin())
+            if (p != (*f->varlist)[0])
                 out << sep;
-            visitExpression(*p);
+            visitExpression(p);
         }
         out << subend << tail;
     }

@@ -29,7 +29,7 @@ void quicksort(int len)
 // //     // quicksort(A + i, len - i);
 }
 
-int main(void)
+int main()
 {
     // // int a[10010] = {0};
     // int n;

@@ -145,7 +145,7 @@ fun-declaration : type-specifier id LP params RP compound-stmt { $$ = new Functi
     ;
 
 params : param-list { $$ = $1; }
-    | VOID { $$ = new vector<Parameter *>; $$->push_back(new Parameter(new VoidType())); }
+    | VOID { $$ = new vector<Parameter *>; }
     | { $$ = new vector<Parameter *>; }
     ;
 

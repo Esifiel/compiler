@@ -5,17 +5,17 @@ using namespace llvm;
 
 Value *Program::codeGen(CodeGenerator &ctx)
 {
-    for (auto p = decs->begin(); p != decs->end(); p++)
+    for (auto &p : *decs)
     {
-        if ((*p)->getName() == "\"VariableDeclaration\"")
+        if (p->getName() == "\"VariableDeclaration\"")
         {
             ctx.isglobal = true;
-            (*p)->codeGen(ctx);
+            p->codeGen(ctx);
             ctx.isglobal = false;
         }
-        else if ((*p)->getName() == "\"FunctionDeclaration\"")
+        else if (p->getName() == "\"FunctionDeclaration\"")
         {
-            Value *ret = (*p)->codeGen(ctx);
+            Value *ret = p->codeGen(ctx);
             verifyFunction(*(Function *)ret, &errs());
         }
     }

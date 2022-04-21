@@ -45,6 +45,21 @@ public:
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
 };
 
+class TypeSpecifier;
+
+class Parameter : public Declaration
+{
+public:
+    TypeSpecifier *type;
+    Identifier *name;
+
+    Parameter(TypeSpecifier *t) : type(t) {}
+    Parameter(TypeSpecifier *t, Identifier *n) : type(t), name(n) {}
+
+    virtual string getName() { return "\"Parameter\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
 class CompoundStatement;
 
 class FunctionDeclaration : public Declaration

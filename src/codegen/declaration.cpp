@@ -14,8 +14,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             false, // not constant
             GlobalValue::PrivateLinkage,
             0,
-            varname
-        );
+            varname);
         // initialize to 0
         v->setInitializer(ConstantInt::get(type->getType(ctx), 0));
         ctx.globals[varname] = v;
@@ -34,16 +33,41 @@ Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
     return nullptr;
 }
 
+Value *Parameter::codeGen(CodeGenerator &ctx)
+{
+    Value *tmp = (Value *)type->getType(ctx);
+    return tmp;
+}
+
 Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 {
     // check redefinition
-    if(ctx.functions.find(*name->name) != ctx.functions.end())
+    if (ctx.functions.find(*name->name) != ctx.functions.end())
         ctx.error(string("redefinition of function '") + *name->name + string("'"));
 
-    // create ret value type
-    FunctionType *functype = FunctionType::get(rettype->getType(ctx), false);
+    // create function type
+    FunctionType *functype;
+    if (params->size() != 0)
+    {
+        // collect args
+        vector<Type *> args;
+        for (auto &p : *params)
+            args.push_back((Type *)(p->codeGen(ctx)));
+        // false: is not variable args
+        functype = FunctionType::get(rettype->getType(ctx), args, false);
+    }
+    else
+        // no param
+        functype = FunctionType::get(rettype->getType(ctx), false);
+
     // create function
-    Function *func = Function::Create(functype, llvm::Function::ExternalLinkage, *name->name, *ctx.module);
+    Function *func = Function::Create(functype, Function::ExternalLinkage, *name->name, *ctx.module);
+
+    // set arg name
+    uint64_t idx = 0;
+    for (auto &arg : func->args())
+        arg.setName(*(*params)[idx++]->name->name);
+
     // add to map and mark as current
     ctx.curFunction = func;
     ctx.functions[*name->name] = func;

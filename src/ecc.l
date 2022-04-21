@@ -11,6 +11,14 @@ void debug() {
     printf("token %lu:\t%s\n", cnt, yytext);
     cnt++;
 }
+
+// replace escape char
+void replace(string &src, string sub, string tar)
+{
+    string::size_type pos = 0;
+    while((pos = src.find(sub)) != string::npos)
+        src.replace(pos, sub.length(), tar);
+}
 %}
 
 %option noyywrap
@@ -128,7 +136,9 @@ void debug() {
                                 }
 \".*\"                          {
                                     debug();
-                                    yylval.stringValue = new string(yytext);
+                                    yytext[strlen(yytext) - 1] = 0;
+                                    yylval.stringValue = new string(yytext + 1);
+                                    replace(*yylval.stringValue, string("\\n"), string("\n"));
                                     return STRING;
                                 }
                             

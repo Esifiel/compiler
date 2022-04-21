@@ -49,5 +49,5 @@ dot = Digraph(
 dot.graph_attr['rankdir'] = 'LR'
 
 json2dot(None, root, ast[root])
-# dot.view()
+dot.view()
 dot.save()

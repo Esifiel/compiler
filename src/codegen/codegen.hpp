@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <map>
 #include <stack>
+#include "../ast/expression.hpp"
 
 using namespace llvm;
 using namespace std;

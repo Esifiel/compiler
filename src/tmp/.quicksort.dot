@@ -1,5 +1,0 @@
-digraph "CFG for 'quicksort' function" {
-	label="CFG for 'quicksort' function";
-
-	Node0x22f2630 [shape=record,label="{entry:\l  %i = alloca i32\l  %j = alloca i32\l  ret void\l}"];
-}

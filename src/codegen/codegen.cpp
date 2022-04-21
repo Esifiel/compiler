@@ -15,6 +15,7 @@ CodeGenerator::CodeGenerator() : builder(ctx)
     // printf
     vector<Type *> args;
     args.push_back(Type::getInt8PtrTy(ctx));
+    // true: is variable args
     FunctionType *functype = FunctionType::get(Type::getInt32Ty(ctx), args, true);
     Function *func = Function::Create(functype, Function::ExternalLinkage, "printf", module);
     func->setCallingConv(CallingConv::C);
@@ -63,7 +64,8 @@ Value *CodeGenerator::GetVar(string name)
     else if (globals.find(name) != globals.end())
         return globals[name];
     else
-        error(string("variable '") + name + string("' not found"));
+        return nullptr;
+        // error(string("variable '") + name + string("' not found"));
 }
 
 // multi types compare instruction

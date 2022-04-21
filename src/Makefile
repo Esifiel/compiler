@@ -39,18 +39,21 @@ scanner.cpp: $(NAME).l parser.hpp
 	$(CC) -c $(LLVMFLAGS) -o $@ $<
 
 $(NAME): $(OBJECTS) FORCE
+	@if [ ! -d tmp ]; then mkdir tmp; fi
+
 	$(CC) -g -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
 	@cat ../test/quicksort.c | ./$(NAME)
-	@clang --target=$(TARGET) ./test.bc -o ./test 
+	@clang --target=$(TARGET) ./test.bc -o ./test
 	@cd tmp && opt -dot-cfg ../test.ll
 	@cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
+	@./test
 
 clean:
 	@rm -f $(NAME)
 	@rm -f *.o utils/*.o codegen/*.o
 	@rm -f parser.* scanner.*
-	@rm -f tmp/*
+	@rm -rf tmp
 	@rm -f test*
 	@rm -f .gdb_history 
 

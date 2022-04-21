@@ -3,10 +3,10 @@
 
 Value *CompoundStatement::codeGen(CodeGenerator &ctx)
 {
-    for (auto p = vardecs->begin(); p != vardecs->end(); p++)
-        (*p)->codeGen(ctx);
-    for (auto p = stmts->begin(); p != stmts->end(); p++)
-        (*p)->codeGen(ctx);
+    for (auto &p : *vardecs)
+        p->codeGen(ctx);
+    for (auto &p : *stmts)
+        p->codeGen(ctx);
     
     return nullptr;
 }
@@ -39,8 +39,8 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
 
     // init expr
     ctx.builder.SetInsertPoint(forinit);
-    for(auto p = init->begin(); p != init->end(); p++)
-        (*p)->codeGen(ctx);
+    for (auto &p : *init)
+        p->codeGen(ctx);
     ctx.builder.CreateBr(forcond);
 
     // conditional branch: true -> go on forloop, false -> go to forout
@@ -52,8 +52,8 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
     ctx.builder.SetInsertPoint(forloop);
     stmts->codeGen(ctx);
     // round end
-    for(auto p = end->begin(); p != end->end(); p++)
-        (*p)->codeGen(ctx);
+    for (auto &p : *end)
+        p->codeGen(ctx);
     ctx.builder.CreateBr(forcond);
 
     ctx.builder.SetInsertPoint(forout);

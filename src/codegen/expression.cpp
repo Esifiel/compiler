@@ -28,19 +28,24 @@ Value *Number::codeGen(CodeGenerator &ctx)
 
 Value *String::codeGen(CodeGenerator &ctx)
 {
-    return nullptr;
+    Value *var = ctx.GetVar(val);
+    if (!var)
+    {
+        Constant *str = ConstantDataArray::getString(ctx.ctx, val);
+        var = new GlobalVariable(*ctx.module, str->getType(), true, GlobalValue::PrivateLinkage, str, val);
+        ctx.globals[val] = var;
+    }
+    return var;
 }
 
 Value *Identifier::codeGen(CodeGenerator &ctx)
 {
+
     string varname = *name;
     Value *var = ctx.GetVar(varname);
+    if (!var)
+        ctx.error(string("variable '") + varname + string("' not found"));
     return ctx.builder.CreateLoad(var);
-}
-
-Value *Parameter::codeGen(CodeGenerator &ctx)
-{
-    return nullptr;
 }
 
 Value *Assignment::codeGen(CodeGenerator &ctx)
@@ -55,13 +60,25 @@ Value *Assignment::codeGen(CodeGenerator &ctx)
 
 Value *FunctionCall::codeGen(CodeGenerator &ctx)
 {
+    Function *func = ctx.GetFunction(*name->name);
+
     // set the params
     vector<Value *> args;
-    for(auto p = varlist->begin(); p != varlist->end(); p++)
-        args.push_back((*p)->codeGen(ctx));
-    
+    auto arg = func->args().begin();
+    for (auto &p : *varlist)
+    {
+        // type conversion to args type
+        Value *tmp = p->codeGen(ctx);
+        if (arg != func->args().end())
+        {
+            tmp = ctx.CreateCast(tmp, arg->getType());
+            arg++;
+        }
+        args.push_back(tmp);
+    }
+
     // build a call instruction
-    return ctx.builder.CreateCall(ctx.GetFunction(*name->name), args);
+    return ctx.builder.CreateCall(func, args);
 }
 
 Value *SimpleExpression::codeGen(CodeGenerator &ctx)
