@@ -23,8 +23,8 @@ make
 ## Reference
 [1] Levine, J., 2009. flex & bison.
 
-[2] BNF of C: [Reference 1](https://blog.csdn.net/PINBODEXIAOZHU/article/details/25394417) / [Reference 2](https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm)
+[2] BNF of C: http://www.cs.man.ac.uk/~pjj/bnf/c_syntax.bnf
 
-[3] ISO/IEC 9899:1999 "Programming languages - C"
-
-[4] [LLVM Documentation](https://www.llvm.org/docs/) / [LLVM tutorial](https://llvm.org/docs/tutorial/index.html)
+[3] LLVM Documentation and tutorial:
+1. https://www.llvm.org/docs/
+2. https://llvm.org/docs/tutorial/index.html

@@ -1,4 +1,5 @@
 #include "../ast/expression.hpp"
+#include "../ast/type.hpp"
 #include "codegen.hpp"
 
 // initialize the context
@@ -27,15 +28,23 @@ void CodeGenerator::dump()
     cout << endl
          << "--------------------IR begin--------------------" << endl;
     module->print(outs(), nullptr);
-    cout << "--------------------IR end---------------------" << endl;
+    cout << "--------------------IR end---------------------" << endl
+         << endl;
 }
 
 void CodeGenerator::error(string msg)
 {
-    cerr << "\033[31m"
+    cerr << "\033[1;31m"
          << "error: "
          << "\033[0m" << msg << endl;
     exit(1);
+}
+
+void CodeGenerator::warning(string msg)
+{
+    cerr << "\033[1;35m"
+         << "warning: "
+         << "\033[0m" << msg << endl;
 }
 
 // simplified type casting
@@ -65,7 +74,7 @@ Value *CodeGenerator::GetVar(string name)
         return globals[name];
     else
         return nullptr;
-        // error(string("variable '") + name + string("' not found"));
+    // error(string("variable '") + name + string("' not found"));
 }
 
 // multi types compare instruction
@@ -135,3 +144,183 @@ Function *CodeGenerator::GetFunction(string name)
     else
         error(string("function '") + name + string("' not found"));
 }
+
+Constant *CodeGenerator::Num2Constant(Number *num)
+{
+    Type *type = num->type->getType(*this);
+    if (type->isIntegerTy())
+    {
+        switch (type->getIntegerBitWidth())
+        {
+        case 8:
+            return ConstantInt::get(type, num->charView());
+        case 16:
+            return ConstantInt::get(type, num->shortView());
+        case 32:
+            return ConstantInt::get(type, num->intView());
+        case 64:
+            return ConstantInt::get(type, num->longView());
+        default:
+            return nullptr;
+        }
+    }
+    else if (type->isFloatTy())
+        return ConstantFP::get(type, num->floatView());
+    else if (type->isDoubleTy())
+        return ConstantFP::get(type, num->doubleView());
+    else
+        return nullptr;
+}
+
+// Constant *CodeGenerator::Expr2Constant(Expression *expr)
+// {
+//     if (expr->op != OP_NONE)
+//         error("Expr2Constant: not a leaf expression");
+
+//     if (expr->left->getName() == "\"Number\"")
+//         return Num2Constant((Number *)(expr->left));
+//     else if (expr->left->getName() == "\"Identifier\"")
+//         // if variable not exists, it means based on current context we cannot calculate the expression
+//         return (Constant *)GetVar(((Identifier *)(expr->left))->getIdName());
+//     else
+//         // not a recognized type of expression
+//         return nullptr;
+// }
+
+// // calculate an expr based on current context
+// Constant *CodeGenerator::CalculateExpr(Expression *expr)
+// {
+//     Constant *lv = nullptr, *rv = nullptr;
+//     // get left value
+//     if (expr->left)
+//         if (expr->left->op != OP_NONE)
+//             lv = CalculateExpr(expr->left);
+//         else
+//             lv = Expr2Constant(expr->left);
+//     // get right value
+//     if (expr->right)
+//         if (expr->right->op != OP_NONE)
+//             rv = CalculateExpr(expr->right);
+//         else
+//             rv = Expr2Constant(expr->right);
+
+//     // calculate based on op type
+//     switch (expr->op)
+//     {
+//     // case OP_EQ:
+//     //     out << "==";
+//     //     break;
+//     // case OP_LT:
+//     //     out << "<";
+//     //     break;
+//     // case OP_GT:
+//     //     out << ">";
+//     //     break;
+//     // case OP_LEQ:
+//     //     out << "<=";
+//     //     break;
+//     // case OP_GEQ:
+//     //     out << ">=";
+//     //     break;
+//     // case OP_NEQ:
+//     //     out << "!=";
+//     //     break;
+//     // case OP_ANDAND:
+//     //     out << "&&";
+//     //     break;
+//     // case OP_OROR:
+//     //     out << "||";
+//     //     break;
+//     // case OP_NOTNOT:
+//     //     out << "!";
+//     //     break;
+//     // case OP_AND:
+//     // case OP_ADDRESS:
+//     //     out << "&";
+//     //     break;
+//     // case OP_OR:
+//     //     out << "|";
+//     //     break;
+//     // case OP_NOT:
+//     //     out << "~";
+//     //     break;
+//     // case OP_XOR:
+//     //     out << "^";
+//     //     break;
+//     // case OP_SL:
+//     //     out << "<<";
+//     //     break;
+//     // case OP_SR:
+//     //     out << ">>";
+//     //     break;
+//     case OP_ADD:
+//         return lv.val
+//             // case OP_POSITIVE:
+//             //     out << "+";
+//             // case OP_SUB:
+//             // case OP_NEGTIVE:
+//             //     out << "-";
+//             //     break;
+//             // case OP_MUL:
+//             // case OP_POINTER:
+//             //     out << "*";
+//             //     break;
+//             // case OP_DIV:
+//             //     out << "/";
+//             //     break;
+//             // case OP_MOD:
+//             //     out << "%";
+//             //     break;
+//             // case OP_INC_FRONT:
+//             // case OP_INC_REAR:
+//             //     out << "++";
+//             //     break;
+//             // case OP_DEC_FRONT:
+//             // case OP_DEC_REAR:
+//             //     out << "--";
+//             //     break;
+//             // case OP_ASSIGN:
+//             //     out << "=";
+//             //     break;
+//             // case OP_MULASSIGN:
+//             //     out << "*=";
+//             //     break;
+//             // case OP_DIVASSIGN:
+//             //     out << "/=";
+//             //     break;
+//             // case OP_MODASSIGN:
+//             //     out << "%=";
+//             //     break;
+//             // case OP_ADDASSIGN:
+//             //     out << "+=";
+//             //     break;
+//             // case OP_SUBASSIGN:
+//             //     out << "-=";
+//             //     break;
+//             // case OP_SLASSIGN:
+//             //     out << "<<=";
+//             //     break;
+//             // case OP_SRASSIGN:
+//             //     out << ">>=";
+//             //     break;
+//             // case OP_ANDASSIGN:
+//             //     out << "&=";
+//             //     break;
+//             // case OP_XORASSIGN:
+//             //     out << "^=";
+//             //     break;
+//             // case OP_ORASSIGN:
+//             //     out << "|=";
+//             //     break;
+//             // case OP_IFELSE:
+//             //     out << "? :";
+//             //     break;
+//             // case OP_CAST:
+//             //     out << "()";
+//             //     break;
+//             // case OP_COMMA:
+//             //     out << ",";
+//             //     break;
+//             default : return nullptr;
+//     }
+// }

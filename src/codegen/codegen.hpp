@@ -28,7 +28,6 @@
 #include <cstdlib>
 #include <map>
 #include <stack>
-#include "../ast/expression.hpp"
 
 using namespace llvm;
 using namespace std;
@@ -51,15 +50,19 @@ public:
     CodeGenerator();
     ~CodeGenerator() {}
 
-    // debug utils
+    // for debug
     void dump();
     void error(string msg);
-    void warning();
+    void warning(string msg);
 
+    // utils
     Value *CreateCast(Value *V, Type *DestTy);
     Value *GetVar(string name);
     Function *GetFunction(string name);
     Value *CreateBinaryExpr(Value *a, Value *b, enum op_type op);
+    Constant *CalculateExpr(Expression *expr);
+    Constant *Expr2Constant(Expression *expr);
+    Constant *Num2Constant(Number *num);
 };
 
 #endif

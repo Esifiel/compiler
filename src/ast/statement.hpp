@@ -3,7 +3,7 @@
 
 #include "basic.hpp"
 #include "expression.hpp"
-#include "declaration.hpp"
+#include <vector>
 
 using namespace std;
 
@@ -12,9 +12,13 @@ class CodeGenerator;
 class Statement : public Node
 {
 public:
-    Statement() {}
-    
+    Statement *next;
+
+    Statement():next(nullptr) {}
+    Statement(Statement *n):next(n){}
+
     virtual string getName() { return "\"Statement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx) { return nullptr; }
 };
 
 class VariableDeclaration;
@@ -23,10 +27,10 @@ class CompoundStatement : public Statement
 {
 public:
     vector<VariableDeclaration *> *vardecs;
-    vector<Statement *> *stmts;
-    
-    CompoundStatement(vector<VariableDeclaration *> *d, vector<Statement *> *s) : vardecs(d), stmts(s) {}
-    
+    Statement *stmt;
+
+    CompoundStatement(vector<VariableDeclaration *> *d, Statement *s) : vardecs(d), stmt(s) {}
+
     virtual string getName() { return "\"CompoundStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
@@ -35,10 +39,10 @@ class ExpressionStatement : public Statement
 {
 public:
     Expression *expr;
-    
-    ExpressionStatement() { expr = nullptr; }
+
+    ExpressionStatement():expr(nullptr) { }
     ExpressionStatement(Expression *e) : expr(e) {}
-    
+
     virtual string getName() { return "\"ExpressionStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
@@ -48,11 +52,17 @@ class SelectionStatement : public Statement
 public:
     Expression *cond;
     Statement *stmt;
-    Statement *elsepart;
 
-    SelectionStatement(Expression *c, Statement *s) : cond(c), stmt(s), elsepart(nullptr) {}
-    SelectionStatement(Expression *c, Statement *s, Statement *el) : cond(c), stmt(s), elsepart(el) {}
-    
+    SelectionStatement(Expression *c, Statement *s) : cond(c), stmt(s) {}
+
+    virtual string getName() { return "\"SelectionStatement\""; }
+};
+
+class IfElseStatement : public SelectionStatement
+{
+public:
+    IfElseStatement(Expression *c, Statement *s) : SelectionStatement(c, s) {}
+
     virtual string getName() { return "\"SelectionStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
@@ -61,29 +71,38 @@ class IterationStatement : public Statement
 {
 public:
     Expression *cond;
-    CompoundStatement *stmts;
+    Statement *stmt;
 
-    IterationStatement(Expression *c, CompoundStatement *s) : cond(c), stmts(s) {}
-    
+    IterationStatement(Expression *c, Statement *s) : cond(c), stmt(s) {}
+
     virtual string getName() { return "\"IterationStatement\""; }
 };
 
 class WhileStatement : public IterationStatement
 {
 public:
-    WhileStatement(Expression *c, CompoundStatement *s) : IterationStatement(c, s) {}
+    WhileStatement(Expression *c, Statement *s) : IterationStatement(c, s) {}
 
     virtual string getName() { return "\"WhileStatement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
+class DoWhileStatement : public IterationStatement
+{
+public:
+    DoWhileStatement(Expression *c, Statement *s) : IterationStatement(c, s) {}
+
+    virtual string getName() { return "\"DoWhileStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
 class ForStatement : public IterationStatement
 {
 public:
-    vector<Expression *> *init;
-    vector<Expression *> *end;
+    Expression *init;
+    Expression *end;
 
-    ForStatement(vector<Expression *> *i, Expression *c, vector<Expression *> *e, CompoundStatement *s) : init(i), IterationStatement(c, s), end(e) {}
+    ForStatement(Expression *i, Expression *c, Expression *e, Statement *s) : init(i), IterationStatement(c, s), end(e) {}
 
     virtual string getName() { return "\"ForStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
@@ -92,11 +111,21 @@ public:
 class ReturnStatement : public Statement
 {
 public:
-    ExpressionStatement *res;
+    Expression *res;
 
-    ReturnStatement(ExpressionStatement *r) : res(r) {}
+    ReturnStatement() : res(nullptr) {}
+    ReturnStatement(Expression *r) : res(r) {}
 
     virtual string getName() { return "\"ReturnStatement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
+class SwitchCaseStatement : public SelectionStatement
+{
+public:
+    SwitchCaseStatement(Expression *c, Statement *s) : SelectionStatement(c, s) {}
+
+    virtual string getName() { return "\"SwitchCaseStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 

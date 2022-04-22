@@ -5,7 +5,8 @@ using namespace llvm;
 
 Value *Program::codeGen(CodeGenerator &ctx)
 {
-    for (auto &p : *decs)
+    Declaration *p = decl;
+    while (p)
     {
         if (p->getName() == "\"VariableDeclaration\"")
         {

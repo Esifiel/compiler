@@ -6,21 +6,13 @@ LLVMFLAGS = `llvm-config --cxxflags --ldflags --system-libs --libs core`
 OBJECTS =	./main.o \
 			./scanner.o \
 			./parser.o \
+			./utils/visualizer.o \
 			./codegen/program.o \
 			./codegen/declaration.o \
 			./codegen/type.o \
 			./codegen/expression.o \
 			./codegen/statement.o \
-			./codegen/codegen.o \
-			./utils/visualizer.o
-HEADS = 	./ast/basic.hpp \
-			./ast/declaration.hpp \
-			./ast/expression.hpp \
-			./ast/program.hpp \
-			./ast/statement.hpp \
-			./ast/type.hpp \
-			./codegen/codegen.hpp \
-			./utils/visualizer.hpp
+			./codegen/codegen.o
 TARGET = `llvm-config --host-target`
 
 .PHONY: all
@@ -44,10 +36,10 @@ $(NAME): $(OBJECTS) FORCE
 	$(CC) -g -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
 	@cat ../test/quicksort.c | ./$(NAME)
-	@clang --target=$(TARGET) ./test.bc -o ./test
-	@cd tmp && opt -dot-cfg ../test.ll
-	@cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
-	@./test
+	# @clang --target=$(TARGET) ./test.bc -o ./test
+	# @cd tmp && opt -dot-cfg ../test.ll
+	# @cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
+	# @./test
 
 clean:
 	@rm -f $(NAME)

@@ -23,22 +23,8 @@ void Visualizer::visitProgram(Program *p)
     if (p)
     {
         out << head << p->getName() << sub;
-        if (p->decs)
-            visitDeclarationList(p->decs);
+        visitDeclaration(p->decl);
         out << subend << tail;
-    }
-}
-
-void Visualizer::visitDeclarationList(vector<Declaration *> *l)
-{
-    if (l)
-    {
-        for (auto &p : *l)
-        {
-            if (p != (*l)[0])
-                out << sep;
-            visitDeclaration(p);
-        }
     }
 }
 
@@ -46,10 +32,17 @@ void Visualizer::visitDeclaration(Declaration *d)
 {
     if (d)
     {
-        if (d->getName() == "\"FunctionDeclaration\"")
-            visitFunctionDeclaration((FunctionDeclaration *)d);
-        else if (d->getName() == "\"VariableDeclaration\"")
-            visitVariableDeclaration((VariableDeclaration *)d);
+        Declaration *decl = d;
+        while (decl)
+        {
+            if (d->getName() == "\"FunctionDeclaration\"")
+                visitFunctionDeclaration((FunctionDeclaration *)decl);
+            else if (d->getName() == "\"VariableDeclaration\"")
+                visitVariableDeclaration((VariableDeclaration *)decl);
+            decl = decl->next;
+            if (decl)
+                out << sep;
+        }
     }
 }
 
@@ -60,7 +53,30 @@ void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
         out << head << d->getName() << sub;
         visitType(d->type);
         out << sep;
-        visitIdentifier(d->name);
+        for (auto &p : *d->ids)
+            visitIdentifier(p);
+        out << subend << tail;
+    }
+}
+
+void Visualizer::visitParameter(Parameter *p)
+{
+    if (p)
+    {
+        out << head << p->getName() << sub;
+        Parameter *tmp = p;
+        while (tmp)
+        {
+            visitType(tmp->type);
+            if (tmp->id)
+            {
+                out << sep;
+                visitExpression(tmp->id);
+            }
+            tmp = (Parameter *)tmp->next;
+            if (tmp)
+                out << sep;
+        }
         out << subend << tail;
     }
 }
@@ -72,16 +88,11 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
         out << head << d->getName() << sub;
         visitType(d->rettype);
         out << sep;
-        visitIdentifier(d->name);
-        out << sep;
-
-        for (auto &p : *d->params)
-        {
-            if (p != (*d->params)[0])
-                out << sep;
-            visitParameter(p);
-        }
-        if (d->params->size() != 0)
+        visitExpression(d->name);
+        if (d->params)
+            out << sep;
+        visitParameter(d->params);
+        if (d->stmts)
             out << sep;
         visitCompoundStatement(d->stmts);
         out << subend << tail;
@@ -93,7 +104,7 @@ void Visualizer::visitType(TypeSpecifier *t)
     if (t)
     {
         out << head << t->getName() << sub;
-        if (t->getName() == "\"array\"")
+        if (t->getName() == "\"ArrayListType\"")
             out << ((ArrayListType *)t)->size;
         out << subend << tail;
     }
@@ -102,18 +113,9 @@ void Visualizer::visitType(TypeSpecifier *t)
 void Visualizer::visitIdentifier(Identifier *i)
 {
     if (i)
-        out << head << i->getName() << sub << "\"" + *i->name + "\"" << subend << tail;
-}
-
-void Visualizer::visitParameter(Parameter *p)
-{
-    if (p)
     {
-        out << head << p->getName() << sub;
-        visitType(p->type);
-        if (p->name)
-            out << sep;
-        visitIdentifier(p->name);
+        out << head << i->getName() << sub;
+        visitExpression(i->name);
         out << subend << tail;
     }
 }
@@ -125,6 +127,9 @@ void Visualizer::visitString(String *s)
     {
         string output = "\"" + s->val + "\"";
         replace(output, "\n", "\\n");
+        replace(output, "\t", "\\t");
+        replace(output, "\r", "\\r");
+        replace(output, "\"", "\\\"");
         out << head << s->getName() << sub << output << subend << tail;
     }
 }
@@ -140,13 +145,13 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
                 out << sep;
             visitDeclaration(p);
         }
-        if (c->vardecs->size() > 0 && c->stmts->size() > 0)
+        if (c->vardecs->size() > 0 && c->stmt != nullptr)
             out << sep;
-        for (auto &p : *c->stmts)
+        Statement *p = c->stmt;
+        while (p)
         {
-            if (p != (*c->stmts)[0])
-                out << sep;
             visitStatement(p);
+            p = p->next;
         }
         out << subend << tail;
     }
@@ -160,10 +165,14 @@ void Visualizer::visitStatement(Statement *s)
             visitExpressionStatement((ExpressionStatement *)s);
         else if (s->getName() == "\"CompoundStatement\"")
             visitCompoundStatement((CompoundStatement *)s);
-        else if (s->getName() == "\"SelectionStatement\"")
-            visitSelectionStatement((SelectionStatement *)s);
+        else if (s->getName() == "\"IfElseStatement\"")
+            visitIfElseStatement((IfElseStatement *)s);
+        else if (s->getName() == "\"SwitchCaseStatement\"")
+            visitSwitchCaseStatement((SwitchCaseStatement *)s);
         else if (s->getName() == "\"WhileStatement\"")
             visitWhileStatement((WhileStatement *)s);
+        else if (s->getName() == "\"DoWhileStatement\"")
+            visitDoWhileStatement((DoWhileStatement *)s);
         else if (s->getName() == "\"ForStatement\"")
             visitForStatement((ForStatement *)s);
         else if (s->getName() == "\"ReturnStatement\"")
@@ -181,7 +190,7 @@ void Visualizer::visitExpressionStatement(ExpressionStatement *e)
     }
 }
 
-void Visualizer::visitSelectionStatement(SelectionStatement *s)
+void Visualizer::visitIfElseStatement(IfElseStatement *s)
 {
     if (s)
     {
@@ -189,9 +198,11 @@ void Visualizer::visitSelectionStatement(SelectionStatement *s)
         visitExpression(s->cond);
         out << sep;
         visitStatement(s->stmt);
-        if (s->elsepart)
+        if (s->stmt->next)
+        {
             out << sep;
-        visitStatement(s->elsepart);
+            visitStatement(s->stmt->next);
+        }
         out << subend << tail;
     }
 }
@@ -201,7 +212,7 @@ void Visualizer::visitReturnStatement(ReturnStatement *r)
     if (r)
     {
         out << head << r->getName() << sub;
-        visitExpressionStatement(r->res);
+        visitExpression(r->res);
         out << subend << tail;
     }
 }
@@ -210,19 +221,156 @@ void Visualizer::visitExpression(Expression *e)
 {
     if (e)
     {
-        if (e->getName() == "\"Assignment\"")
-            visitAssignment((Assignment *)e);
-        else if (e->getName() == "\"Number\"")
+        if (e->getName() == "\"Number\"")
             visitNumber((Number *)e);
         else if (e->getName() == "\"FunctionCall\"")
             visitFunctionCall((FunctionCall *)e);
-        else if (e->getName() == "\"SimpleExpression\"")
-            visitSimpleExpression((SimpleExpression *)e);
         else if (e->getName() == "\"Identifier\"")
             visitIdentifier((Identifier *)e);
         else if (e->getName() == "\"String\"")
             visitString((String *)e);
+        else
+        {
+            out << head << e->getName() << sub;
+            visitOp(e->op);
+            out << sep;
+            visitExpression(e->left);
+            if (e->right)
+            {
+                out << sep;
+                visitExpression(e->right);
+            }
+            if (e->addition)
+            {
+                out << sep;
+                visitExpression(e->addition);
+            }
+        }
     }
+}
+
+void Visualizer::visitOp(enum op_type op)
+{
+    out << head << "\"op\"" << sub << "\"";
+    switch (op)
+    {
+    case OP_EQ:
+        out << "==";
+        break;
+    case OP_LT:
+        out << "<";
+        break;
+    case OP_GT:
+        out << ">";
+        break;
+    case OP_LEQ:
+        out << "<=";
+        break;
+    case OP_GEQ:
+        out << ">=";
+        break;
+    case OP_NEQ:
+        out << "!=";
+        break;
+    case OP_ANDAND:
+        out << "&&";
+        break;
+    case OP_OROR:
+        out << "||";
+        break;
+    case OP_NOTNOT:
+        out << "!";
+        break;
+    case OP_AND:
+    case OP_ADDRESS:
+        out << "&";
+        break;
+    case OP_OR:
+        out << "|";
+        break;
+    case OP_NOT:
+        out << "~";
+        break;
+    case OP_XOR:
+        out << "^";
+        break;
+    case OP_SL:
+        out << "<<";
+        break;
+    case OP_SR:
+        out << ">>";
+        break;
+    case OP_ADD:
+    case OP_POSITIVE:
+        out << "+";
+    case OP_SUB:
+    case OP_NEGTIVE:
+        out << "-";
+        break;
+    case OP_MUL:
+    case OP_POINTER:
+        out << "*";
+        break;
+    case OP_DIV:
+        out << "/";
+        break;
+    case OP_MOD:
+        out << "%";
+        break;
+    case OP_INC_FRONT:
+    case OP_INC_REAR:
+        out << "++";
+        break;
+    case OP_DEC_FRONT:
+    case OP_DEC_REAR:
+        out << "--";
+        break;
+    case OP_ASSIGN:
+        out << "=";
+        break;
+    case OP_MULASSIGN:
+        out << "*=";
+        break;
+    case OP_DIVASSIGN:
+        out << "/=";
+        break;
+    case OP_MODASSIGN:
+        out << "%=";
+        break;
+    case OP_ADDASSIGN:
+        out << "+=";
+        break;
+    case OP_SUBASSIGN:
+        out << "-=";
+        break;
+    case OP_SLASSIGN:
+        out << "<<=";
+        break;
+    case OP_SRASSIGN:
+        out << ">>=";
+        break;
+    case OP_ANDASSIGN:
+        out << "&=";
+        break;
+    case OP_XORASSIGN:
+        out << "^=";
+        break;
+    case OP_ORASSIGN:
+        out << "|=";
+        break;
+    case OP_IFELSE:
+        out << "? :";
+        break;
+    case OP_CAST:
+        out << "()";
+        break;
+    case OP_COMMA:
+        out << ",";
+        break;
+    default:
+        break;
+    }
+    out << "\"" << subend << tail;
 }
 
 void Visualizer::visitWhileStatement(WhileStatement *w)
@@ -239,38 +387,16 @@ void Visualizer::visitForStatement(ForStatement *f)
     if (f)
     {
         out << head << f->getName() << sub;
-        for (auto &p : *f->init)
-        {
-            if (p != (*f->init)[0])
-                out << sep;
-            visitExpression(p);
-        }
-        if (f->init->size() > 0 && f->cond)
+        visitExpression(f->init);
+        if (f->init && (f->cond || f->end || f->stmt))
             out << sep;
         visitExpression(f->cond);
-        if ((f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
+        if ((f->init || f->cond) && (f->end || f->stmt))
             out << sep;
-        for (auto &p : *f->end)
-        {
-            if (p != (*f->end)[0])
-                out << sep;
-            visitExpression(p);
-        }
-        if ((f->stmts && f->end->size() > 0) || (f->cond && f->end->size() > 0) || (f->init->size() > 0 && f->end->size() > 0))
+        visitExpression(f->end);
+        if ((f->init || f->cond || f->end) && f->stmt)
             out << sep;
-        visitCompoundStatement(f->stmts);
-        out << subend << tail;
-    }
-}
-
-void Visualizer::visitAssignment(Assignment *a)
-{
-    if (a)
-    {
-        out << head << a->getName() << sub;
-        visitIdentifier(a->lv);
-        out << sep;
-        visitExpression(a->rv);
+        visitStatement(f->stmt);
         out << subend << tail;
     }
 }
@@ -280,7 +406,7 @@ void Visualizer::visitNumber(Number *n)
     if (n)
     {
         out << head << n->getName() << sub;
-        switch (n->type)
+        switch (n->valtype)
         {
         case VAL_CHAR:
             out << n->charView();
@@ -313,9 +439,7 @@ void Visualizer::visitFunctionCall(FunctionCall *f)
     if (f)
     {
         out << head << f->getName() << sub;
-        visitIdentifier(f->name);
-        if (f->varlist->size() > 0)
-            out << sep;
+        visitExpression(f->name);
         for (auto &p : *f->varlist)
         {
             if (p != (*f->varlist)[0])
@@ -326,63 +450,12 @@ void Visualizer::visitFunctionCall(FunctionCall *f)
     }
 }
 
-void Visualizer::visitSimpleExpression(SimpleExpression *e)
+void Visualizer::visitDoWhileStatement(DoWhileStatement *d)
 {
-    if (e)
-    {
-        out << head << e->getName() << sub;
-        visitExpression(e->left);
-        if (e->left)
-            out << sep;
-        out << head << "\"op\"" << sub << "\"";
-        switch (e->op)
-        {
-        case OP_EQ:
-            out << "==";
-            break;
-        case OP_LT:
-            out << "<";
-            break;
-        case OP_GT:
-            out << ">";
-            break;
-        case OP_LEQ:
-            out << "<=";
-            break;
-        case OP_GEQ:
-            out << ">=";
-            break;
-        case OP_NEQ:
-            out << "!=";
-            break;
-        case OP_ANDAND:
-            out << "&&";
-            break;
-        case OP_OROR:
-            out << "||";
-            break;
-        case OP_ADD:
-            out << "+";
-            break;
-        case OP_SUB:
-            out << "-";
-            break;
-        case OP_MUL:
-            out << "*";
-            break;
-        case OP_DIV:
-            out << "/";
-            break;
-        case OP_MOD:
-            out << "%";
-            break;
-        default:
-            break;
-        }
-        out << "\"" << subend << tail;
-        if (e->right)
-            out << sep;
-        visitExpression(e->right);
-        out << subend << tail;
-    }
+
+}
+
+void Visualizer::visitSwitchCaseStatement(SwitchCaseStatement *s)
+{
+
 }

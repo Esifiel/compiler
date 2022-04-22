@@ -32,20 +32,21 @@ private:
     void visitType(TypeSpecifier *t);
     void visitIdentifier(Identifier *i);
     void visitCompoundStatement(CompoundStatement *c);
-    void visitParameter(Parameter *p);
     void visitString(String *s);
     void visitStatement(Statement *s);
     void visitExpressionStatement(ExpressionStatement *e);
-    void visitSelectionStatement(SelectionStatement *s);
+    void visitIfElseStatement(IfElseStatement *s);
+    void visitSwitchCaseStatement(SwitchCaseStatement *s);
     void visitIterationStatement(IterationStatement *i);
     void visitReturnStatement(ReturnStatement *r);
     void visitExpression(Expression *e);
     void visitWhileStatement(WhileStatement *w);
+    void visitDoWhileStatement(DoWhileStatement *d);
     void visitForStatement(ForStatement *f);
-    void visitAssignment(Assignment *a);
     void visitNumber(Number *n);
     void visitFunctionCall(FunctionCall *f);
-    void visitSimpleExpression(SimpleExpression *e);
+    void visitOp(enum op_type op);
+    void visitParameter(Parameter *p);
 };
 
 #endif

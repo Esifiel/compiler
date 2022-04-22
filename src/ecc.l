@@ -30,8 +30,14 @@ void replace(string &src, string sub, string tar)
 "//".*\n                        {}
 "/*"([^*]|"*"+[^/*])*"*"+"/"    {}
 \\$                             {}
+
+":"                             { debug(); return COLON; }
 ";"                             { debug(); return DELIM; }
+"?"                             { debug(); return QUESTION; }
 ","                             { debug(); return COMMA; }
+"."                             { debug(); return DOT; }
+"->"                            { debug(); return TO; }
+"..."                           { debug(); return DOTDOTDOT; }
 
 "auto"                          { debug(); return AUTO; }
 "double"                        { debug(); return DOUBLE; }
@@ -96,6 +102,8 @@ void replace(string &src, string sub, string tar)
 ">>"                            { debug(); return SR; }
 "<<="                           { debug(); return SLASSIGN; }
 ">>="                           { debug(); return SRASSIGN; }
+"++"                            { debug(); return INC; }
+"--"                            { debug(); return DEC; }
 
 "("                             { debug(); return LP; }
 ")"                             { debug(); return RP; }
@@ -136,9 +144,13 @@ void replace(string &src, string sub, string tar)
                                 }
 \".*\"                          {
                                     debug();
+                                    // strip " and translate escape char
                                     yytext[strlen(yytext) - 1] = 0;
                                     yylval.stringValue = new string(yytext + 1);
-                                    replace(*yylval.stringValue, string("\\n"), string("\n"));
+                                    replace(*yylval.stringValue, "\\n", "\n");
+                                    replace(*yylval.stringValue, "\\t", "\t");
+                                    replace(*yylval.stringValue, "\\r", "\r");
+                                    replace(*yylval.stringValue, "\\\"", "\"");
                                     return STRING;
                                 }
                             

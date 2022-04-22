@@ -27,8 +27,9 @@ class TypeSpecifier : public Node
 {
 public:
     enum type_type type;
+    bool isunsigned;
 
-    TypeSpecifier(enum type_type t) : type(t) {}
+    TypeSpecifier(enum type_type t) : type(t) { isunsigned = false; }
 
     virtual string getName() { return "\"TypeSpecifier\""; }
     virtual Type *getType(CodeGenerator &ctx) = 0;
@@ -121,20 +122,22 @@ public:
     virtual string getName() { return "\"UnionType\""; }
 };
 
+class Expression;
+
 class ArrayListType : public TypeSpecifier
 {
 public:
     uint64_t size;
-    vector<TypeSpecifier *> elements;
+    vector<Expression *> *elements;
 
-    ArrayListType(TypeSpecifier *t, uint64_t s) : TypeSpecifier(TYPE_ARRAY), size(s) {}
+    ArrayListType(vector<Expression *> *e, uint64_t s) : TypeSpecifier(TYPE_ARRAY), elements(e), size(s) {}
 
     virtual string getName() { return "\"ArrayListType\""; }
     virtual Type *getType(CodeGenerator &ctx) {
-        switch(elements[0]->type)
+        switch(type)
         {
             case TYPE_CHAR:
-                return ctx.builder.getInt8Ty();        
+                return ctx.builder.getInt8Ty();    
             case TYPE_SHORT:
                 return ctx.builder.getInt16Ty();
             case TYPE_INT:
