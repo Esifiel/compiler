@@ -88,7 +88,8 @@ void yywarning(string s, string addition = "");
 %type<selectionStatement> selection-stat
 %type<iterationStatement> iteration-stat
 
-%type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp const-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer declarator
+%type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp const-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer
+%type<identifier> declarator
 %type<exprs> argument-exp-list
 %type<identifier> id typedef-name direct-declarator init-declarator
 %type<ids> id-list init-declarator-list
@@ -184,8 +185,8 @@ init-declarator-list        : init-declarator { $$ = new vector<Identifier *>; $
                             | init-declarator-list COMMA init-declarator { $1->push_back($3); $$ = $1; }
                             ;
 
-init-declarator             : declarator { $$ = new Identifier($1); }
-                            | declarator ASSIGN initializer { $$ = new Identifier($1, $3); }
+init-declarator             : declarator { $$ = $1; }
+                            | declarator ASSIGN initializer { $1->init = $3; $$ = $1; }
                             ;
 
 struct-decl                 : spec-qualifier-list struct-declarator-list DELIM
@@ -289,7 +290,7 @@ direct-abstract-declarator  : LP abstract-declarator RP
 typedef-name                : id { $$ = $1; }
                             ;
 
-id                          : IDENTIFIER { $$ = new Identifier(new String(*yylval.stringValue)); }
+id                          : IDENTIFIER { $$ = new Identifier(*yylval.stringValue); }
                             ;
 
 stat                        : labeled-stat { $$ = $1; }
@@ -316,7 +317,13 @@ compound-stat               : LC decl-list stat-list RC { $$ = new CompoundState
                             ;
 
 stat-list                   : stat { $$ = $1; }
-                            | stat-list stat { $1->next = $2; $$ = $1; }
+                            | stat-list stat {
+                                Statement *p = $1;
+                                while(p->next)
+                                    p = p->next;
+                                p->next = $2;
+                                $$ = $1;
+                            }
                             ;
 
 selection-stat		        : IF LP exp RP stat { $$ = new IfElseStatement($3, $5); }
@@ -440,7 +447,7 @@ unary-operator              : AND { $$ = OP_AND; }
                             ;
 
 postfix-exp		            : primary-exp { $$ = $1; }
-                            | postfix-exp LB exp RB { $$ = new Identifier($1, $3); }
+                            | postfix-exp LB exp RB { ((Identifier *)$1)->index = $3; $$ = $1; }
                             | postfix-exp LP argument-exp-list RP { $$ = new FunctionCall($1, $3); }
                             | postfix-exp LP RP { $$ = new FunctionCall($1, nullptr); }
                             | postfix-exp DOT id

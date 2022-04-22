@@ -41,15 +41,13 @@ class Parameter : public Declaration
 {
 public:
     TypeSpecifier *type;
-    Expression *id;
+    Identifier *id;
 
     Parameter(TypeSpecifier *t) : type(t), id(nullptr) {}
-    Parameter(TypeSpecifier *t, Expression *i) : type(t), id(i) {}
+    Parameter(TypeSpecifier *t, Identifier *i) : type(t), id(i) {}
 
     virtual string getName() { return "\"Parameter\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
-
-    string getIdName() { return ((Identifier *)id)->getIdName(); }
 };
 
 class CompoundStatement;
@@ -58,16 +56,14 @@ class FunctionDeclaration : public Declaration
 {
 public:
     TypeSpecifier *rettype;
-    Expression *name;
+    Identifier *id;
     Parameter *params;
     CompoundStatement *stmts;
 
-    FunctionDeclaration(TypeSpecifier *t, Expression *n, Parameter *p, CompoundStatement *s) : rettype(t), name(n), params(p), stmts(s) {}
+    FunctionDeclaration(TypeSpecifier *t, Identifier *n, Parameter *p, CompoundStatement *s) : rettype(t), id(n), params(p), stmts(s) {}
 
     virtual string getName() { return "\"FunctionDeclaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;
-
-    string getFunctionName() { return ((String *)(((Identifier *)name)->name))->val; }
 };
 
 class TypeDeclaration : public Declaration

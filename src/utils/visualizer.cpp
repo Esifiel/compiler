@@ -52,9 +52,11 @@ void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
     {
         out << head << d->getName() << sub;
         visitType(d->type);
-        out << sep;
         for (auto &p : *d->ids)
+        {
+            out << sep;
             visitIdentifier(p);
+        }
         out << subend << tail;
     }
 }
@@ -71,7 +73,7 @@ void Visualizer::visitParameter(Parameter *p)
             if (tmp->id)
             {
                 out << sep;
-                visitExpression(tmp->id);
+                visitIdentifier(tmp->id);
             }
             tmp = (Parameter *)tmp->next;
             if (tmp)
@@ -88,7 +90,7 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
         out << head << d->getName() << sub;
         visitType(d->rettype);
         out << sep;
-        visitExpression(d->name);
+        visitIdentifier(d->id);
         if (d->params)
             out << sep;
         visitParameter(d->params);
@@ -114,8 +116,12 @@ void Visualizer::visitIdentifier(Identifier *i)
 {
     if (i)
     {
-        out << head << i->getName() << sub;
-        visitExpression(i->name);
+        out << head << i->getName() << sub << "\"" + i->name + "\"";
+        if(i->init)
+        {
+            out << sep;
+            visitExpression(i->init);
+        }
         out << subend << tail;
     }
 }
@@ -125,12 +131,12 @@ void Visualizer::visitString(String *s)
 {
     if (s)
     {
-        string output = "\"" + s->val + "\"";
+        string output = s->val;
         replace(output, "\n", "\\n");
         replace(output, "\t", "\\t");
         replace(output, "\r", "\\r");
         replace(output, "\"", "\\\"");
-        out << head << s->getName() << sub << output << subend << tail;
+        out << head << s->getName() << sub << "\"" + output + "\""<< subend << tail;
     }
 }
 
@@ -150,6 +156,8 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
         Statement *p = c->stmt;
         while (p)
         {
+            if(p != c->stmt)
+                out << sep;
             visitStatement(p);
             p = p->next;
         }
@@ -232,9 +240,9 @@ void Visualizer::visitExpression(Expression *e)
         else
         {
             out << head << e->getName() << sub;
-            visitOp(e->op);
-            out << sep;
             visitExpression(e->left);
+            out << sep;
+            visitOp(e->op);
             if (e->right)
             {
                 out << sep;
@@ -245,6 +253,7 @@ void Visualizer::visitExpression(Expression *e)
                 out << sep;
                 visitExpression(e->addition);
             }
+            out << subend << tail;
         }
     }
 }
@@ -442,8 +451,7 @@ void Visualizer::visitFunctionCall(FunctionCall *f)
         visitExpression(f->name);
         for (auto &p : *f->varlist)
         {
-            if (p != (*f->varlist)[0])
-                out << sep;
+            out << sep;
             visitExpression(p);
         }
         out << subend << tail;

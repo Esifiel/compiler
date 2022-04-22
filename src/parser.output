@@ -483,7 +483,7 @@
     enumerator (111)
         on left: 56 57
         on right: 54 55
-    declarator <expression> (112)
+    declarator <identifier> (112)
         on left: 58 59
         on right: 6 7 8 9 39 40 48 49 61 77
     direct-declarator <identifier> (113)

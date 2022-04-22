@@ -1,0 +1,112 @@
+// Visualization of the Abstract Syntax Tree
+digraph AST {
+	graph [rankdir=LR]
+	Program [label=Program]
+	FunctionDeclaration [label=FunctionDeclaration]
+	Program -> FunctionDeclaration
+	IntType [label=IntType]
+	FunctionDeclaration -> IntType
+	Identifier [label=Identifier]
+	FunctionDeclaration -> Identifier
+	main [label=main]
+	Identifier -> main
+	CompoundStatement [label=CompoundStatement]
+	FunctionDeclaration -> CompoundStatement
+	VariableDeclaration [label=VariableDeclaration]
+	CompoundStatement -> VariableDeclaration
+	IntType7 [label=IntType]
+	VariableDeclaration -> IntType7
+	Identifier8 [label=Identifier]
+	VariableDeclaration -> Identifier8
+	sum [label=sum]
+	Identifier8 -> sum
+	Number [label=Number]
+	Identifier8 -> Number
+	0 [label=0]
+	Number -> 0
+	Identifier12 [label=Identifier]
+	VariableDeclaration -> Identifier12
+	i [label=i]
+	Identifier12 -> i
+	ForStatement [label=ForStatement]
+	CompoundStatement -> ForStatement
+	Expression [label=Expression]
+	ForStatement -> Expression
+	Identifier16 [label=Identifier]
+	Expression -> Identifier16
+	i17 [label=i]
+	Identifier16 -> i17
+	op [label=op]
+	Expression -> op
+	"=" [label="="]
+	op -> "="
+	Number20 [label=Number]
+	Expression -> Number20
+	021 [label=0]
+	Number20 -> 021
+	Expression22 [label=Expression]
+	ForStatement -> Expression22
+	Identifier23 [label=Identifier]
+	Expression22 -> Identifier23
+	i24 [label=i]
+	Identifier23 -> i24
+	op25 [label=op]
+	Expression22 -> op25
+	"<" [label="<"]
+	op25 -> "<"
+	Number27 [label=Number]
+	Expression22 -> Number27
+	100 [label=100]
+	Number27 -> 100
+	Expression29 [label=Expression]
+	ForStatement -> Expression29
+	Identifier30 [label=Identifier]
+	Expression29 -> Identifier30
+	i31 [label=i]
+	Identifier30 -> i31
+	op32 [label=op]
+	Expression29 -> op32
+	"++" [label="++"]
+	op32 -> "++"
+	ExpressionStatement [label=ExpressionStatement]
+	ForStatement -> ExpressionStatement
+	Expression35 [label=Expression]
+	ExpressionStatement -> Expression35
+	Identifier36 [label=Identifier]
+	Expression35 -> Identifier36
+	sum37 [label=sum]
+	Identifier36 -> sum37
+	op38 [label=op]
+	Expression35 -> op38
+	"+=" [label="+="]
+	op38 -> "+="
+	Identifier40 [label=Identifier]
+	Expression35 -> Identifier40
+	i41 [label=i]
+	Identifier40 -> i41
+	ExpressionStatement42 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement42
+	FunctionCall [label=FunctionCall]
+	ExpressionStatement42 -> FunctionCall
+	Identifier44 [label=Identifier]
+	FunctionCall -> Identifier44
+	printf [label=printf]
+	Identifier44 -> printf
+	String [label=String]
+	FunctionCall -> String
+	"%d
+" [label="%d
+"]
+	String -> "%d
+"
+	Identifier48 [label=Identifier]
+	FunctionCall -> Identifier48
+	sum49 [label=sum]
+	Identifier48 -> sum49
+	ReturnStatement [label=ReturnStatement]
+	CompoundStatement -> ReturnStatement
+	Number51 [label=Number]
+	ReturnStatement -> Number51
+	052 [label=0]
+	Number51 -> 052
+}

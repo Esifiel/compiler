@@ -66,17 +66,16 @@ public:
 class Identifier : public Expression
 {
 public:
-    Expression *name;
+    string name;
     Expression *init;
     bool ispointer;
+    Expression *index;
 
-    Identifier(Expression *v) : name(v), init(nullptr), ispointer(false) {}
-    Identifier(Expression *v, Expression *ini) : name(v), init(ini), ispointer(false) {}
+    Identifier(string v) : name(v), init(nullptr), index(nullptr), ispointer(false) {}
+    Identifier(string v, Expression *ini, Expression *idx) : name(v), init(ini), index(idx), ispointer(false) {}
 
     virtual string getName() { return "\"Identifier\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
-
-    string getIdName() { return ((String *)name)->val; }
 };
 
 class FunctionCall : public Expression
