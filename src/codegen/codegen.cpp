@@ -77,6 +77,19 @@ Value *CodeGenerator::GetVar(string name)
     // error(string("variable '") + name + string("' not found"));
 }
 
+Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
+{
+    switch (op)
+    {
+    case OP_INC_FRONT:
+    case OP_INC_REAR:
+        return builder.CreateBinOp(Instruction::BinaryOps::Add, a, ConstantInt::get(a->getType(), 1));
+    case OP_DEC_FRONT:
+    case OP_DEC_REAR:
+        return builder.CreateBinOp(Instruction::BinaryOps::Sub, a, ConstantInt::get(a->getType(), 1));
+    }
+}
+
 // multi types compare instruction
 Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
 {
@@ -131,8 +144,13 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
         return builder.CreateBinOp(Instruction::BinaryOps::FDiv, a, b);
     case OP_MOD:
         return builder.CreateBinOp(Instruction::BinaryOps::FRem, a, b);
+    case OP_SL:
+        return builder.CreateBinOp(Instruction::BinaryOps::Shl, a, b);
+    case OP_SR:
+        // may be not ok if always arithmetic shift right
+        return builder.CreateBinOp(Instruction::BinaryOps::AShr, a, b);
     default:
-        return nullptr;
+        error("operand type not supoorted.");
     }
 }
 

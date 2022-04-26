@@ -59,6 +59,7 @@ public:
     Value *CreateCast(Value *V, Type *DestTy);
     Value *GetVar(string name);
     Function *GetFunction(string name);
+    Value *CreateUnaryExpr(Value *a, enum op_type op);
     Value *CreateBinaryExpr(Value *a, Value *b, enum op_type op);
     Constant *CalculateExpr(Expression *expr);
     Constant *Expr2Constant(Expression *expr);

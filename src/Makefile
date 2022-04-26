@@ -36,10 +36,10 @@ $(NAME): $(OBJECTS) FORCE
 	$(CC) -g -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
 	@cat ../test/quicksort.c | ./$(NAME)
-	# @clang --target=$(TARGET) ./test.bc -o ./test
-	# @cd tmp && opt -dot-cfg ../test.ll
-	# @cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
-	# @./test
+	@clang --target=$(TARGET) ./test.bc -o ./test
+	@cd tmp && opt -dot-cfg ../test.ll
+	@cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
+	@./test
 
 clean:
 	@rm -f $(NAME)

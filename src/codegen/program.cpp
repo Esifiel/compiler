@@ -19,6 +19,7 @@ Value *Program::codeGen(CodeGenerator &ctx)
             Value *ret = p->codeGen(ctx);
             verifyFunction(*(Function *)ret, &errs());
         }
+        p = p->next;
     }
 
     return nullptr;

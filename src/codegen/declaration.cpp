@@ -7,7 +7,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
     Type *t = type->getType(ctx);
     for(auto &p : *ids)
     {
-        string varname = p->getIdName();
+        string varname = p->name;
         if (ctx.isglobal)
         {
             // global variable
@@ -28,12 +28,11 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             return v;
         }
         else
-        {
             // allocate space for new local variable
             ctx.locals[varname] = ctx.builder.CreateAlloca(t, 0, varname.c_str());
-            return ctx.locals[varname];
-        }
     }
+
+    return nullptr;
 }
 
 Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
@@ -49,7 +48,7 @@ Value *Parameter::codeGen(CodeGenerator &ctx)
 Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 {
     // check redefinition
-    string funcname = getFunctionName();
+    string funcname = id->name;
     if (ctx.functions.find(funcname) != ctx.functions.end())
         ctx.error(string("redefinition of function '") + funcname + string("'"));
 
@@ -80,7 +79,7 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     Parameter *p = params;
     for (auto &arg : func->args())
     {
-        arg.setName(p->getIdName());
+        arg.setName(p->id->name);
         p = (Parameter *)(p->next);
     }
 

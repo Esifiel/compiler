@@ -24,16 +24,15 @@ Value *String::codeGen(CodeGenerator &ctx)
 
 Value *Identifier::codeGen(CodeGenerator &ctx)
 {
-    string varname = ((Identifier *)name)->getIdName();
-    Value *var = ctx.GetVar(varname);
+    Value *var = ctx.GetVar(name);
     if (!var)
-        ctx.error(string("variable '") + varname + string("' not found"));
+        ctx.error(string("variable '") + name + string("' not found"));
     return ctx.builder.CreateLoad(var);
 }
 
 Value *FunctionCall::codeGen(CodeGenerator &ctx)
 {
-    Function *func = ctx.GetFunction(((Identifier *)name)->getIdName());
+    Function *func = ctx.GetFunction(((Identifier *)name)->name);
 
     // set the params
     vector<Value *> args;
@@ -57,30 +56,17 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
 Value *Expression::codeGen(CodeGenerator &ctx)
 {
     string varname;
-    Value *var;
-    Value *newval;
+    Value *var, *oldval, *newval;
 
     switch (op)
     {
-
-        // case OP_EQ:
-        //     out << "==";
-        //     break;
-        // case OP_LT:
-        //     out << "<";
-        //     break;
-        // case OP_GT:
-        //     out << ">";
-        //     break;
-        // case OP_LEQ:
-        //     out << "<=";
-        //     break;
-        // case OP_GEQ:
-        //     out << ">=";
-        //     break;
-        // case OP_NEQ:
-        //     out << "!=";
-        //     break;
+    case OP_EQ:
+    case OP_LT:
+    case OP_GT:
+    case OP_LEQ:
+    case OP_GEQ:
+    case OP_NEQ:
+        return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
         // case OP_ANDAND:
         //     out << "&&";
         //     break;
@@ -127,51 +113,87 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         // case OP_MOD:
         //     out << "%";
         //     break;
-        // case OP_INC_FRONT:
-        // case OP_INC_REAR:
-        //     out << "++";
-        //     break;
-        // case OP_DEC_FRONT:
-        // case OP_DEC_REAR:
-        //     out << "--";
-        //     break;
-    case OP_ASSIGN:
-        varname = ((Identifier *)left)->getIdName();
+
+    case OP_INC_REAR:
+    case OP_DEC_REAR:
+        varname = ((Identifier *)left)->name;
         var = ctx.GetVar(varname);
-        newval = ctx.CreateCast(right->codeGen(ctx), ((AllocaInst *)var)->getAllocatedType());
-        // do a store operations
+        oldval = ctx.builder.CreateLoad(var);
+        switch (op)
+        {
+        case OP_INC_REAR:
+            newval = ctx.CreateUnaryExpr(oldval, OP_INC_REAR);
+            break;
+        case OP_DEC_REAR:
+            newval = ctx.CreateUnaryExpr(oldval, OP_DEC_REAR);
+            break;
+        default:
+            return nullptr;
+        }
+        ctx.builder.CreateStore(newval, var);
+        return oldval;
+    case OP_INC_FRONT:
+    case OP_DEC_FRONT:
+    case OP_MULASSIGN:
+    case OP_DIVASSIGN:
+    case OP_MODASSIGN:
+    case OP_ADDASSIGN:
+    case OP_SUBASSIGN:
+    case OP_SLASSIGN:
+    case OP_SRASSIGN:
+    case OP_ANDASSIGN:
+    case OP_XORASSIGN:
+    case OP_ORASSIGN:
+        varname = ((Identifier *)left)->name;
+        var = ctx.GetVar(varname);
+        oldval = ctx.builder.CreateLoad(var);
+        switch (op)
+        {
+        case OP_INC_FRONT:
+            newval = ctx.CreateUnaryExpr(oldval, OP_INC_FRONT);
+        case OP_DEC_FRONT:
+            newval = ctx.CreateUnaryExpr(oldval, OP_DEC_FRONT);
+        case OP_MULASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_MUL);
+            break;
+        case OP_DIVASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_DIV);
+            break;
+        case OP_MODASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_MOD);
+            break;
+        case OP_ADDASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_ADD);
+            break;
+        case OP_SUBASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SUB);
+            break;
+        case OP_SLASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SL);
+            break;
+        case OP_SRASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SR);
+            break;
+        case OP_ANDASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_AND);
+            break;
+        case OP_XORASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_XOR);
+            break;
+        case OP_ORASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_OR);
+            break;
+        default:
+            return nullptr;
+        }
         ctx.builder.CreateStore(newval, var);
         return newval;
-    // case OP_MULASSIGN:
-    //     out << "*=";
-    //     break;
-    // case OP_DIVASSIGN:
-    //     out << "/=";
-    //     break;
-    // case OP_MODASSIGN:
-    //     out << "%=";
-    //     break;
-    // case OP_ADDASSIGN:
-    //     out << "+=";
-    //     break;
-    // case OP_SUBASSIGN:
-    //     out << "-=";
-    //     break;
-    // case OP_SLASSIGN:
-    //     out << "<<=";
-    //     break;
-    // case OP_SRASSIGN:
-    //     out << ">>=";
-    //     break;
-    // case OP_ANDASSIGN:
-    //     out << "&=";
-    //     break;
-    // case OP_XORASSIGN:
-    //     out << "^=";
-    //     break;
-    // case OP_ORASSIGN:
-    //     out << "|=";
-    //     break;
+    case OP_ASSIGN:
+        varname = ((Identifier *)left)->name;
+        var = ctx.GetVar(varname);
+        newval = ctx.CreateCast(right->codeGen(ctx), ((AllocaInst *)var)->getAllocatedType());
+        ctx.builder.CreateStore(newval, var);
+        return newval;
     // case OP_IFELSE:
     //     out << "? :";
     //     break;
