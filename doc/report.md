@@ -14,6 +14,8 @@
 
 ### 三、语法分析
 
+%define parse.error verbose
+
 ### 四、语义分析
 
 ### 五、生成目标代码

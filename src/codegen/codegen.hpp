@@ -28,6 +28,8 @@
 #include <cstdlib>
 #include <map>
 #include <stack>
+#include <list>
+#include "../ast/expression.hpp"
 
 using namespace llvm;
 using namespace std;
@@ -43,12 +45,11 @@ public:
     // auxiliary
     Function *curFunction;
     map<string, Function *> functions;
-    map<string, Value *> locals;
-    map<string, Value *> globals;
+    list<map<string, Value *>> blocks;
     bool isglobal;
 
     CodeGenerator();
-    ~CodeGenerator() {}
+    ~CodeGenerator();
 
     // for debug
     void dump();

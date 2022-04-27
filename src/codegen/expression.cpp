@@ -17,7 +17,7 @@ Value *String::codeGen(CodeGenerator &ctx)
     {
         Constant *str = ConstantDataArray::getString(ctx.ctx, val);
         var = new GlobalVariable(*ctx.module, str->getType(), true, GlobalValue::PrivateLinkage, str, val);
-        ctx.globals[val] = var;
+        ctx.blocks.front()[val] = var;
     }
     return var;
 }
@@ -66,6 +66,16 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_LEQ:
     case OP_GEQ:
     case OP_NEQ:
+    case OP_AND:
+    case OP_OR:
+    case OP_XOR:
+    case OP_SL:
+    case OP_SR:
+    case OP_ADD:
+    case OP_SUB:
+    case OP_MUL:
+    case OP_DIV:
+    case OP_MOD:
         return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
         // case OP_ANDAND:
         //     out << "&&";
@@ -76,44 +86,22 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         // case OP_NOTNOT:
         //     out << "!";
         //     break;
-        // case OP_AND:
+
         // case OP_ADDRESS:
         //     out << "&";
         //     break;
-        // case OP_OR:
-        //     out << "|";
-        //     break;
+
         // case OP_NOT:
-        //     out << "~";
-        //     break;
-        // case OP_XOR:
-        //     out << "^";
-        //     break;
-        // case OP_SL:
-        //     out << "<<";
-        //     break;
-        // case OP_SR:
-        //     out << ">>";
-        //     break;
-        // case OP_ADD:
+        //
         //     return lv.val
         // case OP_POSITIVE:
         //     out << "+";
-        // case OP_SUB:
+        //
         // case OP_NEGTIVE:
         //     out << "-";
         //     break;
-        // case OP_MUL:
+        //
         // case OP_POINTER:
-        //     out << "*";
-        //     break;
-        // case OP_DIV:
-        //     out << "/";
-        //     break;
-        // case OP_MOD:
-        //     out << "%";
-        //     break;
-
     case OP_INC_REAR:
     case OP_DEC_REAR:
         varname = ((Identifier *)left)->name;

@@ -99,14 +99,24 @@ digraph AST {
 "]
 	String -> "%d
 "
-	Identifier48 [label=Identifier]
-	FunctionCall -> Identifier48
-	sum49 [label=sum]
-	Identifier48 -> sum49
+	Expression48 [label=Expression]
+	FunctionCall -> Expression48
+	Identifier49 [label=Identifier]
+	Expression48 -> Identifier49
+	sum50 [label=sum]
+	Identifier49 -> sum50
+	op51 [label=op]
+	Expression48 -> op51
+	"-" [label="-"]
+	op51 -> "-"
+	Number53 [label=Number]
+	Expression48 -> Number53
+	1 [label=1]
+	Number53 -> 1
 	ReturnStatement [label=ReturnStatement]
 	CompoundStatement -> ReturnStatement
-	Number51 [label=Number]
-	ReturnStatement -> Number51
-	052 [label=0]
-	Number51 -> 052
+	Number56 [label=Number]
+	ReturnStatement -> Number56
+	057 [label=0]
+	Number56 -> 057
 }

@@ -23,8 +23,6 @@ make
 ## Reference
 [1] Levine, J., 2009. flex & bison.
 
-[2] BNF of C: http://www.cs.man.ac.uk/~pjj/bnf/c_syntax.bnf
+[2] BNF of C: http://www.cs.man.ac.uk/~pjj/bnf/c_syntax.bnf / http://www.quut.com/c/ANSI-C-grammar-y-1995.html#direct-declarator
 
-[3] LLVM Documentation and tutorial:
-1. https://www.llvm.org/docs/
-2. https://llvm.org/docs/tutorial/index.html
+[3] LLVM Documentation and tutorial: https://www.llvm.org/docs/ / https://llvm.org/docs/tutorial/index.html

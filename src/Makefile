@@ -20,7 +20,7 @@ TARGET = `llvm-config --host-target`
 all: $(NAME)
 
 parser.cpp: $(NAME).y
-	$(YACC) -dv -o $@ $<
+	$(YACC) -dvt --debug -o $@ $<
 
 parser.hpp: parser.cpp
 

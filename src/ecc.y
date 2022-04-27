@@ -3,7 +3,9 @@
 Program *program;
 %}
 
-/* %expect 1 // shift-reduce conflict: optional else-part for if-else statement */
+%expect 1 // shift-reduce conflict: optional else-part for if-else statement
+
+%define parse.error verbose
 
 %code requires {
 #include <iostream>
@@ -23,16 +25,17 @@ extern int yylineno;
 extern char *yytext;
 extern int yylex();
 void yyerror(string s);
-void yywarning(string s, string addition = "");
+void yywarning(string s, string addition);
+static void debug(string s);
 }
 
 %union {
     union union_num num;
     string *stringValue;
     enum op_type op;
-    bool flag;
     
     Program *program;
+    Node *node;
 
     TypeSpecifier *type;
 
@@ -65,12 +68,13 @@ void yywarning(string s, string addition = "");
         ANDAND OROR NOTNOT LT GT GEQ LEQ NEQ EQ
         ASSIGN
         INC DEC
+        POSITIVE NEGATIVE
+%token  DEREFERENCE ADDRESSOF
 %token  TYPEDEF SIZEOF RETURN DOTDOTDOT
 %token  DELIM COMMA COLON QUESTION DOT TO LP RP LB RB LC RC
 %token<num> NUMCHAR NUMSHORT NUMINT NUMLONG NUMFLOAT NUMDOUBLE
-%token<stringValue> STRING IDENTIFIER
+%token<stringValue> STRING IDENTIFIER TYPENAME
 %type<op> unary-operator assignment-operator
-%type<flag> signed-spec
 
 %type<program> program
 
@@ -89,11 +93,11 @@ void yywarning(string s, string addition = "");
 %type<iterationStatement> iteration-stat
 
 %type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp const-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer
-%type<identifier> declarator
 %type<exprs> argument-exp-list
-%type<identifier> id typedef-name direct-declarator init-declarator
+%type<identifier> init-declarator
 %type<ids> id-list init-declarator-list
 %type<number> number const
+%type<node> direct-declarator declarator
 
 %right ASSIGN ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN SLASSIGN SRASSIGN
 %left OROR
@@ -123,10 +127,10 @@ external-decl               : function-definition { $$ = $1; }
                             | decl { $$ = $1; }
                             ;
 
-function-definition         : decl-specs declarator param-type-list compound-stat { $$ = new FunctionDeclaration($1, $2, $3, $4); }
-                            |            declarator param-type-list compound-stat { $$ = new FunctionDeclaration(nullptr, $1, $2, $3); }
-                            | decl-specs declarator                 compound-stat { $$ = new FunctionDeclaration($1, $2, nullptr, $3); }
-                            |            declarator                 compound-stat { $$ = new FunctionDeclaration(nullptr, $1, nullptr, $2); }
+function-definition         : decl-specs declarator decl-list compound-stat
+                            | decl-specs declarator           compound-stat { $$ = (FunctionDeclaration *)$2; $$->rettype = $1; $$->stmts = $3; }
+                            |            declarator decl-list compound-stat
+                            |            declarator           compound-stat { $$ = (FunctionDeclaration *)$1; $$->stmts = $2; }
                             ;
 
 decl                        : decl-specs init-declarator-list DELIM { $$ = new VariableDeclaration($1, $2); }
@@ -137,19 +141,27 @@ decl-list                   : decl { $$ = new vector<VariableDeclaration *>; $$-
                             | decl-list decl { $1->push_back($2); $$ = $1; }
                             ;
 
-decl-specs                  : signed-spec type-spec { $2->isunsigned = $1; $$ = $2; }
-                            | type-spec { $$ = $1; }
+decl-specs                  : storage-class-specifier
+                            | storage-class-specifier decl-specs
+                            | type-spec
+                            | type-spec decl-specs
+                            | type-qualifier
+                            | type-qualifier decl-specs
                             ;
 
-storage-class-spec          : AUTO
-                            | REGISTER
-                            | STATIC
+init-declarator-list        : init-declarator { $$ = new vector<Identifier *>; $$->push_back($1); }
+                            | init-declarator-list COMMA init-declarator { $1->push_back($3); $$ = $1; }
+                            ;
+
+init-declarator             : declarator { $$ = (Identifier *)$1; }
+                            | declarator ASSIGN initializer { $$ = (Identifier *)$1; $$->init = $3; }
+                            ;
+
+storage-class-specifier     : TYPEDEF
                             | EXTERN
-                            | TYPEDEF
-                            ;
-
-signed-spec                 : SIGNED { $$ = false; }
-                            | UNSIGNED { $$ = true; }
+                            | STATIC
+                            | AUTO
+                            | REGISTER
                             ;
 
 type-spec                   : CHAR { $$ = new CharType(); }
@@ -159,18 +171,20 @@ type-spec                   : CHAR { $$ = new CharType(); }
                             | FLOAT { $$ = new FloatType(); }
                             | DOUBLE { $$ = new DoubleType(); }
                             | VOID { $$ = new VoidType(); }
+                            | SIGNED
+	                        | UNSIGNED
                             | struct-or-union-spec
                             | enum-spec
-                            | typedef-name
+                            | TYPENAME
                             ;
 
 type-qualifier              : CONST
                             | VOLATILE
                             ;
 
-struct-or-union-spec        : struct-or-union id LC struct-decl-list RC
+struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC
                             | struct-or-union LC struct-decl-list RC
-                            | struct-or-union id
+                            | struct-or-union IDENTIFIER
                             ;
 
 struct-or-union             : STRUCT
@@ -179,14 +193,6 @@ struct-or-union             : STRUCT
 
 struct-decl-list            : struct-decl
                             | struct-decl-list struct-decl
-                            ;
-
-init-declarator-list        : init-declarator { $$ = new vector<Identifier *>; $$->push_back($1); }
-                            | init-declarator-list COMMA init-declarator { $1->push_back($3); $$ = $1; }
-                            ;
-
-init-declarator             : declarator { $$ = $1; }
-                            | declarator ASSIGN initializer { $1->init = $3; $$ = $1; }
                             ;
 
 struct-decl                 : spec-qualifier-list struct-declarator-list DELIM
@@ -207,36 +213,36 @@ struct-declarator           : declarator
                             | COLON const-exp
                             ;
                     
-enum-spec                   : ENUM id LC enumerator-list RC
+enum-spec                   : ENUM IDENTIFIER LC enumerator-list RC
                             | ENUM LC enumerator-list RC
-                            | ENUM id
+                            | ENUM IDENTIFIER
                             ;
 
 enumerator-list             : enumerator
                             | enumerator-list COMMA enumerator
                             ;
 
-enumerator                  : id
-                            | id ASSIGN const-exp
+enumerator                  : IDENTIFIER
+                            | IDENTIFIER ASSIGN const-exp
                             ;
 
 declarator                  : pointer direct-declarator
                             | direct-declarator { $$ = $1; }
                             ;
 
-direct-declarator           : id { $$ = $1; }
+direct-declarator           : IDENTIFIER { $$ = new Identifier(*$1); delete $1; }
                             | LP declarator RP
-                            | direct-declarator LB const-exp RB
-                            | direct-declarator LB RB
-                            | direct-declarator LP param-type-list RP
-                            | direct-declarator LP id-list RP
-                            | direct-declarator LP RP
+                            | direct-declarator LB const-exp       RB
+                            | direct-declarator LB                 RB
+                            | direct-declarator LP id-list         RP
+                            | direct-declarator LP param-type-list RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, $3, nullptr); }
+                            | direct-declarator LP                 RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, nullptr, nullptr); }
                             ;
 
-pointer			            : MUL type-qualifier-list
-                            | MUL
-                            | MUL type-qualifier-list pointer
-                            | MUL pointer
+pointer			            : DEREFERENCE type-qualifier-list
+                            | DEREFERENCE
+                            | DEREFERENCE type-qualifier-list pointer
+                            | DEREFERENCE pointer
                             ;
 
 type-qualifier-list	        : type-qualifier
@@ -248,16 +254,22 @@ param-type-list             : param-list { $$ = $1; }
                             ;
 
 param-list                  : param-decl { $$ = $1; }
-                            | param-list COMMA param-decl { $1->next = $3; $$ = $1; }
+                            | param-list COMMA param-decl {
+                                Declaration *p = $1;
+                                while(p->next)
+                                    p = p->next;
+                                p->next = $3;
+                                $$ = $1;
+                            }
                             ;
 
-param-decl                  : decl-specs declarator { $$ = new Parameter($1, $2); }
+param-decl                  : decl-specs declarator { $$ = new Parameter($1, (Identifier *)$2); }
                             | decl-specs abstract-declarator
                             | decl-specs { $$ = new Parameter($1); }
                             ;
 
-id-list			            : id { $$ = new vector<Identifier *>; $$->push_back($1); }
-                            | id-list COMMA id { $1->push_back($3); $$ = $1; }
+id-list			            : IDENTIFIER { $$ = new vector<Identifier *>; $$->push_back(new Identifier(*$1)); delete $1; }
+                            | id-list COMMA IDENTIFIER { $1->push_back(new Identifier(*$3)); $$ = $1; delete $3; }
                             ;
 
 initializer                 : assignment-exp { $$ = $1; }
@@ -273,47 +285,43 @@ type-name                   : spec-qualifier-list abstract-declarator
                             | spec-qualifier-list
                             ;
 
-abstract-declarator         : direct-abstract-declarator
+abstract-declarator         : pointer
+                            | pointer direct-abstract-declarator
+                            |         direct-abstract-declarator
                             ;
 
 direct-abstract-declarator  : LP abstract-declarator RP
                             | direct-abstract-declarator LB const-exp RB
-                            | LB const-exp RB
-                            | direct-abstract-declarator LB RB
-                            | LB RB
-                            | direct-abstract-declarator LB param-type-list RP
-                            | LB param-type-list RP
-                            | direct-abstract-declarator LP RP
-                            | LP RP
+                            |                            LB const-exp RB
+                            | direct-abstract-declarator LB           RB
+                            |                            LB           RB
+                            | direct-abstract-declarator LP param-type-list RP
+                            |                            LP param-type-list RP
+                            | direct-abstract-declarator LP                 RP
+                            |                            LP                 RP
                             ;
 
-typedef-name                : id { $$ = $1; }
-                            ;
-
-id                          : IDENTIFIER { $$ = new Identifier(*yylval.stringValue); }
-                            ;
-
-stat                        : labeled-stat { $$ = $1; }
-                            | exp-stat { $$ = $1; }
-                            | compound-stat { $$ = $1; }
+stat                        : labeled-stat   { $$ = $1; }
+                            | exp-stat       { $$ = $1; }
+                            | compound-stat  { $$ = $1; }
                             | selection-stat { $$ = $1; }
                             | iteration-stat { $$ = $1; }
-                            | jump-stat { $$ = $1; }
+                            | jump-stat      { $$ = $1; }
                             ;
 
-labeled-stat		        : id COLON stat
+labeled-stat		        : IDENTIFIER COLON stat
                             | CASE const-exp COLON stat
                             | DEFAULT COLON stat
                             ;
 
 exp-stat            		: exp DELIM { $$ = new ExpressionStatement($1); }
-                            | DELIM { $$ = new ExpressionStatement(); }
+                            |     DELIM { $$ = new ExpressionStatement(); }
                             ;
 
 compound-stat               : LC decl-list stat-list RC { $$ = new CompoundStatement($2, $3); }
-                            | LC stat-list RC { $$ = new CompoundStatement(nullptr, $2); }
-                            | LC decl-list RC { $$ = new CompoundStatement($2, nullptr); }
-                            | LC RC { $$ = new CompoundStatement(nullptr, nullptr); }
+                            | LC           stat-list RC { $$ = new CompoundStatement(nullptr, $2); }
+                            | LC decl-list           RC { $$ = new CompoundStatement($2, nullptr); }
+                            | LC                     RC { $$ = new CompoundStatement(nullptr, nullptr); }
                             ;
 
 stat-list                   : stat { $$ = $1; }
@@ -331,8 +339,8 @@ selection-stat		        : IF LP exp RP stat { $$ = new IfElseStatement($3, $5); 
                             | SWITCH LP exp RP stat
                             ;
 
-iteration-stat      		: WHILE LP exp RP stat { $$ = new WhileStatement($3, $5); }
-                            | DO stat WHILE LP exp RP DELIM { $$ = new DoWhileStatement($5, $2); }
+iteration-stat      		: WHILE LP exp RP stat                   { $$ = new WhileStatement($3, $5); }
+                            | DO stat WHILE LP exp RP DELIM          { $$ = new DoWhileStatement($5, $2); }
                             | FOR LP exp DELIM exp DELIM exp RP stat { $$ = new ForStatement($3, $5, $7, $9); }
                             | FOR LP exp DELIM exp DELIM     RP stat { $$ = new ForStatement($3, $5, nullptr, $8); }
                             | FOR LP exp DELIM     DELIM exp RP stat { $$ = new ForStatement($3, nullptr, $6, $8); }
@@ -343,7 +351,7 @@ iteration-stat      		: WHILE LP exp RP stat { $$ = new WhileStatement($3, $5); 
                             | FOR LP     DELIM     DELIM     RP stat { $$ = new ForStatement(nullptr, nullptr, nullptr, $6); }
                             ;
 
-jump-stat                   : GOTO id DELIM
+jump-stat                   : GOTO IDENTIFIER DELIM
                             | CONTINUE DELIM
                             | BREAK DELIM
                             | RETURN exp DELIM { $$ = new ReturnStatement($2); }
@@ -430,7 +438,7 @@ cast-exp		            : unary-exp { $$ = $1; }
                             | LP type-name RP cast-exp
                             ;
 
-unary-exp		            : postfix-exp  { $$ = $1; }
+unary-exp		            : postfix-exp { $$ = $1; }
                             | INC unary-exp { $$ = new Expression($2, OP_INC_FRONT); }
                             | DEC unary-exp { $$ = new Expression($2, OP_DEC_FRONT); }
                             | unary-operator cast-exp { $$ = new Expression($2, $1); }
@@ -438,10 +446,10 @@ unary-exp		            : postfix-exp  { $$ = $1; }
                             | SIZEOF LP type-name RP
                             ;
 
-unary-operator              : AND { $$ = OP_AND; }
-                            | MUL { $$ = OP_POINTER; }
-                            | ADD { $$ = OP_POSITIVE; }
-                            | SUB { $$ = OP_NEGTIVE; }
+unary-operator              : ADDRESSOF { $$ = OP_ADDRESSOF; }
+                            | DEREFERENCE { $$ = OP_DEREFERENCE; }
+                            | POSITIVE { $$ = OP_POSITIVE; }
+                            | NEGATIVE { $$ = OP_NEGTIVE; }
                             | NOT { $$ = OP_NOT; }
                             | NOTNOT { $$ = OP_NOTNOT; }
                             ;
@@ -450,27 +458,21 @@ postfix-exp		            : primary-exp { $$ = $1; }
                             | postfix-exp LB exp RB { ((Identifier *)$1)->index = $3; $$ = $1; }
                             | postfix-exp LP argument-exp-list RP { $$ = new FunctionCall($1, $3); }
                             | postfix-exp LP RP { $$ = new FunctionCall($1, nullptr); }
-                            | postfix-exp DOT id
-                            | postfix-exp TO id
+                            | postfix-exp DOT IDENTIFIER
+                            | postfix-exp TO IDENTIFIER
                             | postfix-exp INC { $$ = new Expression($1, OP_INC_REAR); }
                             | postfix-exp DEC { $$ = new Expression($1, OP_DEC_REAR); }
                             ;
 
-primary-exp		            : id { $$ = $1; }
-                            | const { $$ = $1; }
-                            | STRING { $$ = new String(*yylval.stringValue); }
+primary-exp		            : IDENTIFIER { $$ = new Identifier(*$1); delete $1; }
+                            | const { $$ = $1; } // orignal rule: CONSTANT
+                            | STRING { $$ = new String(*$1); delete $1; }
                             | LP exp RP { $$ = $2; }
                             ;
 
 argument-exp-list	        : assignment-exp { $$ = new vector<Expression *>; $$->push_back($1); }
                             | argument-exp-list COMMA assignment-exp { $1->push_back($3); $$ = $1; }
                             ;
-                            
-/* const			            : int-const
-                            | char-const
-                            | float-const
-                            | enumeration-const
-                            ; */
 
 const                       : number { $$ = $1; }
                             ;
@@ -498,4 +500,8 @@ void yywarning(string s, string addition)
     cerr << "\033[1;35m"
          << "warning: "
          << "\033[0m" << s << " in Line " << yylineno << ": " << yytext << ". " << addition << endl;
+}
+
+static void debug(string s) {
+    cout << s << ": " << yytext << endl;
 }

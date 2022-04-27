@@ -7,12 +7,14 @@ CodeGenerator::CodeGenerator() : builder(ctx)
 {
     module = new Module("main", ctx);
     functions.clear();
-    locals.clear();
-    globals.clear();
+    blocks.clear();
     curFunction = nullptr;
     isglobal = false;
+    // top level (global) blocks
+    blocks.push_front(map<string, Value *>());
 
     // add some sys function
+
     // printf
     vector<Type *> args;
     args.push_back(Type::getInt8PtrTy(ctx));
@@ -21,6 +23,22 @@ CodeGenerator::CodeGenerator() : builder(ctx)
     Function *func = Function::Create(functype, Function::ExternalLinkage, "printf", module);
     func->setCallingConv(CallingConv::C);
     functions["printf"] = func;
+
+    // scanf
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt32Ty(ctx), args, true);
+    func = Function::Create(functype, Function::ExternalLinkage, "scanf", module);
+    func->setCallingConv(CallingConv::C);
+    functions["scanf"] = func;
+}
+
+// destructor
+CodeGenerator::~CodeGenerator()
+{
+    blocks.clear();
+    functions.clear();
+    delete module;
 }
 
 void CodeGenerator::dump()
@@ -68,12 +86,11 @@ Value *CodeGenerator::CreateCast(Value *V, Type *DestTy)
 // search for variables
 Value *CodeGenerator::GetVar(string name)
 {
-    if (locals.find(name) != locals.end())
-        return locals[name];
-    else if (globals.find(name) != globals.end())
-        return globals[name];
-    else
-        return nullptr;
+    if (!blocks.empty())
+        for (auto &p : blocks)
+            if (p.find(name) != p.end())
+                return p[name];
+    return nullptr;
     // error(string("variable '") + name + string("' not found"));
 }
 
@@ -87,6 +104,8 @@ Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
     case OP_DEC_FRONT:
     case OP_DEC_REAR:
         return builder.CreateBinOp(Instruction::BinaryOps::Sub, a, ConstantInt::get(a->getType(), 1));
+    default:
+        error("operand type not supoorted.");
     }
 }
 
@@ -221,124 +240,3 @@ Constant *CodeGenerator::Num2Constant(Number *num)
 //             rv = CalculateExpr(expr->right);
 //         else
 //             rv = Expr2Constant(expr->right);
-
-//     // calculate based on op type
-//     switch (expr->op)
-//     {
-//     // case OP_EQ:
-//     //     out << "==";
-//     //     break;
-//     // case OP_LT:
-//     //     out << "<";
-//     //     break;
-//     // case OP_GT:
-//     //     out << ">";
-//     //     break;
-//     // case OP_LEQ:
-//     //     out << "<=";
-//     //     break;
-//     // case OP_GEQ:
-//     //     out << ">=";
-//     //     break;
-//     // case OP_NEQ:
-//     //     out << "!=";
-//     //     break;
-//     // case OP_ANDAND:
-//     //     out << "&&";
-//     //     break;
-//     // case OP_OROR:
-//     //     out << "||";
-//     //     break;
-//     // case OP_NOTNOT:
-//     //     out << "!";
-//     //     break;
-//     // case OP_AND:
-//     // case OP_ADDRESS:
-//     //     out << "&";
-//     //     break;
-//     // case OP_OR:
-//     //     out << "|";
-//     //     break;
-//     // case OP_NOT:
-//     //     out << "~";
-//     //     break;
-//     // case OP_XOR:
-//     //     out << "^";
-//     //     break;
-//     // case OP_SL:
-//     //     out << "<<";
-//     //     break;
-//     // case OP_SR:
-//     //     out << ">>";
-//     //     break;
-//     case OP_ADD:
-//         return lv.val
-//             // case OP_POSITIVE:
-//             //     out << "+";
-//             // case OP_SUB:
-//             // case OP_NEGTIVE:
-//             //     out << "-";
-//             //     break;
-//             // case OP_MUL:
-//             // case OP_POINTER:
-//             //     out << "*";
-//             //     break;
-//             // case OP_DIV:
-//             //     out << "/";
-//             //     break;
-//             // case OP_MOD:
-//             //     out << "%";
-//             //     break;
-//             // case OP_INC_FRONT:
-//             // case OP_INC_REAR:
-//             //     out << "++";
-//             //     break;
-//             // case OP_DEC_FRONT:
-//             // case OP_DEC_REAR:
-//             //     out << "--";
-//             //     break;
-//             // case OP_ASSIGN:
-//             //     out << "=";
-//             //     break;
-//             // case OP_MULASSIGN:
-//             //     out << "*=";
-//             //     break;
-//             // case OP_DIVASSIGN:
-//             //     out << "/=";
-//             //     break;
-//             // case OP_MODASSIGN:
-//             //     out << "%=";
-//             //     break;
-//             // case OP_ADDASSIGN:
-//             //     out << "+=";
-//             //     break;
-//             // case OP_SUBASSIGN:
-//             //     out << "-=";
-//             //     break;
-//             // case OP_SLASSIGN:
-//             //     out << "<<=";
-//             //     break;
-//             // case OP_SRASSIGN:
-//             //     out << ">>=";
-//             //     break;
-//             // case OP_ANDASSIGN:
-//             //     out << "&=";
-//             //     break;
-//             // case OP_XORASSIGN:
-//             //     out << "^=";
-//             //     break;
-//             // case OP_ORASSIGN:
-//             //     out << "|=";
-//             //     break;
-//             // case OP_IFELSE:
-//             //     out << "? :";
-//             //     break;
-//             // case OP_CAST:
-//             //     out << "()";
-//             //     break;
-//             // case OP_COMMA:
-//             //     out << ",";
-//             //     break;
-//             default : return nullptr;
-//     }
-// }

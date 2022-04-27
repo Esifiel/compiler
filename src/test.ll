@@ -6,6 +6,8 @@ target triple = "x86_64-pc-linux-gnu"
 
 declare i32 @printf(i8*, ...)
 
+declare i32 @scanf(i8*, ...)
+
 define i32 @main() {
 entry:
   %sum = alloca i32
@@ -34,6 +36,8 @@ for.loop:                                         ; preds = %for.cond
 
 for.out:                                          ; preds = %for.cond
   %8 = load i32, i32* %sum
-  %9 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"%d\0A", i32 0, i32 0), i32 %8)
+  %9 = zext i32 %8 to i64
+  %10 = sub i64 %9, 1
+  %11 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"%d\0A", i32 0, i32 0), i64 %10)
   ret i32 0
 }

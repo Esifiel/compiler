@@ -24,12 +24,11 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             else
                 // else initialize to 0
                 v->setInitializer(ConstantInt::get(t, 0));
-            ctx.globals[varname] = v;
-            return v;
+            ctx.blocks.front()[varname] = v;
         }
         else
             // allocate space for new local variable
-            ctx.locals[varname] = ctx.builder.CreateAlloca(t, 0, varname.c_str());
+            ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(t, 0, varname.c_str());
     }
 
     return nullptr;
@@ -47,6 +46,9 @@ Value *Parameter::codeGen(CodeGenerator &ctx)
 
 Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 {
+    // new level block
+    ctx.blocks.push_front(map<string, Value *>());
+
     // check redefinition
     string funcname = id->name;
     if (ctx.functions.find(funcname) != ctx.functions.end())
@@ -98,8 +100,9 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     if (rettype->type == TYPE_VOID)
         ctx.builder.CreateRetVoid();
 
+    // leave the current block
     ctx.curFunction = nullptr;
-    ctx.locals.clear();
+    ctx.blocks.pop_front();
 
     return func;
 }

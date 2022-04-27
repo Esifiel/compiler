@@ -145,13 +145,14 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
     if (c)
     {
         out << head << c->getName() << sub;
-        for (auto &p : *c->vardecs)
-        {
-            if (p != (*c->vardecs)[0])
-                out << sep;
-            visitDeclaration(p);
-        }
-        if (c->vardecs->size() > 0 && c->stmt != nullptr)
+        if(c->vardecs)
+            for (auto &p : *c->vardecs)
+            {
+                if (p != (*c->vardecs)[0])
+                    out << sep;
+                visitDeclaration(p);
+            }
+        if (c->vardecs && c->vardecs->size() > 0 && c->stmt != nullptr)
             out << sep;
         Statement *p = c->stmt;
         while (p)
@@ -291,7 +292,7 @@ void Visualizer::visitOp(enum op_type op)
         out << "!";
         break;
     case OP_AND:
-    case OP_ADDRESS:
+    case OP_ADDRESSOF:
         out << "&";
         break;
     case OP_OR:
@@ -317,7 +318,7 @@ void Visualizer::visitOp(enum op_type op)
         out << "-";
         break;
     case OP_MUL:
-    case OP_POINTER:
+    case OP_DEREFERENCE:
         out << "*";
         break;
     case OP_DIV:

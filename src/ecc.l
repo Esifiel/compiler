@@ -7,7 +7,7 @@
 
 // print out token scanned
 uint64_t cnt = 0;
-void debug() {
+static inline void debug() {
     printf("token %lu:\t%s\n", cnt, yytext);
     cnt++;
 }
@@ -27,7 +27,7 @@ void replace(string &src, string sub, string tar)
 %%
 
 [ \t\n]                         {}
-"//".*\n                        {}
+"//".*                          {}
 "/*"([^*]|"*"+[^/*])*"*"+"/"    {}
 \\$                             {}
 
@@ -112,6 +112,17 @@ void replace(string &src, string sub, string tar)
 "{"                             { debug(); return LC; }
 "}"                             { debug(); return RC; }
 
+"&"[A-Za-z_][A-Za-z0-9_]*       {
+                                    debug();
+                                    yylval.stringValue = new string(yytext + 1);
+                                    return ADDRESSOF;
+                                }
+"*"[A-Za-z_][A-Za-z0-9_]*       {
+                                    debug();
+                                    yylval.stringValue = new string(yytext + 1);
+                                    return DEREFERENCE;
+                                }
+
 -?(0|([1-9][0-9]*))             {
                                     debug();
                                     yylval.num.longValue = atoll(yytext);
@@ -145,8 +156,7 @@ void replace(string &src, string sub, string tar)
 \".*\"                          {
                                     debug();
                                     // strip " and translate escape char
-                                    yytext[strlen(yytext) - 1] = 0;
-                                    yylval.stringValue = new string(yytext + 1);
+                                    yylval.stringValue = new string(string(yytext).substr(1, strlen(yytext) - 2));
                                     replace(*yylval.stringValue, "\\n", "\n");
                                     replace(*yylval.stringValue, "\\t", "\t");
                                     replace(*yylval.stringValue, "\\r", "\r");

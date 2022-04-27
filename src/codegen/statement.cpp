@@ -4,14 +4,21 @@
 
 Value *CompoundStatement::codeGen(CodeGenerator &ctx)
 {
-    for (auto &p : *vardecs)
-        p->codeGen(ctx);
+    // new level block
+    ctx.blocks.push_front(map<string, Value *>());
+
+    if(vardecs)
+        for (auto &p : *vardecs)
+            p->codeGen(ctx);
     Statement *s = stmt;
     while(s)
     {
         s->codeGen(ctx);
         s = s->next;
     }
+
+    // leave the current block
+    ctx.blocks.pop_front();
     
     return nullptr;
 }

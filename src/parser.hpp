@@ -38,13 +38,13 @@
 # define YY_YY_PARSER_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 8 "ecc.y"
+#line 10 "ecc.y"
 
 #include <iostream>
 #include <string>
@@ -63,9 +63,10 @@ extern int yylineno;
 extern char *yytext;
 extern int yylex();
 void yyerror(string s);
-void yywarning(string s, string addition = "");
+void yywarning(string s, string addition);
+static void debug(string s);
 
-#line 69 "parser.hpp"
+#line 70 "parser.hpp"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -134,30 +135,35 @@ void yywarning(string s, string addition = "");
     ASSIGN = 317,
     INC = 318,
     DEC = 319,
-    TYPEDEF = 320,
-    SIZEOF = 321,
-    RETURN = 322,
-    DOTDOTDOT = 323,
-    DELIM = 324,
-    COMMA = 325,
-    COLON = 326,
-    QUESTION = 327,
-    DOT = 328,
-    TO = 329,
-    LP = 330,
-    RP = 331,
-    LB = 332,
-    RB = 333,
-    LC = 334,
-    RC = 335,
-    NUMCHAR = 336,
-    NUMSHORT = 337,
-    NUMINT = 338,
-    NUMLONG = 339,
-    NUMFLOAT = 340,
-    NUMDOUBLE = 341,
-    STRING = 342,
-    IDENTIFIER = 343
+    POSITIVE = 320,
+    NEGATIVE = 321,
+    DEREFERENCE = 322,
+    ADDRESSOF = 323,
+    TYPEDEF = 324,
+    SIZEOF = 325,
+    RETURN = 326,
+    DOTDOTDOT = 327,
+    DELIM = 328,
+    COMMA = 329,
+    COLON = 330,
+    QUESTION = 331,
+    DOT = 332,
+    TO = 333,
+    LP = 334,
+    RP = 335,
+    LB = 336,
+    RB = 337,
+    LC = 338,
+    RC = 339,
+    NUMCHAR = 340,
+    NUMSHORT = 341,
+    NUMINT = 342,
+    NUMLONG = 343,
+    NUMFLOAT = 344,
+    NUMDOUBLE = 345,
+    STRING = 346,
+    IDENTIFIER = 347,
+    TYPENAME = 348
   };
 #endif
 
@@ -165,14 +171,14 @@ void yywarning(string s, string addition = "");
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 29 "ecc.y"
+#line 32 "ecc.y"
 
     union union_num num;
     string *stringValue;
     enum op_type op;
-    bool flag;
     
     Program *program;
+    Node *node;
 
     TypeSpecifier *type;
 
@@ -194,7 +200,7 @@ union YYSTYPE
     vector<Expression *> *exprs;
     Number *number;
 
-#line 198 "parser.hpp"
+#line 204 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

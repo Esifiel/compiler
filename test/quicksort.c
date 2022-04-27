@@ -1,15 +1,12 @@
 // void quicksort(int A[], int len)
 // {
-//     int i;
-//     int j;
-//     int pivot;
-//     int temp;
-    
+//     int i, j, pivot, temp;
+
 //     if (len < 2)
 //         return;
 
 //     pivot = A[len / 2];
-//     for (i = 0, j = len - 1; 1; i = i + 1, j = j - 1)
+//     for (i = 0, j = len - 1; ; i++, j--)
 //     {
 //         while (A[i] < pivot)
 //             i++;
@@ -27,21 +24,20 @@
 
 // int main()
 // {
-//     int A[10010] = {0};
-//     int n;
-//     int i;
+//     // int A[10010] = {0};
+//     // int n, i;
 
-//     scanf("%d", &n);
-//     for (i = 0; i < n; i = i + 1)
-//     {
-//         scanf("%d", &A[i]);
-//     }
+//     printf();
 
-//     quicksort(A, n);
-//     for (i = 0; i < n; i = i + 1)
-//     {
-//         printf("%d\n", A[i]);
-//     }
+//     // printf("%d\n", n);
+
+//     // scanf("%d", &n);
+//     // for (i = 0; i < n; i++)
+//     //     scanf("%d", &A[i]);
+
+//     // quicksort(A, n);
+//     // for (i = 0; i < n; i++)
+//     //     printf("%d\n", A[i]);
 
 //     return 0;
 // }
@@ -51,8 +47,7 @@ int main()
     int sum = 0, i;
     for(i = 0; i < 100; i++)
         sum += i;
-    
-    printf("%d\n", sum);
+    printf("%d\n", sum - 1);
 
     return 0;
 }
