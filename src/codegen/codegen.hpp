@@ -18,11 +18,13 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/CallingConv.h>
 #include <llvm/IR/IRPrintingPasses.h>
-#include <llvm/Support/TargetSelect.h>
+#include <llvm/IR/CFG.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/MCJIT.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/TargetSelect.h>
+#include "llvm/Support/Casting.h"
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <iostream>
 #include <cstdlib>
@@ -46,7 +48,9 @@ public:
     Function *curFunction;
     map<string, Function *> functions;
     list<map<string, Value *>> blocks;
-    bool isglobal;
+    list<pair<BasicBlock *, BasicBlock *>> loopctx; // for jump statement
+    bool isglobal;  // global definition
+    bool isleft;    // left value
 
     CodeGenerator();
     ~CodeGenerator();

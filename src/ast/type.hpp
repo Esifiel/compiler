@@ -9,20 +9,6 @@
 using namespace std;
 using namespace llvm;
 
-enum type_type {
-    TYPE_CHAR,
-    TYPE_SHORT,
-    TYPE_INT,
-    TYPE_LONG,
-    TYPE_FLOAT,
-    TYPE_DOUBLE,
-    TYPE_VOID,
-    TYPE_STRUCT,
-    TYPE_ENUM,
-    TYPE_UNION,
-    TYPE_ARRAY
-};
-
 class TypeSpecifier : public Node
 {
 public:
@@ -122,36 +108,28 @@ public:
     virtual string getName() { return "\"UnionType\""; }
 };
 
-class Expression;
-
-class ArrayListType : public TypeSpecifier
+class MyArrayType : public TypeSpecifier
 {
 public:
+    TypeSpecifier *basictype;
     uint64_t size;
-    vector<Expression *> *elements;
 
-    ArrayListType(vector<Expression *> *e, uint64_t s) : TypeSpecifier(TYPE_ARRAY), elements(e), size(s) {}
+    MyArrayType(TypeSpecifier *t) : TypeSpecifier(TYPE_ARRAY), basictype(t), size(0) {}
+    MyArrayType(TypeSpecifier *t, uint64_t sz) : TypeSpecifier(TYPE_ARRAY), basictype(t), size(sz) {}
 
-    virtual string getName() { return "\"ArrayListType\""; }
-    virtual Type *getType(CodeGenerator &ctx) {
-        switch(type)
-        {
-            case TYPE_CHAR:
-                return ctx.builder.getInt8Ty();    
-            case TYPE_SHORT:
-                return ctx.builder.getInt16Ty();
-            case TYPE_INT:
-                return ctx.builder.getInt32Ty();
-            case TYPE_LONG:
-                return ctx.builder.getInt64Ty();
-            case TYPE_FLOAT:
-                return ctx.builder.getFloatTy();
-            case TYPE_DOUBLE:
-                return ctx.builder.getDoubleTy();
-            default:
-                return nullptr;
-        }
-    }
+    virtual string getName() { return "\"MyArrayType\""; }
+    virtual Type *getType(CodeGenerator &ctx) { return ArrayType::get(basictype->getType(ctx), size); }
+};
+
+class MyPointerType : public TypeSpecifier
+{
+public:
+    TypeSpecifier *basictype;
+
+    MyPointerType(TypeSpecifier *t) : TypeSpecifier(TYPE_POINTER), basictype(t) {}
+
+    virtual string getName() { return "\"MyPointerType\""; }
+    virtual Type *getType(CodeGenerator &ctx) { return PointerType::get(basictype->getType(ctx), 0); }
 };
 
 #endif

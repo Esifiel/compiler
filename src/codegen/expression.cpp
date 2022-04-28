@@ -27,7 +27,13 @@ Value *Identifier::codeGen(CodeGenerator &ctx)
     Value *var = ctx.GetVar(name);
     if (!var)
         ctx.error(string("variable '") + name + string("' not found"));
-    return ctx.builder.CreateLoad(var);
+
+    if(ctx.isleft)
+        // return as left value
+        return var;
+    else
+        // return as right value
+        return ctx.builder.CreateLoad(var);
 }
 
 Value *FunctionCall::codeGen(CodeGenerator &ctx)
@@ -71,12 +77,17 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_XOR:
     case OP_SL:
     case OP_SR:
-    case OP_ADD:
     case OP_SUB:
     case OP_MUL:
     case OP_DIV:
     case OP_MOD:
         return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
+    case OP_ADD:
+        var = left->codeGen(ctx);
+        if(var->getType()->isPointerTy())
+            return ctx.builder.CreateGEP(var, right->codeGen(ctx));
+        else
+            return ctx.CreateBinaryExpr(var, right->codeGen(ctx), op);
         // case OP_ANDAND:
         //     out << "&&";
         //     break;
@@ -100,8 +111,8 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         // case OP_NEGTIVE:
         //     out << "-";
         //     break;
-        //
-        // case OP_POINTER:
+        
+        // case OP_DEREFERENCE:
     case OP_INC_REAR:
     case OP_DEC_REAR:
         varname = ((Identifier *)left)->name;
@@ -177,9 +188,10 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         ctx.builder.CreateStore(newval, var);
         return newval;
     case OP_ASSIGN:
-        varname = ((Identifier *)left)->name;
-        var = ctx.GetVar(varname);
-        newval = ctx.CreateCast(right->codeGen(ctx), ((AllocaInst *)var)->getAllocatedType());
+        ctx.isleft = true;
+        var = left->codeGen(ctx);
+        ctx.isleft = false;
+        newval = ctx.CreateCast(right->codeGen(ctx), var->getType());
         ctx.builder.CreateStore(newval, var);
         return newval;
     // case OP_IFELSE:
@@ -188,9 +200,19 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     // case OP_CAST:
     //     out << "()";
     //     break;
-    // case OP_COMMA:
-    //     out << ",";
-    //     break;
+    case OP_COMMA:
+        left->codeGen(ctx);
+        return right->codeGen(ctx);
+    case OP_INDEX:
+        if(ctx.isleft)
+        {
+            ctx.isleft = false;
+            var = left->codeGen(ctx);
+            ctx.isleft = true;
+            return ctx.builder.CreateGEP(var, right->codeGen(ctx));
+        }
+        else
+            return ctx.builder.CreateLoad(ctx.builder.CreateGEP(left->codeGen(ctx), right->codeGen(ctx)));
     default:
         return nullptr;
     }

@@ -68,11 +68,12 @@ class Identifier : public Expression
 public:
     string name;
     Expression *init;
-    bool ispointer;
+    Expression *size;
     Expression *index;
 
-    Identifier(string v) : name(v), init(nullptr), index(nullptr), ispointer(false) {}
-    Identifier(string v, Expression *ini, Expression *idx) : name(v), init(ini), index(idx), ispointer(false) {}
+    Identifier(string v) : name(v), init(nullptr), size(nullptr), index(nullptr) {}
+    Identifier(string v, Expression *ini) : name(v), init(ini), size(nullptr), index(nullptr) {}
+    Identifier(string v, Expression *ini, Expression *sz,  Expression *idx) : name(v), init(ini), size(sz), index(idx) {}
 
     virtual string getName() { return "\"Identifier\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);

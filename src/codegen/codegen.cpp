@@ -146,7 +146,7 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
     case OP_OROR:
         return nullptr;
     case OP_AND:
-        return isfloatpoint ? builder.CreateBinOp(Instruction::BinaryOps::FAdd, a, b) : builder.CreateBinOp(Instruction::BinaryOps::Add, a, b);
+        return builder.CreateBinOp(Instruction::BinaryOps::And, a, b);
     case OP_OR:
         return builder.CreateBinOp(Instruction::BinaryOps::Or, a, b);
     case OP_NOT:
@@ -160,9 +160,9 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
     case OP_MUL:
         return isfloatpoint ? builder.CreateBinOp(Instruction::BinaryOps::FMul, a, b) : builder.CreateBinOp(Instruction::BinaryOps::Mul, a, b);
     case OP_DIV:
-        return builder.CreateBinOp(Instruction::BinaryOps::FDiv, a, b);
+        return isfloatpoint ? builder.CreateBinOp(Instruction::BinaryOps::FDiv, a, b) : builder.CreateBinOp(Instruction::BinaryOps::SDiv, a, b);
     case OP_MOD:
-        return builder.CreateBinOp(Instruction::BinaryOps::FRem, a, b);
+        return builder.CreateBinOp(Instruction::BinaryOps::SRem, a, b);
     case OP_SL:
         return builder.CreateBinOp(Instruction::BinaryOps::Shl, a, b);
     case OP_SR:

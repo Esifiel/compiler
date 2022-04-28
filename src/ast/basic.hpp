@@ -32,7 +32,8 @@ enum op_type
     OP_SLASSIGN, OP_SRASSIGN, OP_ANDASSIGN, OP_XORASSIGN, OP_ORASSIGN,
     OP_IFELSE,
     OP_CAST,
-    OP_COMMA
+    OP_COMMA,
+    OP_INDEX
 };
 
 enum val_type
@@ -43,6 +44,22 @@ enum val_type
     VAL_LONG,
     VAL_FLOAT,
     VAL_DOUBLE  
+};
+
+enum type_type
+{
+    TYPE_CHAR,
+    TYPE_SHORT,
+    TYPE_INT,
+    TYPE_LONG,
+    TYPE_FLOAT,
+    TYPE_DOUBLE,
+    TYPE_VOID,
+    TYPE_STRUCT,
+    TYPE_ENUM,
+    TYPE_UNION,
+    TYPE_ARRAY,
+    TYPE_POINTER
 };
 
 class Node

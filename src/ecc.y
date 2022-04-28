@@ -74,7 +74,7 @@ static void debug(string s);
 %token  DELIM COMMA COLON QUESTION DOT TO LP RP LB RB LC RC
 %token<num> NUMCHAR NUMSHORT NUMINT NUMLONG NUMFLOAT NUMDOUBLE
 %token<stringValue> STRING IDENTIFIER TYPENAME
-%type<op> unary-operator assignment-operator
+%type<op> assignment-operator unary-operator
 
 %type<program> program
 
@@ -92,7 +92,7 @@ static void debug(string s);
 %type<selectionStatement> selection-stat
 %type<iterationStatement> iteration-stat
 
-%type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp const-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer
+%type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp const-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer initializer-list
 %type<exprs> argument-exp-list
 %type<identifier> init-declarator
 %type<ids> id-list init-declarator-list
@@ -232,8 +232,8 @@ declarator                  : pointer direct-declarator
 
 direct-declarator           : IDENTIFIER { $$ = new Identifier(*$1); delete $1; }
                             | LP declarator RP
-                            | direct-declarator LB const-exp       RB
-                            | direct-declarator LB                 RB
+                            | direct-declarator LB const-exp       RB { $$ = $1; ((Identifier *)$$)->size = $3; }
+                            | direct-declarator LB                 RB { $$ = $1; ((Identifier *)$$)->size = new Expression(); }
                             | direct-declarator LP id-list         RP
                             | direct-declarator LP param-type-list RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, $3, nullptr); }
                             | direct-declarator LP                 RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, nullptr, nullptr); }
@@ -263,7 +263,15 @@ param-list                  : param-decl { $$ = $1; }
                             }
                             ;
 
-param-decl                  : decl-specs declarator { $$ = new Parameter($1, (Identifier *)$2); }
+param-decl                  : decl-specs declarator {
+                                $$ = new Parameter($1, (Identifier *)$2);
+                                if(((Identifier *)$2)->size)
+                                {
+                                    $$->type = new MyPointerType($1);
+                                    delete ((Identifier *)$2)->size;
+                                    ((Identifier *)$2)->size = nullptr;
+                                }
+                            }
                             | decl-specs abstract-declarator
                             | decl-specs { $$ = new Parameter($1); }
                             ;
@@ -272,13 +280,19 @@ id-list			            : IDENTIFIER { $$ = new vector<Identifier *>; $$->push_bac
                             | id-list COMMA IDENTIFIER { $1->push_back(new Identifier(*$3)); $$ = $1; delete $3; }
                             ;
 
-initializer                 : assignment-exp { $$ = $1; }
-                            | LC initializer-list RC
-                            | LC initializer-list COMMA RC
+initializer                 : assignment-exp               { $$ = $1; }
+                            | LC initializer-list RC       { $$ = $2; }
+                            | LC initializer-list COMMA RC { $$ = $2; }
                             ;
 
-initializer-list            : initializer
-                            | initializer-list COMMA initializer
+initializer-list            : initializer { $$ = $1; }
+                            | initializer-list COMMA initializer { 
+                                Expression *p = $1;
+                                while(p->left)
+                                    p = p->left;
+                                p->left = $3;
+                                $$ = $1;
+                            }
                             ;
 
 type-name                   : spec-qualifier-list abstract-declarator
@@ -334,7 +348,7 @@ stat-list                   : stat { $$ = $1; }
                             }
                             ;
 
-selection-stat		        : IF LP exp RP stat { $$ = new IfElseStatement($3, $5); }
+selection-stat		        : IF LP exp RP stat           { $5->next = nullptr; $$ = new IfElseStatement($3, $5); }
                             | IF LP exp RP stat ELSE stat { $5->next = $7; $$ = new IfElseStatement($3, $5); }
                             | SWITCH LP exp RP stat
                             ;
@@ -352,10 +366,10 @@ iteration-stat      		: WHILE LP exp RP stat                   { $$ = new WhileS
                             ;
 
 jump-stat                   : GOTO IDENTIFIER DELIM
-                            | CONTINUE DELIM
-                            | BREAK DELIM
-                            | RETURN exp DELIM { $$ = new ReturnStatement($2); }
-                            | RETURN DELIM { $$ = new ReturnStatement(); }
+                            | CONTINUE DELIM        { $$ = new ContinueStatement(); }
+                            | BREAK DELIM           { $$ = new BreakStatement(); }
+                            | RETURN exp DELIM      { $$ = new ReturnStatement($2); }
+                            | RETURN DELIM          { $$ = new ReturnStatement(); }
                             ;
 
 exp			                : assignment-exp { $$ = $1; }
@@ -366,17 +380,17 @@ assignment-exp      		: conditional-exp { $$ = $1; }
                             | unary-exp assignment-operator assignment-exp { $$ = new Expression($1, $3, $2); }
                             ;
 
-assignment-operator	        : ASSIGN { $$ = OP_ASSIGN; }
+assignment-operator	        : ASSIGN    { $$ = OP_ASSIGN; }
                             | MULASSIGN { $$ = OP_MULASSIGN; }
                             | DIVASSIGN { $$ = OP_DIVASSIGN; }
                             | MODASSIGN { $$ = OP_MODASSIGN; }
                             | ADDASSIGN { $$ = OP_ADDASSIGN; }
                             | SUBASSIGN { $$ = OP_SUBASSIGN; }
-                            | SLASSIGN { $$ = OP_SLASSIGN; }
-                            | SRASSIGN { $$ = OP_SRASSIGN; }
+                            | SLASSIGN  { $$ = OP_SLASSIGN; }
+                            | SRASSIGN  { $$ = OP_SRASSIGN; }
                             | ANDASSIGN { $$ = OP_ANDASSIGN; }
                             | XORASSIGN { $$ = OP_XORASSIGN; }
-                            | ORASSIGN { $$ = OP_ORASSIGN; }
+                            | ORASSIGN  { $$ = OP_ORASSIGN; }
                             ;
 
 conditional-exp             : logical-or-exp { $$ = $1; }
@@ -441,7 +455,7 @@ cast-exp		            : unary-exp { $$ = $1; }
 unary-exp		            : postfix-exp { $$ = $1; }
                             | INC unary-exp { $$ = new Expression($2, OP_INC_FRONT); }
                             | DEC unary-exp { $$ = new Expression($2, OP_DEC_FRONT); }
-                            | unary-operator cast-exp { $$ = new Expression($2, $1); }
+                            | unary-operator cast-exp { $$ = new Expression((Identifier *)$2, $1); }
                             | SIZEOF unary-exp
                             | SIZEOF LP type-name RP
                             ;
@@ -455,7 +469,7 @@ unary-operator              : ADDRESSOF { $$ = OP_ADDRESSOF; }
                             ;
 
 postfix-exp		            : primary-exp { $$ = $1; }
-                            | postfix-exp LB exp RB { ((Identifier *)$1)->index = $3; $$ = $1; }
+                            | postfix-exp LB exp RB { $$ = new Expression($1, $3, OP_INDEX); }
                             | postfix-exp LP argument-exp-list RP { $$ = new FunctionCall($1, $3); }
                             | postfix-exp LP RP { $$ = new FunctionCall($1, nullptr); }
                             | postfix-exp DOT IDENTIFIER
@@ -504,4 +518,9 @@ void yywarning(string s, string addition)
 
 static void debug(string s) {
     cout << s << ": " << yytext << endl;
+}
+
+static Number *calculate(Number *a, Number *b, enum op_type op)
+{
+    return nullptr;
 }

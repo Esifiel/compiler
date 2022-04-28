@@ -26,11 +26,6 @@ void replace(string &src, string sub, string tar)
 
 %%
 
-[ \t\n]                         {}
-"//".*                          {}
-"/*"([^*]|"*"+[^/*])*"*"+"/"    {}
-\\$                             {}
-
 ":"                             { debug(); return COLON; }
 ";"                             { debug(); return DELIM; }
 "?"                             { debug(); return QUESTION; }
@@ -112,14 +107,14 @@ void replace(string &src, string sub, string tar)
 "{"                             { debug(); return LC; }
 "}"                             { debug(); return RC; }
 
-"&"[A-Za-z_][A-Za-z0-9_]*       {
+"&"[^ ]                         {
                                     debug();
-                                    yylval.stringValue = new string(yytext + 1);
+                                    unput(yytext[1]);
                                     return ADDRESSOF;
                                 }
-"*"[A-Za-z_][A-Za-z0-9_]*       {
+"*"[^ ]                         {
                                     debug();
-                                    yylval.stringValue = new string(yytext + 1);
+                                    unput(yytext[1]);
                                     return DEREFERENCE;
                                 }
 
@@ -168,6 +163,11 @@ void replace(string &src, string sub, string tar)
 "#else"                         {}
 "#endif"                        {}
 "#define"                       {}
+
+[ \t\n]                         {}
+"//".*                          {}
+"/*"([^*]|"*"+[^/*])*"*"+"/"    {}
+\\$                             {}
 
 .                               {}
 

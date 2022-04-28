@@ -47,6 +47,8 @@ private:
     void visitFunctionCall(FunctionCall *f);
     void visitOp(enum op_type op);
     void visitParameter(Parameter *p);
+    void visitBreakStatement(BreakStatement *b);
+    void visitContinueStatement(ContinueStatement *c);
 };
 
 #endif

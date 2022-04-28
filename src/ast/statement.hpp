@@ -14,8 +14,8 @@ class Statement : public Node
 public:
     Statement *next;
 
-    Statement():next(nullptr) {}
-    Statement(Statement *n):next(n){}
+    Statement() : next(nullptr) {}
+    Statement(Statement *n) : next(n) {}
 
     virtual string getName() { return "\"Statement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) { return nullptr; }
@@ -40,7 +40,7 @@ class ExpressionStatement : public Statement
 public:
     Expression *expr;
 
-    ExpressionStatement():expr(nullptr) { }
+    ExpressionStatement() : expr(nullptr) {}
     ExpressionStatement(Expression *e) : expr(e) {}
 
     virtual string getName() { return "\"ExpressionStatement\""; }
@@ -63,7 +63,7 @@ class IfElseStatement : public SelectionStatement
 public:
     IfElseStatement(Expression *c, Statement *s) : SelectionStatement(c, s) {}
 
-    virtual string getName() { return "\"SelectionStatement\""; }
+    virtual string getName() { return "\"IfElseStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
@@ -126,6 +126,24 @@ public:
     SwitchCaseStatement(Expression *c, Statement *s) : SelectionStatement(c, s) {}
 
     virtual string getName() { return "\"SwitchCaseStatement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
+class BreakStatement : public Statement
+{
+public:
+    BreakStatement() {}
+
+    virtual string getName() { return "\"BreakStatement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
+class ContinueStatement : public Statement
+{
+public:
+    ContinueStatement() {}
+
+    virtual string getName() { return "\"ContinueStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 

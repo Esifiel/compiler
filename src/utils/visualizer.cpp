@@ -35,9 +35,9 @@ void Visualizer::visitDeclaration(Declaration *d)
         Declaration *decl = d;
         while (decl)
         {
-            if (d->getName() == "\"FunctionDeclaration\"")
+            if (decl->getName() == "\"FunctionDeclaration\"")
                 visitFunctionDeclaration((FunctionDeclaration *)decl);
-            else if (d->getName() == "\"VariableDeclaration\"")
+            else if (decl->getName() == "\"VariableDeclaration\"")
                 visitVariableDeclaration((VariableDeclaration *)decl);
             decl = decl->next;
             if (decl)
@@ -104,12 +104,7 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
 void Visualizer::visitType(TypeSpecifier *t)
 {
     if (t)
-    {
-        out << head << t->getName() << sub;
-        if (t->getName() == "\"ArrayListType\"")
-            out << ((ArrayListType *)t)->size;
-        out << subend << tail;
-    }
+        out << head << t->getName() << sub << subend << tail;
 }
 
 void Visualizer::visitIdentifier(Identifier *i)
@@ -117,6 +112,16 @@ void Visualizer::visitIdentifier(Identifier *i)
     if (i)
     {
         out << head << i->getName() << sub << "\"" + i->name + "\"";
+        if(i->size)
+        {
+            out << sep;
+            visitExpression(i->size);
+        }
+        if(i->index)
+        {
+            out << sep;
+            visitExpression(i->index);
+        }
         if(i->init)
         {
             out << sep;
@@ -152,7 +157,7 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
                     out << sep;
                 visitDeclaration(p);
             }
-        if (c->vardecs && c->vardecs->size() > 0 && c->stmt != nullptr)
+        if(c->vardecs && c->vardecs->size() > 0 && c->stmt)
             out << sep;
         Statement *p = c->stmt;
         while (p)
@@ -186,6 +191,10 @@ void Visualizer::visitStatement(Statement *s)
             visitForStatement((ForStatement *)s);
         else if (s->getName() == "\"ReturnStatement\"")
             visitReturnStatement((ReturnStatement *)s);
+        else if (s->getName() == "\"BreakStatement\"")
+            visitBreakStatement((BreakStatement *)s);
+        else if (s->getName() == "\"ContinueStatement\"")
+            visitContinueStatement((ContinueStatement *)s);
     }
 }
 
@@ -313,6 +322,7 @@ void Visualizer::visitOp(enum op_type op)
     case OP_ADD:
     case OP_POSITIVE:
         out << "+";
+        break;
     case OP_SUB:
     case OP_NEGTIVE:
         out << "-";
@@ -377,6 +387,9 @@ void Visualizer::visitOp(enum op_type op)
     case OP_COMMA:
         out << ",";
         break;
+    case OP_INDEX:
+        out << "[]";
+        break;
     default:
         break;
     }
@@ -388,6 +401,9 @@ void Visualizer::visitWhileStatement(WhileStatement *w)
     if (w)
     {
         out << head << w->getName() << sub;
+        visitExpression(w->cond);
+        out << sep;
+        visitStatement(w->stmt);
         out << subend << tail;
     }
 }
@@ -398,10 +414,10 @@ void Visualizer::visitForStatement(ForStatement *f)
     {
         out << head << f->getName() << sub;
         visitExpression(f->init);
-        if (f->init && (f->cond || f->end || f->stmt))
+        if ((f->init) && f->cond)
             out << sep;
         visitExpression(f->cond);
-        if ((f->init || f->cond) && (f->end || f->stmt))
+        if ((f->init || f->cond) && f->end)
             out << sep;
         visitExpression(f->end);
         if ((f->init || f->cond || f->end) && f->stmt)
@@ -467,4 +483,16 @@ void Visualizer::visitDoWhileStatement(DoWhileStatement *d)
 void Visualizer::visitSwitchCaseStatement(SwitchCaseStatement *s)
 {
 
+}
+
+void Visualizer::visitBreakStatement(BreakStatement *b)
+{
+    if (b)
+        out << head << b->getName() << sub << subend << tail;
+}
+
+void Visualizer::visitContinueStatement(ContinueStatement *c)
+{
+    if (c)
+        out << head << c->getName() << sub << subend << tail;
 }

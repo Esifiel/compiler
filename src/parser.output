@@ -491,7 +491,7 @@
     initializer <expression> (125)
         on left: 91 92 93
         on right: 23 94 95
-    initializer-list (126)
+    initializer-list <expression> (126)
         on left: 94 95
         on right: 92 93 95
     type-name (127)
