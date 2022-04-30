@@ -123,7 +123,10 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     {
         if (p->id->name != "")
             arg.setName(p->id->name);
+        // allocate for arg
         ctx.blocks.front()[p->id->name] = ctx.builder.CreateAlloca(p->type->getType(ctx), 0, p->id->name.c_str());
+        // store arg
+        ctx.builder.CreateStore(&arg, ctx.blocks.front()[p->id->name]);
         p = (Parameter *)(p->next);
     }
 

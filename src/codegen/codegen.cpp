@@ -3,13 +3,11 @@
 #include "codegen.hpp"
 
 // initialize the context
-CodeGenerator::CodeGenerator() : builder(ctx)
+CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(false), isleft(false)
 {
     module = new Module("main", ctx);
     functions.clear();
     blocks.clear();
-    curFunction = nullptr;
-    isglobal = false;
     // top level (global) blocks
     blocks.push_front(map<string, Value *>());
 
@@ -90,6 +88,7 @@ Value *CodeGenerator::GetVar(string name)
         for (auto &p : blocks)
             if (p.find(name) != p.end())
                 return p[name];
+    // warning(string("null variable '") + name + "'");
     return nullptr;
     // error(string("variable '") + name + string("' not found"));
 }
@@ -166,7 +165,7 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
     case OP_SL:
         return builder.CreateBinOp(Instruction::BinaryOps::Shl, a, b);
     case OP_SR:
-        // may be not ok if always arithmetic shift right
+        // TODO: may be not ok if always arithmetic shift right
         return builder.CreateBinOp(Instruction::BinaryOps::AShr, a, b);
     default:
         error("operand type not supoorted.");

@@ -28,12 +28,20 @@ Value *Identifier::codeGen(CodeGenerator &ctx)
     if (!var)
         ctx.error(string("variable '") + name + string("' not found"));
 
-    if(ctx.isleft)
+    if (ctx.isleft)
         // return as left value
         return var;
     else
+    {
         // return as right value
+        if(((AllocaInst *)var)->getAllocatedType()->isArrayTy())
+        {
+            // if the variable is ArrayType, return as a pointer type (pointer of first element)
+            Value *idxlist[] = {ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0)};
+            return ctx.builder.CreateGEP(var, ArrayRef<Value *>(idxlist, 2));
+        }
         return ctx.builder.CreateLoad(var);
+    }
 }
 
 Value *FunctionCall::codeGen(CodeGenerator &ctx)
@@ -86,13 +94,25 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_ADD:
         // if a variable loaded as right value and is pointer type, it means a pointer addition
         lv = left->codeGen(ctx);
-        if(lv->getType()->isPointerTy())
+        if (lv->getType()->isPointerTy())
             return ctx.builder.CreateGEP(lv, right->codeGen(ctx));
+        if(lv->getType()->isArrayTy())
+        {
+            // TBD: array's GEP may need to be refactored as a static function
+            idxlist[1] = right->codeGen(ctx);
+            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+            return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
+        }
         rv = right->codeGen(ctx);
-        if(rv->getType()->isPointerTy())
-            return ctx.builder.CreateGEP(lv, rv);
-        else
-            return ctx.CreateBinaryExpr(lv, rv, op);
+        if (rv->getType()->isPointerTy())
+            return ctx.builder.CreateGEP(rv, lv);
+        if(rv->getType()->isArrayTy())
+        {
+            idxlist[1] = lv;
+            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+            return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
+        }
+        return ctx.CreateBinaryExpr(lv, rv, op);
         // case OP_ANDAND:
         //     out << "&&";
         //     break;
@@ -112,8 +132,6 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         // case OP_NEGTIVE:
         //     out << "-";
         //     break;
-        
-        // 
     case OP_INC_REAR:
     case OP_DEC_REAR:
         varname = ((Identifier *)left)->name;
@@ -205,44 +223,48 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         left->codeGen(ctx);
         return right->codeGen(ctx);
     case OP_INDEX:
-        if(ctx.isleft)
+        varname = ((Identifier *)left)->name;
+        var = ctx.GetVar(varname);
+        if (((AllocaInst *)var)->getAllocatedType()->isPointerTy())
         {
-            lv = left->codeGen(ctx);
-            ctx.isleft = false;
-            idxlist[1] = right->codeGen(ctx);
-            ctx.isleft = true;
-            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
-            return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
+            var = ctx.builder.CreateLoad(var);
+            if (ctx.isleft)
+            {
+                ctx.isleft = false;
+                rv = right->codeGen(ctx);
+                ctx.isleft = true;
+                return ctx.builder.CreateGEP(var, rv);
+            }
+            else
+                return ctx.builder.CreateLoad(ctx.builder.CreateGEP(var, right->codeGen(ctx)));
+        }
+        else if (((AllocaInst *)var)->getAllocatedType()->isArrayTy())
+        {
+            if (ctx.isleft)
+            {
+                ctx.isleft = false;
+                idxlist[1] = right->codeGen(ctx);
+                ctx.isleft = true;
+                idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+                return ctx.builder.CreateGEP(var, ArrayRef<Value *>(idxlist, 2));
+            }
+            else
+            {
+                idxlist[1] = right->codeGen(ctx);
+                idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+                return ctx.builder.CreateLoad(ctx.builder.CreateGEP(var, ArrayRef<Value *>(idxlist, 2)));
+            }
         }
         else
-        {
-            ctx.isleft = true;
-            lv = left->codeGen(ctx);
-            ctx.isleft = false;
-            idxlist[1] = right->codeGen(ctx);
-            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
-            return ctx.builder.CreateLoad(ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2)));
-        }
+            ctx.error("not supported operand of [] operator");
     case OP_DEREFERENCE:
         break;
     case OP_ADDRESSOF:
         ctx.isleft = true;
         var = left->codeGen(ctx);
         ctx.isleft = false;
-        ctx.dump();
         return var;
     default:
         return nullptr;
     }
 }
-
-// Value *SimpleExpression::codeGen(CodeGenerator &ctx)
-// {
-//     Value *lv = left->codeGen(ctx), *rv = nullptr;
-//     if (right)
-//         rv = right->codeGen(ctx);
-//     else
-//         return lv;
-
-//     return ctx.CreateBinaryExpr(lv, rv, op);
-// }

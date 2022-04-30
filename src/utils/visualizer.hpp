@@ -11,14 +11,8 @@ public:
     Program *program;
     ofstream out;
 
-    Visualizer(Program *p, string s) : program(p)
-    {
-        out.open(s.c_str());
-    }
-    ~Visualizer()
-    {
-        out.close();
-    }
+    Visualizer(Program *p, string s) : program(p), out(s) {}
+    ~Visualizer() { out.close(); }
 
     // traverse AST in pre-order and write to a legal .json file
     void traverse();
