@@ -62,7 +62,8 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
 Value *Expression::codeGen(CodeGenerator &ctx)
 {
     string varname;
-    Value *var, *oldval, *newval;
+    Value *var, *oldval, *newval, *lv, *rv;
+    Value *idxlist[2];
 
     switch (op)
     {
@@ -83,11 +84,15 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_MOD:
         return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
     case OP_ADD:
-        var = left->codeGen(ctx);
-        if(var->getType()->isPointerTy())
-            return ctx.builder.CreateGEP(var, right->codeGen(ctx));
+        // if a variable loaded as right value and is pointer type, it means a pointer addition
+        lv = left->codeGen(ctx);
+        if(lv->getType()->isPointerTy())
+            return ctx.builder.CreateGEP(lv, right->codeGen(ctx));
+        rv = right->codeGen(ctx);
+        if(rv->getType()->isPointerTy())
+            return ctx.builder.CreateGEP(lv, rv);
         else
-            return ctx.CreateBinaryExpr(var, right->codeGen(ctx), op);
+            return ctx.CreateBinaryExpr(lv, rv, op);
         // case OP_ANDAND:
         //     out << "&&";
         //     break;
@@ -96,10 +101,6 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         //     break;
         // case OP_NOTNOT:
         //     out << "!";
-        //     break;
-
-        // case OP_ADDRESS:
-        //     out << "&";
         //     break;
 
         // case OP_NOT:
@@ -112,7 +113,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         //     out << "-";
         //     break;
         
-        // case OP_DEREFERENCE:
+        // 
     case OP_INC_REAR:
     case OP_DEC_REAR:
         varname = ((Identifier *)left)->name;
@@ -191,7 +192,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         ctx.isleft = true;
         var = left->codeGen(ctx);
         ctx.isleft = false;
-        newval = ctx.CreateCast(right->codeGen(ctx), var->getType());
+        newval = ctx.CreateCast(right->codeGen(ctx), ((AllocaInst *)var)->getAllocatedType());
         ctx.builder.CreateStore(newval, var);
         return newval;
     // case OP_IFELSE:
@@ -206,13 +207,30 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_INDEX:
         if(ctx.isleft)
         {
+            lv = left->codeGen(ctx);
             ctx.isleft = false;
-            var = left->codeGen(ctx);
+            idxlist[1] = right->codeGen(ctx);
             ctx.isleft = true;
-            return ctx.builder.CreateGEP(var, right->codeGen(ctx));
+            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+            return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
         }
         else
-            return ctx.builder.CreateLoad(ctx.builder.CreateGEP(left->codeGen(ctx), right->codeGen(ctx)));
+        {
+            ctx.isleft = true;
+            lv = left->codeGen(ctx);
+            ctx.isleft = false;
+            idxlist[1] = right->codeGen(ctx);
+            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+            return ctx.builder.CreateLoad(ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2)));
+        }
+    case OP_DEREFERENCE:
+        break;
+    case OP_ADDRESSOF:
+        ctx.isleft = true;
+        var = left->codeGen(ctx);
+        ctx.isleft = false;
+        ctx.dump();
+        return var;
     default:
         return nullptr;
     }

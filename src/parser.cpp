@@ -2770,7 +2770,7 @@ yyreduce:
 
   case 197:
 #line 458 "ecc.y"
-                                                      { (yyval.expression) = new Expression((Identifier *)(yyvsp[0].expression), (yyvsp[-1].op)); }
+                                                      { (yyval.expression) = new Expression((yyvsp[0].expression), (yyvsp[-1].op)); }
 #line 2775 "parser.cpp"
     break;
 

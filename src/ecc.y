@@ -455,7 +455,7 @@ cast-exp		            : unary-exp { $$ = $1; }
 unary-exp		            : postfix-exp { $$ = $1; }
                             | INC unary-exp { $$ = new Expression($2, OP_INC_FRONT); }
                             | DEC unary-exp { $$ = new Expression($2, OP_DEC_FRONT); }
-                            | unary-operator cast-exp { $$ = new Expression((Identifier *)$2, $1); }
+                            | unary-operator cast-exp { $$ = new Expression($2, $1); }
                             | SIZEOF unary-exp
                             | SIZEOF LP type-name RP
                             ;

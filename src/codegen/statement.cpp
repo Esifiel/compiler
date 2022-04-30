@@ -16,8 +16,6 @@ Value *CompoundStatement::codeGen(CodeGenerator &ctx)
     {
         s->codeGen(ctx);
         s = s->next;
-
-        ctx.dump();
     }
 
     // leave the current block
@@ -118,6 +116,8 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
     ctx.builder.SetInsertPoint(forloop);
     stmt->codeGen(ctx);
     ctx.builder.CreateBr(forend);
+
+    ctx.dump();
 
     // round end
     ctx.builder.SetInsertPoint(forend);
