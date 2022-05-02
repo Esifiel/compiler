@@ -72,6 +72,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     string varname;
     Value *var, *oldval, *newval, *lv, *rv;
     Value *idxlist[2];
+    bool tmpleft;
 
     switch (op)
     {
@@ -223,9 +224,14 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         left->codeGen(ctx);
         return right->codeGen(ctx);
     case OP_INDEX:
-        varname = ((Identifier *)left)->name;
-        var = ctx.GetVar(varname);
-        if (((AllocaInst *)var)->getAllocatedType()->isPointerTy())
+        // fetch the iterable type
+        tmpleft = ctx.isleft;
+        ctx.isleft = true;
+        var = left->codeGen(ctx);
+        ctx.isleft = tmpleft;
+
+        // pointer or array
+        if (var->getType()->getPointerElementType()->isPointerTy())
         {
             var = ctx.builder.CreateLoad(var);
             if (ctx.isleft)
@@ -238,7 +244,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             else
                 return ctx.builder.CreateLoad(ctx.builder.CreateGEP(var, right->codeGen(ctx)));
         }
-        else if (((AllocaInst *)var)->getAllocatedType()->isArrayTy())
+        else if (var->getType()->getPointerElementType()->isArrayTy())
         {
             if (ctx.isleft)
             {

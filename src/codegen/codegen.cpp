@@ -29,6 +29,14 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     func = Function::Create(functype, Function::ExternalLinkage, "scanf", module);
     func->setCallingConv(CallingConv::C);
     functions["scanf"] = func;
+
+    // puts
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt32Ty(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "puts", module);
+    func->setCallingConv(CallingConv::C);
+    functions["puts"] = func;
 }
 
 // destructor

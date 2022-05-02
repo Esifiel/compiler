@@ -5,21 +5,22 @@ using namespace llvm;
 
 Value *Program::codeGen(CodeGenerator &ctx)
 {
-    Declaration *p = decl;
-    while (p)
+    for (Declaration *p = decl; p; p = p->next)
     {
         if (p->getName() == "\"VariableDeclaration\"")
         {
             ctx.isglobal = true;
             p->codeGen(ctx);
             ctx.isglobal = false;
+
+            ctx.dump();
         }
         else if (p->getName() == "\"FunctionDeclaration\"")
         {
             Value *ret = p->codeGen(ctx);
             verifyFunction(*(Function *)ret, &errs());
         }
-        p = p->next;
+        ctx.dump();
     }
 
     return nullptr;

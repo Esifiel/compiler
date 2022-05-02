@@ -108,25 +108,31 @@ public:
     virtual string getName() { return "\"UnionType\""; }
 };
 
-class MyArrayType : public TypeSpecifier
+class IterableType : public TypeSpecifier
 {
 public:
     TypeSpecifier *basictype;
+    uint64_t dim;
+
+    IterableType(TypeSpecifier *bt, enum type_type type) : basictype(bt), TypeSpecifier(type), dim(0) {}
+};
+
+class MyArrayType : public IterableType
+{
+public:
     uint64_t size;
 
-    MyArrayType(TypeSpecifier *t) : TypeSpecifier(TYPE_ARRAY), basictype(t), size(0) {}
-    MyArrayType(TypeSpecifier *t, uint64_t sz) : TypeSpecifier(TYPE_ARRAY), basictype(t), size(sz) {}
+    MyArrayType(TypeSpecifier *t) : IterableType(t, TYPE_ARRAY), size(0) {}
+    MyArrayType(TypeSpecifier *t, uint64_t sz) : IterableType(t, TYPE_ARRAY), size(sz) {}
 
     virtual string getName() { return "\"MyArrayType\""; }
     virtual Type *getType(CodeGenerator &ctx) { return ArrayType::get(basictype->getType(ctx), size); }
 };
 
-class MyPointerType : public TypeSpecifier
+class MyPointerType : public IterableType
 {
 public:
-    TypeSpecifier *basictype;
-
-    MyPointerType(TypeSpecifier *t) : TypeSpecifier(TYPE_POINTER), basictype(t) {}
+    MyPointerType(TypeSpecifier *t) : IterableType(t, TYPE_POINTER) {}
 
     virtual string getName() { return "\"MyPointerType\""; }
     virtual Type *getType(CodeGenerator &ctx) { return PointerType::get(basictype->getType(ctx), 0); }

@@ -28,10 +28,10 @@ public:
 class VariableDeclaration : public Declaration
 {
 public:
-    TypeSpecifier *type;
+    vector<TypeSpecifier *> *types;
     vector<Identifier *> *ids;
 
-    VariableDeclaration(TypeSpecifier *t, vector<Identifier *> *i) : type(t), ids(i) {}
+    VariableDeclaration(vector<TypeSpecifier *> *t, vector<Identifier *> *i) : types(t), ids(i) {}
 
     virtual string getName() { return "\"VariableDeclaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;

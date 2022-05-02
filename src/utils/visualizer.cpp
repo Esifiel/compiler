@@ -51,11 +51,15 @@ void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
     if (d)
     {
         out << head << d->getName() << sub;
-        visitType(d->type);
-        for (auto &p : *d->ids)
+        auto pt = d->types->begin();
+        auto pi = d->ids->begin();
+        for (; pt != d->types->end() && pi != d->ids->end(); pt++, pi++)
         {
+            if(pt != d->types->begin() && pi != d->ids->begin())
+                out << sep;
+            visitType(*pt);
             out << sep;
-            visitIdentifier(p);
+            visitIdentifier(*pi);
         }
         out << subend << tail;
     }
@@ -104,7 +108,15 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
 void Visualizer::visitType(TypeSpecifier *t)
 {
     if (t)
-        out << head << t->getName() << sub << subend << tail;
+    {
+        out << head << t->getName() << sub;
+        if(t->type == TYPE_ARRAY || t->type == TYPE_ARRAY)
+        {
+            out << ((MyArrayType *)t)->size << sep;
+            visitType(((IterableType *)t)->basictype);
+        }
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitIdentifier(Identifier *i)
@@ -112,16 +124,6 @@ void Visualizer::visitIdentifier(Identifier *i)
     if (i)
     {
         out << head << i->getName() << sub << "\"" + i->name + "\"";
-        if(i->size)
-        {
-            out << sep;
-            visitExpression(i->size);
-        }
-        if(i->index)
-        {
-            out << sep;
-            visitExpression(i->index);
-        }
         if(i->init)
         {
             out << sep;
@@ -434,6 +436,9 @@ void Visualizer::visitNumber(Number *n)
         out << head << n->getName() << sub;
         switch (n->valtype)
         {
+        case VAL_NONE:
+            out << "\"NaN\"";
+            break;
         case VAL_CHAR:
             out << n->charView();
             break;

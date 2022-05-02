@@ -39,6 +39,7 @@ public:
     TypeSpecifier *type;
     enum val_type valtype;
 
+    Number() : type(nullptr), valtype(VAL_NONE) {}
     Number(union union_num u, TypeSpecifier *t, enum val_type v) : type(t), valtype(v) { memcpy(buf, &u, 8); }
 
     virtual string getName() { return "\"Number\""; }
@@ -68,12 +69,9 @@ class Identifier : public Expression
 public:
     string name;
     Expression *init;
-    Expression *size;
-    Expression *index;
 
-    Identifier(string v) : name(v), init(nullptr), size(nullptr), index(nullptr) {}
-    Identifier(string v, Expression *ini) : name(v), init(ini), size(nullptr), index(nullptr) {}
-    Identifier(string v, Expression *ini, Expression *sz,  Expression *idx) : name(v), init(ini), size(sz), index(idx) {}
+    Identifier(string v) : name(v), init(nullptr) {}
+    Identifier(string v, Expression *ini) : name(v), init(ini) {}
 
     virtual string getName() { return "\"Identifier\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);

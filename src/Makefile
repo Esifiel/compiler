@@ -32,21 +32,28 @@ scanner.cpp: $(NAME).l parser.hpp
 
 $(NAME): $(OBJECTS) FORCE
 	@if [ ! -d tmp ]; then mkdir tmp; fi
+	@if [ ! -d obj ]; then mkdir obj; fi
 
 	$(CC) -g -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
-	@cat ../test/quicksort.c | ./$(NAME)
-	@clang --target=$(TARGET) ./test.bc -o ./test
-	@cd tmp && opt -dot-cfg ../test.ll
+	@./$(NAME) ../test/quicksort.c
+	@clang --target=$(TARGET) ./obj/quicksort.bc -o ./obj/quicksort
+	@cd tmp && opt -dot-cfg ../obj/quicksort.ll
+
+	@./$(NAME) ../test/matrix-multiplication.c
+	@clang --target=$(TARGET) ./obj/matrix-multiplication.bc -o ./obj/matrix-multiplication
+	@cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
+
 	@cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
-	@./test
+
+	@./obj/matrix-multiplication
 
 clean:
 	@rm -f $(NAME)
 	@rm -f *.o utils/*.o codegen/*.o
 	@rm -f parser.* scanner.*
 	@rm -rf tmp
-	@rm -f test*
+	@rm -rf obj
 	@rm -f .gdb_history 
 
 FORCE:

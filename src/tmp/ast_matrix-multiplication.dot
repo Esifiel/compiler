@@ -1,0 +1,508 @@
+// Visualization of the Abstract Syntax Tree
+digraph AST {
+	graph [rankdir=LR]
+	Program [label=Program]
+	VariableDeclaration [label=VariableDeclaration]
+	Program -> VariableDeclaration
+	MyArrayType [label=MyArrayType]
+	VariableDeclaration -> MyArrayType
+	30 [label=30]
+	MyArrayType -> 30
+	MyArrayType4 [label=MyArrayType]
+	MyArrayType -> MyArrayType4
+	40 [label=40]
+	MyArrayType4 -> 40
+	IntType [label=IntType]
+	MyArrayType4 -> IntType
+	Identifier [label=Identifier]
+	VariableDeclaration -> Identifier
+	a [label=a]
+	Identifier -> a
+	VariableDeclaration9 [label=VariableDeclaration]
+	Program -> VariableDeclaration9
+	MyArrayType10 [label=MyArrayType]
+	VariableDeclaration9 -> MyArrayType10
+	3011 [label=30]
+	MyArrayType10 -> 3011
+	MyArrayType12 [label=MyArrayType]
+	MyArrayType10 -> MyArrayType12
+	4013 [label=40]
+	MyArrayType12 -> 4013
+	IntType14 [label=IntType]
+	MyArrayType12 -> IntType14
+	Identifier15 [label=Identifier]
+	VariableDeclaration9 -> Identifier15
+	b [label=b]
+	Identifier15 -> b
+	VariableDeclaration17 [label=VariableDeclaration]
+	Program -> VariableDeclaration17
+	MyArrayType18 [label=MyArrayType]
+	VariableDeclaration17 -> MyArrayType18
+	3019 [label=30]
+	MyArrayType18 -> 3019
+	MyArrayType20 [label=MyArrayType]
+	MyArrayType18 -> MyArrayType20
+	4021 [label=40]
+	MyArrayType20 -> 4021
+	IntType22 [label=IntType]
+	MyArrayType20 -> IntType22
+	Identifier23 [label=Identifier]
+	VariableDeclaration17 -> Identifier23
+	c [label=c]
+	Identifier23 -> c
+	FunctionDeclaration [label=FunctionDeclaration]
+	Program -> FunctionDeclaration
+	IntType26 [label=IntType]
+	FunctionDeclaration -> IntType26
+	Identifier27 [label=Identifier]
+	FunctionDeclaration -> Identifier27
+	main [label=main]
+	Identifier27 -> main
+	CompoundStatement [label=CompoundStatement]
+	FunctionDeclaration -> CompoundStatement
+	VariableDeclaration30 [label=VariableDeclaration]
+	CompoundStatement -> VariableDeclaration30
+	IntType31 [label=IntType]
+	VariableDeclaration30 -> IntType31
+	Identifier32 [label=Identifier]
+	VariableDeclaration30 -> Identifier32
+	ma [label=ma]
+	Identifier32 -> ma
+	IntType34 [label=IntType]
+	VariableDeclaration30 -> IntType34
+	Identifier35 [label=Identifier]
+	VariableDeclaration30 -> Identifier35
+	na [label=na]
+	Identifier35 -> na
+	IntType37 [label=IntType]
+	VariableDeclaration30 -> IntType37
+	Identifier38 [label=Identifier]
+	VariableDeclaration30 -> Identifier38
+	mb [label=mb]
+	Identifier38 -> mb
+	IntType40 [label=IntType]
+	VariableDeclaration30 -> IntType40
+	Identifier41 [label=Identifier]
+	VariableDeclaration30 -> Identifier41
+	nb [label=nb]
+	Identifier41 -> nb
+	VariableDeclaration43 [label=VariableDeclaration]
+	CompoundStatement -> VariableDeclaration43
+	IntType44 [label=IntType]
+	VariableDeclaration43 -> IntType44
+	Identifier45 [label=Identifier]
+	VariableDeclaration43 -> Identifier45
+	i [label=i]
+	Identifier45 -> i
+	IntType47 [label=IntType]
+	VariableDeclaration43 -> IntType47
+	Identifier48 [label=Identifier]
+	VariableDeclaration43 -> Identifier48
+	j [label=j]
+	Identifier48 -> j
+	ExpressionStatement [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement
+	FunctionCall [label=FunctionCall]
+	ExpressionStatement -> FunctionCall
+	Identifier52 [label=Identifier]
+	FunctionCall -> Identifier52
+	scanf [label=scanf]
+	Identifier52 -> scanf
+	String [label=String]
+	FunctionCall -> String
+	"%d %d" [label="%d %d"]
+	String -> "%d %d"
+	Expression [label=Expression]
+	FunctionCall -> Expression
+	Identifier57 [label=Identifier]
+	Expression -> Identifier57
+	ma58 [label=ma]
+	Identifier57 -> ma58
+	op [label=op]
+	Expression -> op
+	"&" [label="&"]
+	op -> "&"
+	Expression61 [label=Expression]
+	FunctionCall -> Expression61
+	Identifier62 [label=Identifier]
+	Expression61 -> Identifier62
+	na63 [label=na]
+	Identifier62 -> na63
+	op64 [label=op]
+	Expression61 -> op64
+	"&65" [label="&"]
+	op64 -> "&65"
+	ForStatement [label=ForStatement]
+	CompoundStatement -> ForStatement
+	Expression67 [label=Expression]
+	ForStatement -> Expression67
+	Identifier68 [label=Identifier]
+	Expression67 -> Identifier68
+	i69 [label=i]
+	Identifier68 -> i69
+	op70 [label=op]
+	Expression67 -> op70
+	"=" [label="="]
+	op70 -> "="
+	Number [label=Number]
+	Expression67 -> Number
+	0 [label=0]
+	Number -> 0
+	Expression74 [label=Expression]
+	ForStatement -> Expression74
+	Identifier75 [label=Identifier]
+	Expression74 -> Identifier75
+	i76 [label=i]
+	Identifier75 -> i76
+	op77 [label=op]
+	Expression74 -> op77
+	"<" [label="<"]
+	op77 -> "<"
+	Identifier79 [label=Identifier]
+	Expression74 -> Identifier79
+	ma80 [label=ma]
+	Identifier79 -> ma80
+	Expression81 [label=Expression]
+	ForStatement -> Expression81
+	Identifier82 [label=Identifier]
+	Expression81 -> Identifier82
+	i83 [label=i]
+	Identifier82 -> i83
+	op84 [label=op]
+	Expression81 -> op84
+	"++" [label="++"]
+	op84 -> "++"
+	ForStatement86 [label=ForStatement]
+	ForStatement -> ForStatement86
+	Expression87 [label=Expression]
+	ForStatement86 -> Expression87
+	Identifier88 [label=Identifier]
+	Expression87 -> Identifier88
+	j89 [label=j]
+	Identifier88 -> j89
+	op90 [label=op]
+	Expression87 -> op90
+	"=91" [label="="]
+	op90 -> "=91"
+	Number92 [label=Number]
+	Expression87 -> Number92
+	093 [label=0]
+	Number92 -> 093
+	Expression94 [label=Expression]
+	ForStatement86 -> Expression94
+	Identifier95 [label=Identifier]
+	Expression94 -> Identifier95
+	j96 [label=j]
+	Identifier95 -> j96
+	op97 [label=op]
+	Expression94 -> op97
+	"<98" [label="<"]
+	op97 -> "<98"
+	Identifier99 [label=Identifier]
+	Expression94 -> Identifier99
+	na100 [label=na]
+	Identifier99 -> na100
+	Expression101 [label=Expression]
+	ForStatement86 -> Expression101
+	Identifier102 [label=Identifier]
+	Expression101 -> Identifier102
+	j103 [label=j]
+	Identifier102 -> j103
+	op104 [label=op]
+	Expression101 -> op104
+	"++105" [label="++"]
+	op104 -> "++105"
+	ExpressionStatement106 [label=ExpressionStatement]
+	ForStatement86 -> ExpressionStatement106
+	FunctionCall107 [label=FunctionCall]
+	ExpressionStatement106 -> FunctionCall107
+	Identifier108 [label=Identifier]
+	FunctionCall107 -> Identifier108
+	scanf109 [label=scanf]
+	Identifier108 -> scanf109
+	String110 [label=String]
+	FunctionCall107 -> String110
+	"%d" [label="%d"]
+	String110 -> "%d"
+	Expression112 [label=Expression]
+	FunctionCall107 -> Expression112
+	Expression113 [label=Expression]
+	Expression112 -> Expression113
+	Expression114 [label=Expression]
+	Expression113 -> Expression114
+	Identifier115 [label=Identifier]
+	Expression114 -> Identifier115
+	a116 [label=a]
+	Identifier115 -> a116
+	op117 [label=op]
+	Expression114 -> op117
+	"[]" [label="[]"]
+	op117 -> "[]"
+	Identifier119 [label=Identifier]
+	Expression114 -> Identifier119
+	i120 [label=i]
+	Identifier119 -> i120
+	op121 [label=op]
+	Expression113 -> op121
+	"[]122" [label="[]"]
+	op121 -> "[]122"
+	Identifier123 [label=Identifier]
+	Expression113 -> Identifier123
+	j124 [label=j]
+	Identifier123 -> j124
+	op125 [label=op]
+	Expression112 -> op125
+	"&126" [label="&"]
+	op125 -> "&126"
+	ExpressionStatement127 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement127
+	FunctionCall128 [label=FunctionCall]
+	ExpressionStatement127 -> FunctionCall128
+	Identifier129 [label=Identifier]
+	FunctionCall128 -> Identifier129
+	scanf130 [label=scanf]
+	Identifier129 -> scanf130
+	String131 [label=String]
+	FunctionCall128 -> String131
+	"%d %d132" [label="%d %d"]
+	String131 -> "%d %d132"
+	Expression133 [label=Expression]
+	FunctionCall128 -> Expression133
+	Identifier134 [label=Identifier]
+	Expression133 -> Identifier134
+	mb135 [label=mb]
+	Identifier134 -> mb135
+	op136 [label=op]
+	Expression133 -> op136
+	"&137" [label="&"]
+	op136 -> "&137"
+	Expression138 [label=Expression]
+	FunctionCall128 -> Expression138
+	Identifier139 [label=Identifier]
+	Expression138 -> Identifier139
+	nb140 [label=nb]
+	Identifier139 -> nb140
+	op141 [label=op]
+	Expression138 -> op141
+	"&142" [label="&"]
+	op141 -> "&142"
+	ForStatement143 [label=ForStatement]
+	CompoundStatement -> ForStatement143
+	Expression144 [label=Expression]
+	ForStatement143 -> Expression144
+	Identifier145 [label=Identifier]
+	Expression144 -> Identifier145
+	i146 [label=i]
+	Identifier145 -> i146
+	op147 [label=op]
+	Expression144 -> op147
+	"=148" [label="="]
+	op147 -> "=148"
+	Number149 [label=Number]
+	Expression144 -> Number149
+	0150 [label=0]
+	Number149 -> 0150
+	Expression151 [label=Expression]
+	ForStatement143 -> Expression151
+	Identifier152 [label=Identifier]
+	Expression151 -> Identifier152
+	i153 [label=i]
+	Identifier152 -> i153
+	op154 [label=op]
+	Expression151 -> op154
+	"<155" [label="<"]
+	op154 -> "<155"
+	Identifier156 [label=Identifier]
+	Expression151 -> Identifier156
+	mb157 [label=mb]
+	Identifier156 -> mb157
+	Expression158 [label=Expression]
+	ForStatement143 -> Expression158
+	Identifier159 [label=Identifier]
+	Expression158 -> Identifier159
+	i160 [label=i]
+	Identifier159 -> i160
+	op161 [label=op]
+	Expression158 -> op161
+	"++162" [label="++"]
+	op161 -> "++162"
+	ForStatement163 [label=ForStatement]
+	ForStatement143 -> ForStatement163
+	Expression164 [label=Expression]
+	ForStatement163 -> Expression164
+	Identifier165 [label=Identifier]
+	Expression164 -> Identifier165
+	j166 [label=j]
+	Identifier165 -> j166
+	op167 [label=op]
+	Expression164 -> op167
+	"=168" [label="="]
+	op167 -> "=168"
+	Number169 [label=Number]
+	Expression164 -> Number169
+	0170 [label=0]
+	Number169 -> 0170
+	Expression171 [label=Expression]
+	ForStatement163 -> Expression171
+	Identifier172 [label=Identifier]
+	Expression171 -> Identifier172
+	j173 [label=j]
+	Identifier172 -> j173
+	op174 [label=op]
+	Expression171 -> op174
+	"<175" [label="<"]
+	op174 -> "<175"
+	Identifier176 [label=Identifier]
+	Expression171 -> Identifier176
+	nb177 [label=nb]
+	Identifier176 -> nb177
+	Expression178 [label=Expression]
+	ForStatement163 -> Expression178
+	Identifier179 [label=Identifier]
+	Expression178 -> Identifier179
+	j180 [label=j]
+	Identifier179 -> j180
+	op181 [label=op]
+	Expression178 -> op181
+	"++182" [label="++"]
+	op181 -> "++182"
+	ExpressionStatement183 [label=ExpressionStatement]
+	ForStatement163 -> ExpressionStatement183
+	FunctionCall184 [label=FunctionCall]
+	ExpressionStatement183 -> FunctionCall184
+	Identifier185 [label=Identifier]
+	FunctionCall184 -> Identifier185
+	scanf186 [label=scanf]
+	Identifier185 -> scanf186
+	String187 [label=String]
+	FunctionCall184 -> String187
+	"%d188" [label="%d"]
+	String187 -> "%d188"
+	Expression189 [label=Expression]
+	FunctionCall184 -> Expression189
+	Expression190 [label=Expression]
+	Expression189 -> Expression190
+	Expression191 [label=Expression]
+	Expression190 -> Expression191
+	Identifier192 [label=Identifier]
+	Expression191 -> Identifier192
+	b193 [label=b]
+	Identifier192 -> b193
+	op194 [label=op]
+	Expression191 -> op194
+	"[]195" [label="[]"]
+	op194 -> "[]195"
+	Identifier196 [label=Identifier]
+	Expression191 -> Identifier196
+	i197 [label=i]
+	Identifier196 -> i197
+	op198 [label=op]
+	Expression190 -> op198
+	"[]199" [label="[]"]
+	op198 -> "[]199"
+	Identifier200 [label=Identifier]
+	Expression190 -> Identifier200
+	j201 [label=j]
+	Identifier200 -> j201
+	op202 [label=op]
+	Expression189 -> op202
+	"&203" [label="&"]
+	op202 -> "&203"
+	IfElseStatement [label=IfElseStatement]
+	CompoundStatement -> IfElseStatement
+	Expression205 [label=Expression]
+	IfElseStatement -> Expression205
+	Identifier206 [label=Identifier]
+	Expression205 -> Identifier206
+	na207 [label=na]
+	Identifier206 -> na207
+	op208 [label=op]
+	Expression205 -> op208
+	"!=" [label="!="]
+	op208 -> "!="
+	Identifier210 [label=Identifier]
+	Expression205 -> Identifier210
+	mb211 [label=mb]
+	Identifier210 -> mb211
+	ExpressionStatement212 [label=ExpressionStatement]
+	IfElseStatement -> ExpressionStatement212
+	FunctionCall213 [label=FunctionCall]
+	ExpressionStatement212 -> FunctionCall213
+	Identifier214 [label=Identifier]
+	FunctionCall213 -> Identifier214
+	puts [label=puts]
+	Identifier214 -> puts
+	String216 [label=String]
+	FunctionCall213 -> String216
+	"Incompatible Dimensions" [label="Incompatible Dimensions"]
+	String216 -> "Incompatible Dimensions"
+	CompoundStatement218 [label=CompoundStatement]
+	IfElseStatement -> CompoundStatement218
+	ForStatement219 [label=ForStatement]
+	CompoundStatement218 -> ForStatement219
+	Expression220 [label=Expression]
+	ForStatement219 -> Expression220
+	Identifier221 [label=Identifier]
+	Expression220 -> Identifier221
+	i222 [label=i]
+	Identifier221 -> i222
+	op223 [label=op]
+	Expression220 -> op223
+	"=224" [label="="]
+	op223 -> "=224"
+	Number225 [label=Number]
+	Expression220 -> Number225
+	0226 [label=0]
+	Number225 -> 0226
+	Expression227 [label=Expression]
+	ForStatement219 -> Expression227
+	Identifier228 [label=Identifier]
+	Expression227 -> Identifier228
+	i229 [label=i]
+	Identifier228 -> i229
+	op230 [label=op]
+	Expression227 -> op230
+	"<231" [label="<"]
+	op230 -> "<231"
+	Identifier232 [label=Identifier]
+	Expression227 -> Identifier232
+	ma233 [label=ma]
+	Identifier232 -> ma233
+	Expression234 [label=Expression]
+	ForStatement219 -> Expression234
+	Identifier235 [label=Identifier]
+	Expression234 -> Identifier235
+	i236 [label=i]
+	Identifier235 -> i236
+	op237 [label=op]
+	Expression234 -> op237
+	"++238" [label="++"]
+	op237 -> "++238"
+	CompoundStatement239 [label=CompoundStatement]
+	ForStatement219 -> CompoundStatement239
+	ExpressionStatement240 [label=ExpressionStatement]
+	CompoundStatement239 -> ExpressionStatement240
+	FunctionCall241 [label=FunctionCall]
+	ExpressionStatement240 -> FunctionCall241
+	Identifier242 [label=Identifier]
+	FunctionCall241 -> Identifier242
+	printf [label=printf]
+	Identifier242 -> printf
+	String244 [label=String]
+	FunctionCall241 -> String244
+	"%d
+" [label="%d
+"]
+	String244 -> "%d
+"
+	Number246 [label=Number]
+	FunctionCall241 -> Number246
+	1 [label=1]
+	Number246 -> 1
+	ReturnStatement [label=ReturnStatement]
+	CompoundStatement -> ReturnStatement
+	Number249 [label=Number]
+	ReturnStatement -> Number249
+	0250 [label=0]
+	Number249 -> 0250
+}

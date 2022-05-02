@@ -9,6 +9,8 @@ declare i32 @printf(i8*, ...)
 
 declare i32 @scanf(i8*, ...)
 
+declare i32 @puts(i8*)
+
 define void @quicksort(i32* %A, i32 %len) {
 entry:
   %A1 = alloca i32*

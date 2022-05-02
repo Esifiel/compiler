@@ -10,20 +10,38 @@ using namespace llvm;
 using namespace std;
 
 extern int yyparse();
+extern FILE *yyin;
 extern Program *program;
 
 int main(int argc, char *argv[], char **envp)
 {
+    if (argc == 1)
+    {
+        cout << "Usage: ./ecc <c source file name>" << endl;
+        exit(1);
+    }
+    
+    // redirect yyparse
+    yyin = fopen(argv[1], "r");
+
+    // extract obj name
+    string object = argv[1];
+    size_t begin = object.find_last_of('/') + 1, end = object.find_last_of('.');
+    if (begin < end)
+        object = object.substr(begin, end - begin);
+    else
+        object = object.substr(begin, object.length() - begin);
+
     // parse the source code
     yyparse();
     cout << "[+] parse done." << endl;
-    
+
     // do visualization (output json and png)
-    string filepath = "./tmp/ast.json";
-    Visualizer *v = new Visualizer(program, filepath);
+    string path = string("./tmp/ast_") + object + string(".json");
+    Visualizer *v = new Visualizer(program, path);
     v->traverse();
     delete v;
-    system((string("python3 utils/json2dot.py ") + filepath).c_str());
+    system((string("python3 utils/json2dot.py ") + path).c_str());
     cout << "[+] visualization done." << endl;
 
     // init llvm
@@ -42,16 +60,13 @@ int main(int argc, char *argv[], char **envp)
 
     // save the llvm bit code and plaintext IR
     error_code ec;
-    raw_fd_ostream bc("./test.bc", ec, sys::fs::F_None);
+    raw_fd_ostream bc(string("./obj/") + object + string(".bc"), ec, sys::fs::F_None);
     WriteBitcodeToFile(*generator.module, bc);
     bc.flush();
-    raw_fd_ostream ll("./test.ll", ec, sys::fs::F_None);
+    raw_fd_ostream ll(string("./obj/") + object + string(".ll"), ec, sys::fs::F_None);
     generator.module->print(ll, nullptr);
     ll.flush();
-
     cout << "[+] target code generated." << endl;
 
     return 0;
 }
-
-// getopt

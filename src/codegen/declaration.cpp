@@ -2,15 +2,21 @@
 #include "../ast/type.hpp"
 #include "codegen.hpp"
 
+// static ArrayType *
+
 Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
 {
-    for (auto &p : *ids)
+    auto pt = types->begin();
+    auto pi = ids->begin();
+
+    for (; pt != types->end() && pi != ids->end(); pt++, pi++)
     {
-        string varname = p->name;
-        if (p->size)
+        string varname = (*pi)->name;
+
+        if ((*pt)->type == TYPE_ARRAY)
         {
             // array type
-            ArrayType *array_t = ArrayType::get(type->getType(ctx), ((Number *)(p->size))->longView());
+            ArrayType *array_t = (ArrayType *)((*pt)->getType(ctx));
             if (ctx.isglobal)
             {
                 GlobalVariable *v = new GlobalVariable(
@@ -21,23 +27,20 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     0,
                     varname);
                 vector<Constant *> elements;
-                Expression *q = p->init;
-                while (q)
-                {
+                for (Expression *q = (*pi)->init; q; q = q->left)
                     elements.push_back(ctx.Num2Constant((Number *)(q->codeGen(ctx))));
-                    q = q->left;
-                }
                 Constant *constarr = ConstantArray::get(array_t, elements);
                 v->setInitializer(constarr);
                 ctx.blocks.front()[varname] = v;
             }
             else
+                // TODO: local variable initialize not supported yet
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(array_t, 0, varname.c_str());
         }
         else
         {
             // normal type
-            Type *t = type->getType(ctx);
+            Type *t = (*pt)->getType(ctx);
             if (ctx.isglobal)
             {
                 // global variable
@@ -48,9 +51,9 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     GlobalValue::PrivateLinkage,
                     0,
                     varname);
-                if (p->init)
+                if ((*pi)->init)
                     // if initializer exist
-                    v->setInitializer(ctx.Num2Constant((Number *)(p->init)));
+                    v->setInitializer(ctx.Num2Constant((Number *)((*pi)->init)));
                 else
                     // else initialize to 0
                     v->setInitializer(ConstantInt::get(t, 0));
@@ -91,12 +94,8 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     {
         // collect args
         vector<Type *> args;
-        Parameter *p = params;
-        while (p)
-        {
+        for (Parameter *p = params; p; p = (Parameter *)(p->next))
             args.push_back((Type *)(p->codeGen(ctx)));
-            p = (Parameter *)(p->next);
-        }
         // false: is not variable args
         functype = FunctionType::get(rettype->getType(ctx), args, false);
     }

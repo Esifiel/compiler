@@ -38,6 +38,7 @@ enum op_type
 
 enum val_type
 {
+    VAL_NONE,
     VAL_CHAR,
     VAL_SHORT,
     VAL_INT,

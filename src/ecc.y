@@ -120,7 +120,13 @@ program                     : translation-unit { $$ = new Program($1); program =
                             ;
 
 translation-unit	        : external-decl { $$ = $1; }
-                            | translation-unit external-decl { $1->next = $2; $$ = $1; }
+                            | translation-unit external-decl {
+                                Declaration *p = $1;
+                                while(p->next)
+                                    p = p->next;
+                                p->next = $2;
+                                $$ = $1;
+                            }
                             ;
 
 external-decl               : function-definition { $$ = $1; }
@@ -133,7 +139,36 @@ function-definition         : decl-specs declarator decl-list compound-stat
                             |            declarator           compound-stat { $$ = (FunctionDeclaration *)$1; $$->stmts = $2; }
                             ;
 
-decl                        : decl-specs init-declarator-list DELIM { $$ = new VariableDeclaration($1, $2); }
+decl                        : decl-specs init-declarator-list DELIM {
+                                vector<TypeSpecifier *> *ts = new vector<TypeSpecifier *>;
+
+                                for(auto &p : *$2)
+                                {
+                                    Expression *size = p->right;
+                                    TypeSpecifier *t;
+
+                                    if(!size)
+                                        ts->push_back($1);
+                                    else
+                                    {
+                                        TypeSpecifier *t = $1;
+                                        while(size)
+                                        {
+                                            if(((Number *)size)->valtype != VAL_NONE)
+                                                t = new MyArrayType(t, ((Number *)size)->longView());
+                                            else
+                                                t = new MyPointerType(t);
+                                            ((IterableType *)t)->dim++;
+                                            Expression *tmp = size;
+                                            size = size->right;
+                                            delete tmp;
+                                        }
+                                        ts->push_back(t);
+                                    }
+                                }
+
+                                $$ = new VariableDeclaration(ts, $2);
+                            }
                             | decl-specs DELIM
                             ;
 
@@ -226,14 +261,20 @@ enumerator                  : IDENTIFIER
                             | IDENTIFIER ASSIGN const-exp
                             ;
 
-declarator                  : pointer direct-declarator
+declarator                  : pointer direct-declarator {
+                                
+                            }
                             | direct-declarator { $$ = $1; }
                             ;
 
 direct-declarator           : IDENTIFIER { $$ = new Identifier(*$1); delete $1; }
                             | LP declarator RP
-                            | direct-declarator LB const-exp       RB { $$ = $1; ((Identifier *)$$)->size = $3; }
-                            | direct-declarator LB                 RB { $$ = $1; ((Identifier *)$$)->size = new Expression(); }
+                            | direct-declarator LB const-exp       RB {
+                                $$ = $1;
+                                ((Expression *)$3)->right = ((Identifier *)$$)->right;
+                                ((Identifier *)$$)->right = $3;
+                            }
+                            | direct-declarator LB                 RB { $$ = $1; ((Identifier *)$$)->right = new Number(); }
                             | direct-declarator LP id-list         RP
                             | direct-declarator LP param-type-list RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, $3, nullptr); }
                             | direct-declarator LP                 RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, nullptr, nullptr); }
@@ -264,12 +305,24 @@ param-list                  : param-decl { $$ = $1; }
                             ;
 
 param-decl                  : decl-specs declarator {
-                                $$ = new Parameter($1, (Identifier *)$2);
-                                if(((Identifier *)$2)->size)
+                                Expression *size = ((Identifier *)$2)->right;
+                                if(!size)
+                                    $$ = new Parameter($1, (Identifier *)$2);
+                                else
                                 {
-                                    $$->type = new MyPointerType($1);
-                                    delete ((Identifier *)$2)->size;
-                                    ((Identifier *)$2)->size = nullptr;
+                                    TypeSpecifier *t = $1;
+                                    while(size)
+                                    {
+                                        if(((Number *)size)->valtype != VAL_NONE)
+                                            t = new MyArrayType(t, ((Number *)size)->longView());
+                                        else
+                                            t = new MyPointerType(t);
+                                        ((IterableType *)t)->dim++;
+                                        Expression *tmp = size;
+                                        size = size->right;
+                                        delete tmp;
+                                    }
+                                    $$ = new Parameter(t, (Identifier *)$2);
                                 }
                             }
                             | decl-specs abstract-declarator
@@ -277,7 +330,7 @@ param-decl                  : decl-specs declarator {
                             ;
 
 id-list			            : IDENTIFIER { $$ = new vector<Identifier *>; $$->push_back(new Identifier(*$1)); delete $1; }
-                            | id-list COMMA IDENTIFIER { $1->push_back(new Identifier(*$3)); $$ = $1; delete $3; }
+                            | id-list COMMA IDENTIFIER { $1->push_back(new Identifier(*$3)); $$ = $1; delete $3;  }
                             ;
 
 initializer                 : assignment-exp               { $$ = $1; }
