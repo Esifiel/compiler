@@ -142,7 +142,7 @@ if.else:                                          ; preds = %if.cond
   br label %for.init16
 
 if.out:                                           ; preds = %for.out20, %if.then
-  br label %for.init26
+  br label %for.init31
 
 for.init16:                                       ; preds = %if.else
   store i32 0, i32* %i
@@ -177,65 +177,110 @@ for.cond22:                                       ; preds = %for.end24, %for.ini
   br i1 %43, label %for.loop23, label %for.out25
 
 for.loop23:                                       ; preds = %for.cond22
-  br label %for.end24
+  %44 = load i32, i32* %i
+  %45 = getelementptr [30 x [40 x i32]], [30 x [40 x i32]]* @c, i32 0, i32 %44
+  %46 = load i32, i32* %j
+  %47 = getelementptr [40 x i32], [40 x i32]* %45, i32 0, i32 %46
+  store i32 0, i32* %47
+  br label %for.init26
 
-for.end24:                                        ; preds = %for.loop23
-  %44 = load i32, i32* %j
-  %45 = add i32 %44, 1
-  store i32 %45, i32* %j
+for.end24:                                        ; preds = %for.out30
+  %48 = load i32, i32* %j
+  %49 = add i32 %48, 1
+  store i32 %49, i32* %j
   br label %for.cond22
 
 for.out25:                                        ; preds = %for.cond22
   br label %for.end19
 
-for.init26:                                       ; preds = %if.out
-  store i32 0, i32* %i
+for.init26:                                       ; preds = %for.loop23
+  store i32 0, i32* %k
   br label %for.cond27
 
 for.cond27:                                       ; preds = %for.end29, %for.init26
-  %46 = load i32, i32* %ma
-  %47 = load i32, i32* %i
-  %48 = icmp slt i32 %47, %46
-  br i1 %48, label %for.loop28, label %for.out30
+  %50 = load i32, i32* %na
+  %51 = load i32, i32* %k
+  %52 = icmp slt i32 %51, %50
+  br i1 %52, label %for.loop28, label %for.out30
 
 for.loop28:                                       ; preds = %for.cond27
-  br label %for.init31
+  %53 = load i32, i32* %i
+  %54 = getelementptr [30 x [40 x i32]], [30 x [40 x i32]]* @c, i32 0, i32 %53
+  %55 = load i32, i32* %j
+  %56 = getelementptr [40 x i32], [40 x i32]* %54, i32 0, i32 %55
+  %57 = load i32, i32* %56
+  %58 = load i32, i32* %k
+  %59 = getelementptr [30 x [40 x i32]], [30 x [40 x i32]]* @b, i32 0, i32 %58
+  %60 = load i32, i32* %j
+  %61 = getelementptr [40 x i32], [40 x i32]* %59, i32 0, i32 %60
+  %62 = load i32, i32* %61
+  %63 = load i32, i32* %i
+  %64 = getelementptr [30 x [40 x i32]], [30 x [40 x i32]]* @a, i32 0, i32 %63
+  %65 = load i32, i32* %k
+  %66 = getelementptr [40 x i32], [40 x i32]* %64, i32 0, i32 %65
+  %67 = load i32, i32* %66
+  %68 = mul i32 %67, %62
+  %69 = add i32 %57, %68
+  store i32 %69, i32* %56
+  br label %for.end29
 
-for.end29:                                        ; preds = %for.out35
-  %49 = load i32, i32* %i
-  %50 = add i32 %49, 1
-  store i32 %50, i32* %i
+for.end29:                                        ; preds = %for.loop28
+  %70 = load i32, i32* %k
+  %71 = add i32 %70, 1
+  store i32 %71, i32* %k
   br label %for.cond27
 
 for.out30:                                        ; preds = %for.cond27
-  ret i32 0
+  br label %for.end24
 
-for.init31:                                       ; preds = %for.loop28
-  store i32 0, i32* %j
+for.init31:                                       ; preds = %if.out
+  store i32 0, i32* %i
   br label %for.cond32
 
 for.cond32:                                       ; preds = %for.end34, %for.init31
-  %51 = load i32, i32* %nb
-  %52 = load i32, i32* %j
-  %53 = icmp slt i32 %52, %51
-  br i1 %53, label %for.loop33, label %for.out35
+  %72 = load i32, i32* %ma
+  %73 = load i32, i32* %i
+  %74 = icmp slt i32 %73, %72
+  br i1 %74, label %for.loop33, label %for.out35
 
 for.loop33:                                       ; preds = %for.cond32
-  %54 = load i32, i32* %i
-  %55 = getelementptr [30 x [40 x i32]], [30 x [40 x i32]]* @c, i32 0, i32 %54
-  %56 = load i32, i32* %j
-  %57 = getelementptr [40 x i32], [40 x i32]* %55, i32 0, i32 %56
-  %58 = load i32, i32* %57
-  %59 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @"%10d", i32 0, i32 0), i32 %58)
-  br label %for.end34
+  br label %for.init36
 
-for.end34:                                        ; preds = %for.loop33
-  %60 = load i32, i32* %j
-  %61 = add i32 %60, 1
-  store i32 %61, i32* %j
+for.end34:                                        ; preds = %for.out40
+  %75 = load i32, i32* %i
+  %76 = add i32 %75, 1
+  store i32 %76, i32* %i
   br label %for.cond32
 
 for.out35:                                        ; preds = %for.cond32
-  %62 = call i32 @puts(i8* getelementptr inbounds ([1 x i8], [1 x i8]* @0, i32 0, i32 0))
-  br label %for.end29
+  ret i32 0
+
+for.init36:                                       ; preds = %for.loop33
+  store i32 0, i32* %j
+  br label %for.cond37
+
+for.cond37:                                       ; preds = %for.end39, %for.init36
+  %77 = load i32, i32* %nb
+  %78 = load i32, i32* %j
+  %79 = icmp slt i32 %78, %77
+  br i1 %79, label %for.loop38, label %for.out40
+
+for.loop38:                                       ; preds = %for.cond37
+  %80 = load i32, i32* %i
+  %81 = getelementptr [30 x [40 x i32]], [30 x [40 x i32]]* @c, i32 0, i32 %80
+  %82 = load i32, i32* %j
+  %83 = getelementptr [40 x i32], [40 x i32]* %81, i32 0, i32 %82
+  %84 = load i32, i32* %83
+  %85 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @"%10d", i32 0, i32 0), i32 %84)
+  br label %for.end39
+
+for.end39:                                        ; preds = %for.loop38
+  %86 = load i32, i32* %j
+  %87 = add i32 %86, 1
+  store i32 %87, i32* %j
+  br label %for.cond37
+
+for.out40:                                        ; preds = %for.cond37
+  %88 = call i32 @puts(i8* getelementptr inbounds ([1 x i8], [1 x i8]* @0, i32 0, i32 0))
+  br label %for.end34
 }

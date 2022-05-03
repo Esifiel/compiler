@@ -23,9 +23,9 @@ int main()
         for (i = 0; i < ma; i++)
             for (j = 0; j < nb; j++)
             {
-                // c[i][j] = 0;
-                // for (k = 0; k < na; k++)
-                //     c[i][j] += a[i][k] * b[k][j];
+                c[i][j] = 0;
+                for (k = 0; k < na; k++)
+                    c[i][j] += a[i][k] * b[k][j];
             }
 
     for (i = 0; i < ma; i++)

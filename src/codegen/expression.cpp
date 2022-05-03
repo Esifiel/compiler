@@ -73,6 +73,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     Value *var, *oldval, *newval, *lv, *rv;
     Value *idxlist[2];
     bool tmpleft;
+    Type *t;
 
     switch (op)
     {
@@ -163,8 +164,9 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_ANDASSIGN:
     case OP_XORASSIGN:
     case OP_ORASSIGN:
-        varname = ((Identifier *)left)->name;
-        var = ctx.GetVar(varname);
+        ctx.isleft = true;
+        var = left->codeGen(ctx);
+        ctx.isleft = false;
         oldval = ctx.builder.CreateLoad(var);
         switch (op)
         {
@@ -211,7 +213,8 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         ctx.isleft = true;
         var = left->codeGen(ctx);
         ctx.isleft = false;
-        newval = ctx.CreateCast(right->codeGen(ctx), ((AllocaInst *)var)->getAllocatedType());
+        t = ((AllocaInst *)var)->getAllocatedType();
+        newval = ctx.CreateCast(right->codeGen(ctx),t->isArrayTy() ? var->getType()->getPointerElementType() : t);
         ctx.builder.CreateStore(newval, var);
         return newval;
     // case OP_IFELSE:
