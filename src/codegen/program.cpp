@@ -12,8 +12,6 @@ Value *Program::codeGen(CodeGenerator &ctx)
             ctx.isglobal = true;
             p->codeGen(ctx);
             ctx.isglobal = false;
-
-            ctx.dump();
         }
         else if (p->getName() == "\"FunctionDeclaration\"")
         {

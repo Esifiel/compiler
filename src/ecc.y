@@ -294,14 +294,8 @@ param-type-list             : param-list { $$ = $1; }
                             | param-list COMMA DOTDOTDOT
                             ;
 
-param-list                  : param-decl { $$ = $1; }
-                            | param-list COMMA param-decl {
-                                Declaration *p = $1;
-                                while(p->next)
-                                    p = p->next;
-                                p->next = $3;
-                                $$ = $1;
-                            }
+param-list                  : param-decl { $$ = $1; $$->tail = $$; }
+                            | param-list COMMA param-decl { $$ = $1; $$->tail->next = $3; $$->tail = $3; }
                             ;
 
 param-decl                  : decl-specs declarator {
@@ -391,14 +385,8 @@ compound-stat               : LC decl-list stat-list RC { $$ = new CompoundState
                             | LC                     RC { $$ = new CompoundStatement(nullptr, nullptr); }
                             ;
 
-stat-list                   : stat { $$ = $1; }
-                            | stat-list stat {
-                                Statement *p = $1;
-                                while(p->next)
-                                    p = p->next;
-                                p->next = $2;
-                                $$ = $1;
-                            }
+stat-list                   : stat { $$ = $1; $$->tail = $$; }
+                            | stat-list stat { $$ = $1; $$->tail->next = $2; $$->tail = $2; }
                             ;
 
 selection-stat		        : IF LP exp RP stat           { $5->next = nullptr; $$ = new IfElseStatement($3, $5); }
@@ -544,11 +532,11 @@ argument-exp-list	        : assignment-exp { $$ = new vector<Expression *>; $$->
 const                       : number { $$ = $1; }
                             ;
 
-number                      : NUMCHAR { $$ = new Number($1, new CharType(), VAL_CHAR); }
-                            | NUMSHORT { $$ = new Number($1, new ShortType(), VAL_SHORT); }
-                            | NUMINT { $$ = new Number($1, new IntType(), VAL_INT); }
-                            | NUMLONG { $$ = new Number($1, new LongType(), VAL_LONG); }
-                            | NUMFLOAT { $$ = new Number($1, new FloatType(), VAL_FLOAT); }
+number                      : NUMCHAR   { $$ = new Number($1, new CharType(),   VAL_CHAR); }
+                            | NUMSHORT  { $$ = new Number($1, new ShortType(),  VAL_SHORT); }
+                            | NUMINT    { $$ = new Number($1, new IntType(),    VAL_INT); }
+                            | NUMLONG   { $$ = new Number($1, new LongType(),   VAL_LONG); }
+                            | NUMFLOAT  { $$ = new Number($1, new FloatType(),  VAL_FLOAT); }
                             | NUMDOUBLE { $$ = new Number($1, new DoubleType(), VAL_DOUBLE); }
                             ;
 

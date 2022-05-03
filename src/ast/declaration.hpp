@@ -16,10 +16,10 @@ class CodeGenerator;
 class Declaration : public Node
 {
 public:
+    Declaration *tail;
     Declaration *next;
 
-    Declaration() {}
-    Declaration(Declaration *d) : next(d) {}
+    Declaration() : tail(nullptr), next(nullptr) {}
 
     virtual string getName() { return "\"Declaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) { return nullptr; };

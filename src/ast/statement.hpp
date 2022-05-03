@@ -12,10 +12,10 @@ class CodeGenerator;
 class Statement : public Node
 {
 public:
+    Statement *tail;
     Statement *next;
 
-    Statement() : next(nullptr) {}
-    Statement(Statement *n) : next(n) {}
+    Statement() : tail(nullptr), next(nullptr) {}
 
     virtual string getName() { return "\"Statement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) { return nullptr; }
