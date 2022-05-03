@@ -33,6 +33,9 @@ if.then:                                          ; preds = %if.cond
   ret void
 
 if.else:                                          ; preds = %if.cond
+  br label %if.out
+
+if.out:                                           ; preds = %if.else
   %3 = load i32*, i32** %A1
   %4 = load i32, i32* %len2
   %5 = zext i32 %4 to i64
@@ -42,7 +45,7 @@ if.else:                                          ; preds = %if.cond
   store i32 %8, i32* %pivot
   br label %for.init
 
-for.init:                                         ; preds = %if.else
+for.init:                                         ; preds = %if.out
   store i32 0, i32* %i
   %9 = load i32, i32* %len2
   %10 = zext i32 %9 to i64
@@ -57,7 +60,7 @@ for.cond:                                         ; preds = %for.end, %for.init
 for.loop:                                         ; preds = %for.cond
   br label %while.cond
 
-for.end:                                          ; preds = %if.else8
+for.end:                                          ; preds = %if.out9
   %13 = load i32, i32* %i
   %14 = add i32 %13, 1
   store i32 %14, i32* %i
@@ -125,6 +128,9 @@ if.then7:                                         ; preds = %if.cond6
   br label %for.out
 
 if.else8:                                         ; preds = %if.cond6
+  br label %if.out9
+
+if.out9:                                          ; preds = %if.else8
   %44 = load i32*, i32** %A1
   %45 = load i32, i32* %i
   %46 = getelementptr i32, i32* %44, i32 %45

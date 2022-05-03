@@ -111,6 +111,8 @@ Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
     case OP_DEC_FRONT:
     case OP_DEC_REAR:
         return builder.CreateBinOp(Instruction::BinaryOps::Sub, a, ConstantInt::get(a->getType(), 1));
+    case OP_NOT:
+        return builder.CreateFNeg(a);
     default:
         error("operand type not supoorted.");
     }
@@ -156,8 +158,6 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
         return builder.CreateBinOp(Instruction::BinaryOps::And, a, b);
     case OP_OR:
         return builder.CreateBinOp(Instruction::BinaryOps::Or, a, b);
-    case OP_NOT:
-        return nullptr;
     case OP_XOR:
         return builder.CreateBinOp(Instruction::BinaryOps::Xor, a, b);
     case OP_ADD:

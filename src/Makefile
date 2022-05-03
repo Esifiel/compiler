@@ -15,7 +15,9 @@ OBJECTS =	./main.o \
 			./codegen/codegen.o
 TARGET = `llvm-config --host-target`
 
-.PHONY: all
+.PHONY: all $(NAME)
+
+.PRECIOUS: all $(NAME)
 
 all: $(NAME)
 
@@ -30,7 +32,7 @@ scanner.cpp: $(NAME).l parser.hpp
 %.o: %.cpp
 	$(CC) -c $(LLVMFLAGS) -o $@ $<
 
-$(NAME): $(OBJECTS) FORCE
+$(NAME): $(OBJECTS)
 	@if [ ! -d tmp ]; then mkdir tmp; fi
 	@if [ ! -d obj ]; then mkdir obj; fi
 
@@ -55,5 +57,3 @@ clean:
 	@rm -rf tmp
 	@rm -rf obj
 	@rm -f .gdb_history 
-
-FORCE:

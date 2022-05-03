@@ -27,24 +27,33 @@ Value *ExpressionStatement::codeGen(CodeGenerator &ctx)
 
 Value *IfElseStatement::codeGen(CodeGenerator &ctx)
 {
-    BasicBlock *if_cond = BasicBlock::Create(ctx.ctx, "if.cond", ctx.curFunction);
-    BasicBlock *if_then = BasicBlock::Create(ctx.ctx, "if.then", ctx.curFunction);
-    BasicBlock *if_else = BasicBlock::Create(ctx.ctx, "if.else", ctx.curFunction);
-    ctx.builder.CreateBr(if_cond);
+    BasicBlock *ifcond = BasicBlock::Create(ctx.ctx, "if.cond", ctx.curFunction);
+    BasicBlock *ifthen = BasicBlock::Create(ctx.ctx, "if.then", ctx.curFunction);
+    BasicBlock *ifelse = BasicBlock::Create(ctx.ctx, "if.else", ctx.curFunction);
+    BasicBlock *ifout = BasicBlock::Create(ctx.ctx, "if.out", ctx.curFunction);
+    ctx.builder.CreateBr(ifcond);
 
     // branch condition
-    ctx.builder.SetInsertPoint(if_cond);
+    ctx.builder.SetInsertPoint(ifcond);
     Value *cmpres = cond->codeGen(ctx);
-    ctx.builder.CreateCondBr(cmpres, if_then, if_else);
+    ctx.builder.CreateCondBr(cmpres, ifthen, ifelse);
 
     // if-statement
-    ctx.builder.SetInsertPoint(if_then);
+    ctx.builder.SetInsertPoint(ifthen);
     stmt->codeGen(ctx);
+    // if current block has not terminated, go if.out
+    if(!ctx.builder.GetInsertBlock()->getTerminator())
+        ctx.builder.CreateBr(ifout);
 
     // else-part
-    ctx.builder.SetInsertPoint(if_else);
+    ctx.builder.SetInsertPoint(ifelse);
     if (stmt->next)
         stmt->next->codeGen(ctx);
+    if(!ctx.builder.GetInsertBlock()->getTerminator())
+        ctx.builder.CreateBr(ifout);
+    
+    // go out
+    ctx.builder.SetInsertPoint(ifout);
 
     return nullptr;
 }
@@ -128,6 +137,10 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
 
 Value *ReturnStatement::codeGen(CodeGenerator &ctx)
 {
+    // BasicBlock *returnblock = BasicBlock::Create(ctx.ctx, "return.block", ctx.curFunction);
+    // ctx.builder.CreateBr(returnblock);
+    // ctx.builder.SetInsertPoint(returnblock);
+
     if (res)
         // correct the ret val type and do a type cast
         ctx.builder.CreateRet(ctx.CreateCast(res->codeGen(ctx), ctx.curFunction->getReturnType()));

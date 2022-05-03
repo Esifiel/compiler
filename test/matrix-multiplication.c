@@ -5,7 +5,7 @@ int c[30][40];
 int main()
 {
     int ma, na, mb, nb;
-    int i, j;
+    int i, j, k;
 
     scanf("%d %d", &ma, &na);
     for (i = 0; i < ma; i++)
@@ -20,11 +20,19 @@ int main()
     if (na != mb)
         puts("Incompatible Dimensions");
     else
+        for (i = 0; i < ma; i++)
+            for (j = 0; j < nb; j++)
+            {
+                // c[i][j] = 0;
+                // for (k = 0; k < na; k++)
+                //     c[i][j] += a[i][k] * b[k][j];
+            }
+
+    for (i = 0; i < ma; i++)
     {
-        for(i = 0; i < ma; i++)
-        {
-            printf("%d\n", 1);
-        }
+        for (j = 0; j < nb; j++)
+            printf("%10d", c[i][j]);
+        puts("");
     }
 
     return 0;

@@ -22,7 +22,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 GlobalVariable *v = new GlobalVariable(
                     *ctx.module,
                     array_t,
-                    true,
+                    false, // not constant, TODO: add "const" specifier
                     GlobalValue::PrivateLinkage,
                     0,
                     varname);
@@ -110,7 +110,7 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     ctx.curFunction = func;
     ctx.functions[funcname] = func;
 
-    // create entry block for the function
+    // create entry and end block for the function
     BasicBlock *block = BasicBlock::Create(ctx.ctx, "entry", func);
     // set up the builder insertion
     ctx.builder.SetInsertPoint(block);

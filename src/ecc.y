@@ -119,14 +119,8 @@ static void debug(string s);
 program                     : translation-unit { $$ = new Program($1); program = $$; }
                             ;
 
-translation-unit	        : external-decl { $$ = $1; }
-                            | translation-unit external-decl {
-                                Declaration *p = $1;
-                                while(p->next)
-                                    p = p->next;
-                                p->next = $2;
-                                $$ = $1;
-                            }
+translation-unit	        : external-decl { $$ = $1; $$->tail = $$; }
+                            | translation-unit external-decl { $$ = $1; $$->tail->next = $2; $$->tail = $2; }
                             ;
 
 external-decl               : function-definition { $$ = $1; }
