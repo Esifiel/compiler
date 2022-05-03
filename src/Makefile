@@ -46,9 +46,13 @@ $(NAME): $(OBJECTS)
 	@clang --target=$(TARGET) ./obj/matrix-multiplication.bc -o ./obj/matrix-multiplication
 	@cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
 
+	@./$(NAME) ../test/auto-advisor.c
+	@clang --target=$(TARGET) ./obj/auto-advisor.bc -o ./obj/auto-advisor
+	@cd tmp && opt -dot-cfg ../obj/auto-advisor.ll
+
 	@cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
 
-	@./obj/matrix-multiplication
+	@./obj/auto-advisor
 
 clean:
 	@rm -f $(NAME)
