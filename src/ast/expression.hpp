@@ -49,9 +49,45 @@ public:
     uint8_t charView() { return *(uint8_t *)buf; }
     uint16_t shortView() { return *(uint16_t *)buf; }
     uint32_t intView() { return *(uint32_t *)buf; }
-    uint64_t longView() { return *(uint64_t *)buf; }
+    uint64_t longView()
+    {
+        switch (valtype)
+        {
+        case VAL_CHAR:
+            return (uint64_t)charView();
+        case VAL_SHORT:
+            return (uint64_t)shortView();
+        case VAL_INT:
+            return (uint64_t)intView();
+        case VAL_FLOAT:
+            return (uint64_t)floatView();
+        case VAL_DOUBLE:
+            return (uint64_t)doubleView();
+        case VAL_LONG:
+        default:
+            return *(uint64_t *)buf;
+        }
+    }
     float_t floatView() { return *(float_t *)buf; }
-    double_t doubleView() { return *(double_t *)buf; }
+    double_t doubleView()
+    {
+        switch (valtype)
+        {
+        case VAL_CHAR:
+            return (double_t)charView();
+        case VAL_SHORT:
+            return (double_t)shortView();
+        case VAL_INT:
+            return (double_t)intView();
+        case VAL_LONG:
+            return (double_t)longView();
+        case VAL_FLOAT:
+            return (double_t)floatView();
+        case VAL_DOUBLE:
+        default:
+            return *(double_t *)buf;
+        }
+    }
 };
 
 class String : public Expression

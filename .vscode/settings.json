@@ -84,7 +84,9 @@
         "shared_mutex": "cpp",
         "__memory": "cpp",
         "*.def": "cpp",
-        "assert.h": "c"
+        "assert.h": "c",
+        "string.h": "c",
+        "stdio.h": "c"
     },
     "python.linting.enabled": false
 }

@@ -24,9 +24,14 @@ using namespace std;
 extern int yylineno;
 extern char *yytext;
 extern int yylex();
+
 void yyerror(string s);
 void yywarning(string s, string addition);
+
 static void debug(string s);
+static Expression *calculate(Expression *a, enum op_type op);
+static Expression *calculate(Expression *a, Expression *b, enum op_type op);
+static Expression *calculate(Expression *a, Expression *b, Expression *c, enum op_type op);
 }
 
 %union {
@@ -95,11 +100,11 @@ static void debug(string s);
 %type<selectionStatement> selection-stat
 %type<iterationStatement> iteration-stat
 
-%type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp const-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer initializer-list
+%type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer initializer-list
 %type<exprs> argument-exp-list
 %type<identifier> init-declarator
 %type<ids> id-list init-declarator-list
-%type<number> number const
+%type<number> number const const-exp
 %type<node> direct-declarator declarator
 
 %right ASSIGN ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN SLASSIGN SRASSIGN
@@ -218,7 +223,7 @@ type-spec                   : CHAR      { $$ = new CharType();      }
                             | DOUBLE    { $$ = new DoubleType();    }
                             | VOID      { $$ = new VoidType();      }
                             | SIGNED
-	                        | UNSIGNED
+                            | UNSIGNED
                             | struct-or-union-spec
                             | enum-spec
                             | TYPENAME
@@ -437,11 +442,15 @@ jump-stat                   : GOTO IDENTIFIER DELIM // TODO: goto
                             ;
 
 exp			                : assignment-exp { $$ = $1; }
-                            | exp COMMA assignment-exp { $$ = new Expression($1, $3, OP_COMMA); }
+                            | exp COMMA assignment-exp { $$ = calculate($1, $3, OP_COMMA); }
                             ;
 
 assignment-exp      		: conditional-exp { $$ = $1; }
-                            | unary-exp assignment-operator assignment-exp { $$ = new Expression($1, $3, $2); }
+                            | unary-exp assignment-operator assignment-exp {
+                                if($1->getName() == "\"Number\"")
+                                    yyerror("lvalue required as left operand of assignment");
+                                $$ = new Expression($1, $3, $2);
+                            }
                             ;
 
 assignment-operator	        : ASSIGN    { $$ = OP_ASSIGN; }
@@ -458,58 +467,63 @@ assignment-operator	        : ASSIGN    { $$ = OP_ASSIGN; }
                             ;
 
 conditional-exp             : logical-or-exp { $$ = $1; }
-                            | logical-or-exp QUESTION exp COLON conditional-exp { $$ = new Expression($3, $5, $1, OP_IFELSE); }
+                            | logical-or-exp QUESTION exp COLON conditional-exp { $$ = calculate($3, $5, $1, OP_IFELSE); }
                             ;
 
-const-exp           		: conditional-exp { $$ = $1; }
+const-exp           		: conditional-exp {
+                                // TODO: or a constant variable
+                                if($1->getName() != "\"Number\"")
+                                    yyerror("const-exp is not a Number constant");
+                                $$ = (Number *)$1;
+                            }
                             ;
 
 logical-or-exp		        : logical-and-exp { $$ = $1; }
-                            | logical-or-exp OROR logical-and-exp { $$ = new Expression($1, $3, OP_OROR); }
+                            | logical-or-exp OROR logical-and-exp { $$ = calculate($1, $3, OP_OROR); }
                             ;
 
 logical-and-exp		        : inclusive-or-exp { $$ = $1; }
-                            | logical-and-exp ANDAND inclusive-or-exp { $$ = new Expression($1, $3, OP_ANDAND); }
+                            | logical-and-exp ANDAND inclusive-or-exp { $$ = calculate($1, $3, OP_ANDAND); }
                             ;
 
 inclusive-or-exp	        : exclusive-or-exp { $$ = $1; }
-                            | inclusive-or-exp OR exclusive-or-exp { $$ = new Expression($1, $3, OP_OR); }
+                            | inclusive-or-exp OR exclusive-or-exp { $$ = calculate($1, $3, OP_OR); }
                             ;
 
 exclusive-or-exp	        : and-exp { $$ = $1; }
-                            | exclusive-or-exp XOR and-exp { $$ = new Expression($1, $3, OP_XOR); }
+                            | exclusive-or-exp XOR and-exp { $$ = calculate($1, $3, OP_XOR); }
                             ;
 
 and-exp			            : equality-exp { $$ = $1; }
-                            | and-exp AND equality-exp { $$ = new Expression($1, $3, OP_AND); }
+                            | and-exp AND equality-exp { $$ = calculate($1, $3, OP_AND); }
                             ;
 
 equality-exp		        : relational-exp { $$ = $1;}
-                            | equality-exp EQ relational-exp { $$ = new Expression($1, $3, OP_EQ); }
-                            | equality-exp NEQ relational-exp { $$ = new Expression($1, $3, OP_NEQ); }
+                            | equality-exp EQ relational-exp { $$ = calculate($1, $3, OP_EQ); }
+                            | equality-exp NEQ relational-exp { $$ = calculate($1, $3, OP_NEQ); }
                             ;
 
 relational-exp		        : shift-expression { $$ = $1; }
-                            | relational-exp LT shift-expression { $$ = new Expression($1, $3, OP_LT); }
-                            | relational-exp GT shift-expression { $$ = new Expression($1, $3, OP_GT); }
-                            | relational-exp LEQ shift-expression { $$ = new Expression($1, $3, OP_LEQ); }
-                            | relational-exp GEQ shift-expression { $$ = new Expression($1, $3, OP_GEQ); }
+                            | relational-exp LT shift-expression { $$ = calculate($1, $3, OP_LT); }
+                            | relational-exp GT shift-expression { $$ = calculate($1, $3, OP_GT); }
+                            | relational-exp LEQ shift-expression { $$ = calculate($1, $3, OP_LEQ); }
+                            | relational-exp GEQ shift-expression { $$ = calculate($1, $3, OP_GEQ); }
                             ;
                             
 shift-expression	        : additive-exp { $$ = $1; }
-                            | shift-expression SL additive-exp { $$ = new Expression($1, $3, OP_SL); }
-                            | shift-expression SR additive-exp { $$ = new Expression($1, $3, OP_SR); }
+                            | shift-expression SL additive-exp { $$ = calculate($1, $3, OP_SL); }
+                            | shift-expression SR additive-exp { $$ = calculate($1, $3, OP_SR); }
                             ;
 
 additive-exp		        : mult-exp { $$ = $1; }
-                            | additive-exp ADD mult-exp { $$ = new Expression($1, $3, OP_ADD); }
-                            | additive-exp SUB mult-exp { $$ = new Expression($1, $3, OP_SUB); }
+                            | additive-exp ADD mult-exp { $$ = calculate($1, $3, OP_ADD); }
+                            | additive-exp SUB mult-exp { $$ = calculate($1, $3, OP_SUB); }
                             ;
 
 mult-exp		            : cast-exp { $$ = $1; }
-                            | mult-exp MUL cast-exp { $$ = new Expression($1, $3, OP_MUL); }
-                            | mult-exp DIV cast-exp { $$ = new Expression($1, $3, OP_DIV); }
-                            | mult-exp MOD cast-exp { $$ = new Expression($1, $3, OP_MOD); }
+                            | mult-exp MUL cast-exp { $$ = calculate($1, $3, OP_MUL); }
+                            | mult-exp DIV cast-exp { $$ = calculate($1, $3, OP_DIV); }
+                            | mult-exp MOD cast-exp { $$ = calculate($1, $3, OP_MOD); }
                             ;
 
 cast-exp		            : unary-exp { $$ = $1; }
@@ -517,9 +531,17 @@ cast-exp		            : unary-exp { $$ = $1; }
                             ;
 
 unary-exp		            : postfix-exp { $$ = $1; }
-                            | INC unary-exp { $$ = new Expression($2, OP_INC_FRONT); }
-                            | DEC unary-exp { $$ = new Expression($2, OP_DEC_FRONT); }
-                            | unary-operator cast-exp { $$ = new Expression($2, $1); }
+                            | INC unary-exp {
+                                if($2->getName() == "\"Number\"")
+                                    yyerror("lvalue required as decrement operand");
+                                $$ = new Expression($2, OP_INC_FRONT);
+                            }
+                            | DEC unary-exp {
+                                if($2->getName() == "\"Number\"")
+                                    yyerror("lvalue required as decrement operand");
+                                $$ = new Expression($2, OP_DEC_FRONT);
+                            }
+                            | unary-operator cast-exp { $$ = calculate($2, $1); }
                             | SIZEOF unary-exp // TODO: sizeof
                             | SIZEOF LP type-name RP // TODO: sizeof
                             ;
@@ -533,13 +555,33 @@ unary-operator              : ADDRESSOF     { $$ = OP_ADDRESSOF; }
                             ;
 
 postfix-exp		            : primary-exp { $$ = $1; }
-                            | postfix-exp LB exp RB { $$ = new Expression($1, $3, OP_INDEX); }
-                            | postfix-exp LP argument-exp-list RP { $$ = new FunctionCall($1, $3); }
-                            | postfix-exp LP RP { $$ = new FunctionCall($1, nullptr); }
+                            | postfix-exp LB exp RB {
+                                if($1->getName() == "\"Number\"")
+                                    yyerror("subscripted value is neither array nor pointer nor vector");
+                                $$ = new Expression($1, $3, OP_INDEX);
+                            }
+                            | postfix-exp LP argument-exp-list RP {
+                                if($1->getName() == "\"Number\"")
+                                    yyerror("called object is not a function or function pointer");
+                                $$ = new FunctionCall($1, $3);
+                            }
+                            | postfix-exp LP RP {
+                                if($1->getName() == "\"Number\"")
+                                    yyerror("called object is not a function or function pointer");
+                                $$ = new FunctionCall($1, nullptr);
+                            }
                             | postfix-exp DOT IDENTIFIER // TODO: struct dot
                             | postfix-exp TO IDENTIFIER // TODO: struct pointer
-                            | postfix-exp INC { $$ = new Expression($1, OP_INC_REAR); }
-                            | postfix-exp DEC { $$ = new Expression($1, OP_DEC_REAR); }
+                            | postfix-exp INC {
+                                if($1->getName() == "\"Number\"")
+                                    yyerror("lvalue required as increment operand");
+                                $$ = new Expression($1, OP_INC_REAR);
+                            }
+                            | postfix-exp DEC {
+                                if($1->getName() == "\"Number\"")
+                                    yyerror("lvalue required as decrement operand");
+                                $$ = new Expression($1, OP_DEC_REAR);
+                            }
                             ;
 
 primary-exp		            : IDENTIFIER    { $$ = new Identifier(*$1); delete $1; }
@@ -567,24 +609,243 @@ number                      : NUMCHAR   { $$ = new Number($1, new CharType(),   
 
 void yyerror(string s)
 {
-    cerr << "\033[1;31m"
-         << "error: "
-         << "\033[0m" << s << " in Line " << yylineno << ": " << yytext << endl;
+    cerr << "\033[1;31m" << "error: " << "\033[0m" << s << endl;
+    cerr << "Line " << yylineno << ": " << "\033[1;31m" << yytext << "\033[0m" << endl;
     exit(1);
 }
 
 void yywarning(string s, string addition)
 {
-    cerr << "\033[1;35m"
-         << "warning: "
-         << "\033[0m" << s << " in Line " << yylineno << ": " << yytext << ". " << addition << endl;
+    cerr << "\033[1;35m" << "warning: " << "\033[0m" << s << endl;
+    cerr << "Line " << yylineno << ": " << "\033[1;35m" << yytext << "\033[0m" << ". " << addition << endl;
 }
 
 static void debug(string s) {
     cout << s << ": " << yytext << endl;
 }
 
-static Number *calculate(Number *a, Number *b, enum op_type op)
+// constant folding
+static Expression *calculate(Expression *a, enum op_type op)
 {
-    return nullptr;
+    if(a->getName() == "\"Number\"")
+    {
+        union union_num num;
+        bool isfloatpoint = \
+            (((Number *)a)->valtype == VAL_FLOAT) || \
+            (((Number *)a)->valtype == VAL_DOUBLE);
+
+        switch(op)
+        {
+        case ADDRESSOF:
+            yyerror("lvalue required as unary '&' operand");
+        case DEREFERENCE:
+            yyerror("invalid type argument of unary '*' operand");
+        case POSITIVE:
+            if(isfloatpoint)
+                num.doubleValue = +((Number *)a)->doubleView();
+            else
+                num.longValue = +((Number *)a)->longView();
+            break;
+        case NEGATIVE:
+            if(isfloatpoint)
+                num.doubleValue = -((Number *)a)->doubleView();
+            else
+                num.longValue = -((Number *)a)->longView();
+            break;
+        case NOT:
+            if(isfloatpoint)
+                yyerror("logical not is not supported for double type");
+            else
+                num.longValue = ~((Number *)a)->longView();
+            break;
+        case NOTNOT:
+            if(isfloatpoint)
+                num.doubleValue = !((Number *)a)->doubleView();
+            else
+                num.longValue = !((Number *)a)->longView();
+            break;
+        default:
+            yyerror("not supported operator");
+        }
+        
+        if(isfloatpoint)
+            return new Number(num, new DoubleType(), VAL_DOUBLE);
+        else
+            return new Number(num, new LongType(), VAL_LONG);
+    }
+    
+    return new Expression(a, op);
+}
+
+static Expression *calculate(Expression *a, Expression *b, enum op_type op)
+{
+    if(a->getName() == "\"Number\"" && b->getName() == "\"Number\"")
+    {
+        union union_num num;
+        bool isfloatpoint = \
+            (((Number *)a)->valtype == VAL_FLOAT) || \
+            (((Number *)b)->valtype == VAL_FLOAT) || \
+            (((Number *)a)->valtype == VAL_DOUBLE) || \
+            (((Number *)b)->valtype == VAL_DOUBLE);
+        if (isfloatpoint)
+        {
+            double_t v1 = ((Number *)a)->doubleView(), v2 = ((Number *)b)->doubleView();
+            switch(op)
+            {
+            case OP_ADD:
+                num.doubleValue = v1 + v2;
+                return new Number(num, new DoubleType(), VAL_DOUBLE);
+            case OP_SUB:
+                num.doubleValue = v1 - v2;
+                return new Number(num, new DoubleType(), VAL_DOUBLE);
+            case OP_MUL:
+                num.doubleValue = v1 * v2;
+                return new Number(num, new DoubleType(), VAL_DOUBLE);
+            case OP_DIV:
+                num.doubleValue = v1 / v2;
+                return new Number(num, new DoubleType(), VAL_DOUBLE);
+            case OP_COMMA:
+                num.doubleValue = v2;
+                return new Number(num, new DoubleType(), VAL_DOUBLE);
+            case OP_EQ:
+                num.longValue = v1 == v2;
+                break;
+            case OP_NEQ:
+                num.longValue = v1 != v2;
+                break;
+            case OP_LT:
+                num.longValue = v1 < v2;
+                break;
+            case OP_GT:
+                num.longValue = v1 > v2;
+                break;
+            case OP_LEQ:
+                num.longValue = v1 <= v2;
+                break;
+            case OP_GEQ:
+                num.longValue = v1 >= v2;
+                break;
+            case OP_OROR:
+                num.longValue = v1 || v2;
+                break;
+            case OP_ANDAND:
+                num.longValue = v1 && v2;
+                break;
+            default:
+                yyerror("not supported operator for double type");
+            }
+            return new Number(num, new LongType(), VAL_LONG);
+        }
+        else
+        {
+            uint64_t v1 = ((Number *)a)->longView(), v2 = ((Number *)b)->longView();
+            switch(op)
+            {
+            case OP_ADD:
+                num.longValue = v1 + v2;
+            case OP_SUB:
+                num.longValue = v1 - v2;
+            case OP_MUL:
+                num.longValue = v1 * v2;
+            case OP_DIV:
+                num.longValue = v1 / v2;
+            case OP_MOD:
+                num.longValue = v1 % v2;
+            case OP_COMMA:
+                num.longValue = v2;
+            case OP_SL:
+                num.longValue = v1 >> v2;
+            case OP_SR:
+                num.longValue = v1 << v2;
+            case OP_AND:
+                num.longValue = v1 & v2;
+            case OP_OR:
+                num.longValue = v1 | v2;
+            case OP_XOR:
+                num.longValue = v1 ^ v2;
+            case OP_EQ:
+                num.longValue = v1 == v2;
+                break;
+            case OP_NEQ:
+                num.longValue = v1 != v2;
+                break;
+            case OP_LT:
+                num.longValue = v1 < v2;
+                break;
+            case OP_GT:
+                num.longValue = v1 > v2;
+                break;
+            case OP_LEQ:
+                num.longValue = v1 <= v2;
+                break;
+            case OP_GEQ:
+                num.longValue = v1 >= v2;
+                break;
+            case OP_OROR:
+                num.longValue = v1 || v2;
+                break;
+            case OP_ANDAND:
+                num.longValue = v1 && v2;
+            default:
+                yyerror("not supported operator for long type");
+            }
+            return new Number(num, new LongType(), VAL_LONG);
+        }
+    
+    }
+    return new Expression(a, b, op);
+}
+
+static Expression *calculate(Expression *a, Expression *b, Expression *c, enum op_type op)
+{
+    if(a->getName() == "\"Number\"" && b->getName() == "\"Number\"" && c->getName() == "\"Number\"")
+    {
+        union union_num num;
+        bool isfloatpoint = \
+            (((Number *)b)->valtype == VAL_FLOAT) || \
+            (((Number *)c)->valtype == VAL_FLOAT) || \
+            (((Number *)b)->valtype == VAL_DOUBLE) || \
+            (((Number *)c)->valtype == VAL_DOUBLE);
+        bool choice;
+        switch(op)
+        {
+        case OP_IFELSE:
+            switch(((Number *)a)->valtype)
+            {
+            case VAL_CHAR:
+            case VAL_SHORT:
+            case VAL_INT:
+            case VAL_LONG:
+                choice = ((Number *)a)->longView() != 0;
+                break;
+            case VAL_FLOAT:
+            case VAL_DOUBLE:
+                choice = ((Number *)a)->doubleView() != 0;
+                break;
+            default:
+                yyerror("not supported type");
+            }
+        default:
+            yyerror("not supported operator");
+        }
+
+        if(isfloatpoint)
+        {
+            if(choice)
+                num.doubleValue = ((Number *)b)->doubleView();
+            else
+                num.doubleValue = ((Number *)c)->doubleView();
+            return new Number(num, new DoubleType(), VAL_DOUBLE);
+        }
+        else
+        {
+            if(choice)
+                num.doubleValue = ((Number *)b)->longView();
+            else
+                num.doubleValue = ((Number *)c)->longView();
+            return new Number(num, new LongType(), VAL_LONG);
+        }
+    }
+    
+    return new Expression(a, b, c, op);
 }

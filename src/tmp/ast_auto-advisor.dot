@@ -332,20 +332,110 @@ digraph AST {
 	Identifier162 -> Number164
 	100 [label=100]
 	Number164 -> 100
-	FunctionDeclaration166 [label=FunctionDeclaration]
-	Program -> FunctionDeclaration166
-	IntType167 [label=IntType]
-	FunctionDeclaration166 -> IntType167
-	Identifier168 [label=Identifier]
-	FunctionDeclaration166 -> Identifier168
+	VariableDeclaration166 [label=VariableDeclaration]
+	Program -> VariableDeclaration166
+	MyArrayType [label=MyArrayType]
+	VariableDeclaration166 -> MyArrayType
+	9236594798050148352 [label=9236594798050148352]
+	MyArrayType -> 9236594798050148352
+	MyArrayType169 [label=MyArrayType]
+	MyArrayType -> MyArrayType169
+	10 [label=10]
+	MyArrayType169 -> 10
+	CharType171 [label=CharType]
+	MyArrayType169 -> CharType171
+	Identifier172 [label=Identifier]
+	VariableDeclaration166 -> Identifier172
+	name [label=name]
+	Identifier172 -> name
+	VariableDeclaration174 [label=VariableDeclaration]
+	Program -> VariableDeclaration174
+	MyArrayType175 [label=MyArrayType]
+	VariableDeclaration174 -> MyArrayType175
+	9236596997073403904 [label=9236596997073403904]
+	MyArrayType175 -> 9236596997073403904
+	IntType177 [label=IntType]
+	MyArrayType175 -> IntType177
+	Identifier178 [label=Identifier]
+	VariableDeclaration174 -> Identifier178
+	credit [label=credit]
+	Identifier178 -> credit
+	FunctionDeclaration180 [label=FunctionDeclaration]
+	Program -> FunctionDeclaration180
+	IntType181 [label=IntType]
+	FunctionDeclaration180 -> IntType181
+	Identifier182 [label=Identifier]
+	FunctionDeclaration180 -> Identifier182
 	main [label=main]
-	Identifier168 -> main
-	CompoundStatement170 [label=CompoundStatement]
-	FunctionDeclaration166 -> CompoundStatement170
-	ReturnStatement171 [label=ReturnStatement]
-	CompoundStatement170 -> ReturnStatement171
-	Number172 [label=Number]
-	ReturnStatement171 -> Number172
-	0173 [label=0]
-	Number172 -> 0173
+	Identifier182 -> main
+	CompoundStatement184 [label=CompoundStatement]
+	FunctionDeclaration180 -> CompoundStatement184
+	VariableDeclaration185 [label=VariableDeclaration]
+	CompoundStatement184 -> VariableDeclaration185
+	DoubleType [label=DoubleType]
+	VariableDeclaration185 -> DoubleType
+	Identifier187 [label=Identifier]
+	VariableDeclaration185 -> Identifier187
+	gpa [label=gpa]
+	Identifier187 -> gpa
+	Number189 [label=Number]
+	Identifier187 -> Number189
+	0190 [label=0]
+	Number189 -> 0190
+	VariableDeclaration191 [label=VariableDeclaration]
+	CompoundStatement184 -> VariableDeclaration191
+	IntType192 [label=IntType]
+	VariableDeclaration191 -> IntType192
+	Identifier193 [label=Identifier]
+	VariableDeclaration191 -> Identifier193
+	total [label=total]
+	Identifier193 -> total
+	Number195 [label=Number]
+	Identifier193 -> Number195
+	0196 [label=0]
+	Number195 -> 0196
+	IntType197 [label=IntType]
+	VariableDeclaration191 -> IntType197
+	Identifier198 [label=Identifier]
+	VariableDeclaration191 -> Identifier198
+	try [label=try]
+	Identifier198 -> try
+	Number200 [label=Number]
+	Identifier198 -> Number200
+	0201 [label=0]
+	Number200 -> 0201
+	IntType202 [label=IntType]
+	VariableDeclaration191 -> IntType202
+	Identifier203 [label=Identifier]
+	VariableDeclaration191 -> Identifier203
+	taken [label=taken]
+	Identifier203 -> taken
+	Number205 [label=Number]
+	Identifier203 -> Number205
+	0206 [label=0]
+	Number205 -> 0206
+	IntType207 [label=IntType]
+	VariableDeclaration191 -> IntType207
+	Identifier208 [label=Identifier]
+	VariableDeclaration191 -> Identifier208
+	remaining [label=remaining]
+	Identifier208 -> remaining
+	Number210 [label=Number]
+	Identifier208 -> Number210
+	0211 [label=0]
+	Number210 -> 0211
+	VariableDeclaration212 [label=VariableDeclaration]
+	CompoundStatement184 -> VariableDeclaration212
+	IntType213 [label=IntType]
+	VariableDeclaration212 -> IntType213
+	Identifier214 [label=Identifier]
+	VariableDeclaration212 -> Identifier214
+	cnt215 [label=cnt]
+	Identifier214 -> cnt215
+	ReturnStatement216 [label=ReturnStatement]
+	CompoundStatement184 -> ReturnStatement216
+	Number217 [label=Number]
+	ReturnStatement216 -> Number217
+	0218 [label=0]
+	Number217 -> 0218
 }

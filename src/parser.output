@@ -539,7 +539,7 @@
     conditional-exp <expression> (141)
         on left: 160 161
         on right: 147 161 162
-    const-exp <expression> (142)
+    const-exp <number> (142)
         on left: 162
         on right: 58 59 66 71 102 103 117
     logical-or-exp <expression> (143)

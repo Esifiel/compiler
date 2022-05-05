@@ -62,11 +62,16 @@ using namespace std;
 extern int yylineno;
 extern char *yytext;
 extern int yylex();
+
 void yyerror(string s);
 void yywarning(string s, string addition);
-static void debug(string s);
 
-#line 70 "parser.hpp"
+static void debug(string s);
+static Expression *calculate(Expression *a, enum op_type op);
+static Expression *calculate(Expression *a, Expression *b, enum op_type op);
+static Expression *calculate(Expression *a, Expression *b, Expression *c, enum op_type op);
+
+#line 75 "parser.hpp"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -171,7 +176,7 @@ static void debug(string s);
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 32 "ecc.y"
+#line 37 "ecc.y"
 
     union union_num num;
     string *stringValue;
@@ -201,7 +206,7 @@ union YYSTYPE
     vector<Expression *> *exprs;
     Number *number;
 
-#line 205 "parser.hpp"
+#line 210 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

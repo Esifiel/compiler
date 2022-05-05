@@ -19,8 +19,8 @@ int split(char *src, char delim, char *vec[])
 const int MAXLEN = 1000;
 const int MAXN = 100;
 
-// char name[MAXN][10];
-// int credit[MAXN];
+char name[MAXN][10];
+int credit[MAXN];
 // struct dep
 // {
 //     char name[10];
@@ -77,14 +77,6 @@ const int MAXN = 100;
 //     }
 // }
 
-// int indexof(char *s, char *arr[])
-// {
-//     int idx = 0;
-//     while (strcmp(arr[idx], s))
-//         idx++;
-//     return idx;
-// }
-
 // void dump(int index)
 // {
 //     printf("course %s:\tcredit: %d\tgrade: %c\n", name[index], credit[index], grade[index] ? grade[index] : ' ');
@@ -106,14 +98,14 @@ const int MAXN = 100;
 
 int main()
 {
-    // double gpa = 0;
-    // int total = 0, try = 0, taken = 0, remaining = 0;
+    double gpa = 0;
+    int total = 0, try = 0, taken = 0, remaining = 0;
     // char pyfa[MAXN][MAXLEN];
-    // int cnt;
+    int cnt;
 
     // get input
     // for (cnt = 0; gets(pyfa[cnt]), strcmp(pyfa[cnt], ""); cnt++)
-    //     ;
+        // ;
 
     // // get info
     // extract(pyfa, cnt);
