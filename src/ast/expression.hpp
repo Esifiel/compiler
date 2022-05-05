@@ -10,6 +10,7 @@ using namespace std;
 
 class CodeGenerator;
 class TypeSpecifier;
+class Qualifier;
 
 class Expression : public Node
 {
@@ -69,9 +70,10 @@ class Identifier : public Expression
 public:
     string name;
     Expression *init;
+    Qualifier *qual;
 
-    Identifier(string v) : name(v), init(nullptr) {}
-    Identifier(string v, Expression *ini) : name(v), init(ini) {}
+    Identifier(string v) : name(v), init(nullptr), qual(nullptr) {}
+    Identifier(string v, Expression *ini) : name(v), init(ini), qual(nullptr) {}
 
     virtual string getName() { return "\"Identifier\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);

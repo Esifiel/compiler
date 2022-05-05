@@ -100,7 +100,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             return ctx.builder.CreateGEP(lv, right->codeGen(ctx));
         if(lv->getType()->isArrayTy())
         {
-            // TBD: array's GEP may need to be refactored as a static function
+            // TODO: getting array's GEP may need to be refactored as a static function
             idxlist[1] = right->codeGen(ctx);
             idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
             return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
@@ -115,25 +115,32 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
         }
         return ctx.CreateBinaryExpr(lv, rv, op);
-        // case OP_ANDAND:
-        //     out << "&&";
-        //     break;
-        // case OP_OROR:
-        //     out << "||";
-        //     break;
-        // case OP_NOTNOT:
-        //     out << "!";
-        //     break;
-
-        // case OP_NOT:
-        //
-        //     return lv.val
-        // case OP_POSITIVE:
-        //     out << "+";
-        //
-        // case OP_NEGTIVE:
-        //     out << "-";
-        //     break;
+    case OP_ANDAND:
+        lv = left->codeGen(ctx);
+        rv = right->codeGen(ctx);
+        return ctx.CreateBinaryExpr(
+            ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
+            ctx.CreateBinaryExpr(rv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
+            OP_AND
+        );
+    case OP_OROR:
+        lv = left->codeGen(ctx);
+        rv = right->codeGen(ctx);
+        return ctx.CreateBinaryExpr(
+            ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
+            ctx.CreateBinaryExpr(rv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
+            OP_OR
+        );
+    case OP_NOTNOT:
+        return ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_EQ);
+    case OP_NOT:
+        return ctx.CreateUnaryExpr(lv, OP_NOT);
+    // case OP_POSITIVE:
+    //     out << "+";
+    //
+    // case OP_NEGTIVE:
+    //     out << "-";
+    //     break;
     case OP_INC_REAR:
     case OP_DEC_REAR:
         varname = ((Identifier *)left)->name;

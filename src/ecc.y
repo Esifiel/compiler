@@ -38,6 +38,7 @@ static void debug(string s);
     Node *node;
 
     TypeSpecifier *type;
+    Qualifier *qual;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -74,11 +75,13 @@ static void debug(string s);
 %token  DELIM COMMA COLON QUESTION DOT TO LP RP LB RB LC RC
 %token<num> NUMCHAR NUMSHORT NUMINT NUMLONG NUMFLOAT NUMDOUBLE
 %token<stringValue> STRING IDENTIFIER TYPENAME
+
 %type<op> assignment-operator unary-operator
 
 %type<program> program
 
 %type<type> type-spec decl-specs
+%type<qual> pointer type-qualifier type-qualifier-list
 
 %type<declaration> external-decl translation-unit
 %type<variableDeclaration> decl
@@ -119,18 +122,26 @@ static void debug(string s);
 program                     : translation-unit { $$ = new Program($1); program = $$; }
                             ;
 
-translation-unit	        : external-decl { $$ = $1; $$->tail = $$; }
-                            | translation-unit external-decl { $$ = $1; $$->tail->next = $2; $$->tail = $2; }
+translation-unit	        : external-decl                     { $$ = $1; $$->tail = $$; }
+                            | translation-unit external-decl    { $$ = $1; $$->tail->next = $2; $$->tail = $2; }
                             ;
 
-external-decl               : function-definition { $$ = $1; }
-                            | decl { $$ = $1; }
+external-decl               : function-definition   { $$ = $1; }
+                            | decl                  { $$ = $1; }
                             ;
 
-function-definition         : decl-specs declarator decl-list compound-stat
-                            | decl-specs declarator           compound-stat { $$ = (FunctionDeclaration *)$2; $$->rettype = $1; $$->stmts = $3; }
-                            |            declarator decl-list compound-stat
-                            |            declarator           compound-stat { $$ = (FunctionDeclaration *)$1; $$->stmts = $2; }
+function-definition         : decl-specs declarator decl-list compound-stat // TODO: unknown
+                            | decl-specs declarator           compound-stat  {
+                                $$ = (FunctionDeclaration *)$2;
+                                $$->rettype = $1;
+                                $$->stmts = $3;
+                            }
+                            |            declarator decl-list compound-stat // TODO: unknown
+                            |            declarator           compound-stat {
+                                $$ = (FunctionDeclaration *)$1;
+                                $$->rettype = new IntType(); // default return type is int
+                                $$->stmts = $2;
+                            }
                             ;
 
 decl                        : decl-specs init-declarator-list DELIM {
@@ -141,18 +152,24 @@ decl                        : decl-specs init-declarator-list DELIM {
                                     Expression *size = p->right;
                                     TypeSpecifier *t;
 
-                                    if(!size)
+                                    // no array size defined and pointer qualifier
+                                    if(!size && (p->qual && !p->qual->pcnt))
                                         ts->push_back($1);
                                     else
                                     {
+                                        // basic type
                                         TypeSpecifier *t = $1;
+                                        // pointer qualifier
+                                        if(p->qual)
+                                            for(int i = 0; i < p->qual->pcnt; i++)
+                                                t = new MyPointerType(t);
+                                        // if array size defined
                                         while(size)
                                         {
                                             if(((Number *)size)->valtype != VAL_NONE)
                                                 t = new MyArrayType(t, ((Number *)size)->longView());
                                             else
                                                 t = new MyPointerType(t);
-                                            ((IterableType *)t)->dim++;
                                             Expression *tmp = size;
                                             size = size->right;
                                             delete tmp;
@@ -163,19 +180,19 @@ decl                        : decl-specs init-declarator-list DELIM {
 
                                 $$ = new VariableDeclaration(ts, $2);
                             }
-                            | decl-specs DELIM
+                            | decl-specs DELIM // TODO: unknown
                             ;
 
 decl-list                   : decl { $$ = new vector<VariableDeclaration *>; $$->push_back($1); }
                             | decl-list decl { $1->push_back($2); $$ = $1; }
                             ;
 
-decl-specs                  : storage-class-specifier
-                            | storage-class-specifier decl-specs
-                            | type-spec
-                            | type-spec decl-specs
-                            | type-qualifier
-                            | type-qualifier decl-specs
+decl-specs                  : storage-class-specifier // TODO: storage
+                            | storage-class-specifier decl-specs // TODO: storage
+                            | type-spec { $$ = $1; }
+                            | type-spec decl-specs // TODO: unsigned & signed
+                            | type-qualifier { $$ = new IntType($1); } // no type decl, default is "int"
+                            | type-qualifier decl-specs { $$ = $2 ; $$->qual = $1; }
                             ;
 
 init-declarator-list        : init-declarator { $$ = new vector<Identifier *>; $$->push_back($1); }
@@ -193,13 +210,13 @@ storage-class-specifier     : TYPEDEF
                             | REGISTER
                             ;
 
-type-spec                   : CHAR { $$ = new CharType(); }
-                            | SHORT { $$ = new ShortType(); }
-                            | INT { $$ = new IntType(); }
-                            | LONG { $$ = new LongType(); }
-                            | FLOAT { $$ = new FloatType(); }
-                            | DOUBLE { $$ = new DoubleType(); }
-                            | VOID { $$ = new VoidType(); }
+type-spec                   : CHAR      { $$ = new CharType();      }
+                            | SHORT     { $$ = new ShortType();     }
+                            | INT       { $$ = new IntType();       }
+                            | LONG      { $$ = new LongType();      }
+                            | FLOAT     { $$ = new FloatType();     }
+                            | DOUBLE    { $$ = new DoubleType();    }
+                            | VOID      { $$ = new VoidType();      }
                             | SIGNED
 	                        | UNSIGNED
                             | struct-or-union-spec
@@ -207,8 +224,8 @@ type-spec                   : CHAR { $$ = new CharType(); }
                             | TYPENAME
                             ;
 
-type-qualifier              : CONST
-                            | VOLATILE
+type-qualifier              : CONST     { $$ = new Qualifier(); $$->isconst    = true; }
+                            | VOLATILE  { $$ = new Qualifier(); $$->isvolatile = true; }
                             ;
 
 struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC
@@ -255,37 +272,45 @@ enumerator                  : IDENTIFIER
                             | IDENTIFIER ASSIGN const-exp
                             ;
 
-declarator                  : pointer direct-declarator {
-                                
-                            }
+declarator                  : pointer direct-declarator { $$ = $2; ((Identifier *)$$)->qual = $1; }
                             | direct-declarator { $$ = $1; }
                             ;
 
 direct-declarator           : IDENTIFIER { $$ = new Identifier(*$1); delete $1; }
-                            | LP declarator RP
+                            | LP declarator RP // TODO: unknown
                             | direct-declarator LB const-exp       RB {
                                 $$ = $1;
                                 ((Expression *)$3)->right = ((Identifier *)$$)->right;
                                 ((Identifier *)$$)->right = $3;
                             }
                             | direct-declarator LB                 RB { $$ = $1; ((Identifier *)$$)->right = new Number(); }
-                            | direct-declarator LP id-list         RP
+                            | direct-declarator LP id-list         RP // TODO: unknown
                             | direct-declarator LP param-type-list RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, $3, nullptr); }
                             | direct-declarator LP                 RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, nullptr, nullptr); }
                             ;
 
-pointer			            : DEREFERENCE type-qualifier-list
-                            | DEREFERENCE
-                            | DEREFERENCE type-qualifier-list pointer
-                            | DEREFERENCE pointer
+pointer			            : DEREFERENCE type-qualifier-list { $$ = $2; $$->pcnt++; }
+                            | DEREFERENCE { $$ = new Qualifier(1); }
+                            | DEREFERENCE type-qualifier-list pointer {
+                                $$ = $2;
+                                $$->pcnt += $3->pcnt + 1;
+                                delete $3;
+                            }
+                            | DEREFERENCE pointer { $$ = $2; $$->pcnt++; }
                             ;
 
-type-qualifier-list	        : type-qualifier
-                            | type-qualifier-list type-qualifier
+type-qualifier-list	        : type-qualifier { $$ = $1; }
+                            | type-qualifier-list type-qualifier {
+                                $$ = $1;
+                                $$->isconst = $2->isconst;
+                                $$->isvolatile = $2->isvolatile;
+                                $$->pcnt += $2->pcnt;
+                                delete $2;
+                            }
                             ;
 
 param-type-list             : param-list { $$ = $1; }
-                            | param-list COMMA DOTDOTDOT
+                            | param-list COMMA DOTDOTDOT // TODO: variable args
                             ;
 
 param-list                  : param-decl { $$ = $1; $$->tail = $$; }
@@ -293,27 +318,31 @@ param-list                  : param-decl { $$ = $1; $$->tail = $$; }
                             ;
 
 param-decl                  : decl-specs declarator {
-                                Expression *size = ((Identifier *)$2)->right;
-                                if(!size)
-                                    $$ = new Parameter($1, (Identifier *)$2);
+                                Identifier *id = ((Identifier *)$2);
+                                Expression *size = id->right; // TODO: constant folding
+                                if(!size && (id->qual && !id->qual->pcnt))
+                                    $$ = new Parameter($1, id);
                                 else
                                 {
                                     TypeSpecifier *t = $1;
+                                    if(id->qual)
+                                        for(int i = 0; i < id->qual->pcnt; i++)
+                                            t = new MyPointerType(t);
                                     while(size)
                                     {
                                         if(((Number *)size)->valtype != VAL_NONE)
                                             t = new MyArrayType(t, ((Number *)size)->longView());
                                         else
                                             t = new MyPointerType(t);
-                                        ((IterableType *)t)->dim++;
                                         Expression *tmp = size;
                                         size = size->right;
                                         delete tmp;
                                     }
-                                    $$ = new Parameter(t, (Identifier *)$2);
+                                    id->right = nullptr;
+                                    $$ = new Parameter(t, id);
                                 }
                             }
-                            | decl-specs abstract-declarator
+                            | decl-specs abstract-declarator // TODO: abstract decl
                             | decl-specs { $$ = new Parameter($1); }
                             ;
 
@@ -364,9 +393,9 @@ stat                        : labeled-stat   { $$ = $1; }
                             | jump-stat      { $$ = $1; }
                             ;
 
-labeled-stat		        : IDENTIFIER COLON stat
-                            | CASE const-exp COLON stat
-                            | DEFAULT COLON stat
+labeled-stat		        : IDENTIFIER COLON stat // TODO: label
+                            | CASE const-exp COLON stat // TODO: case
+                            | DEFAULT COLON stat // TODO: default
                             ;
 
 exp-stat            		: exp DELIM { $$ = new ExpressionStatement($1); }
@@ -385,7 +414,7 @@ stat-list                   : stat { $$ = $1; $$->tail = $$; }
 
 selection-stat		        : IF LP exp RP stat           { $5->next = nullptr; $$ = new IfElseStatement($3, $5); }
                             | IF LP exp RP stat ELSE stat { $5->next = $7; $$ = new IfElseStatement($3, $5); }
-                            | SWITCH LP exp RP stat
+                            | SWITCH LP exp RP stat // TODO: switch
                             ;
 
 iteration-stat      		: WHILE LP exp RP stat                   { $$ = new WhileStatement($3, $5); }
@@ -400,7 +429,7 @@ iteration-stat      		: WHILE LP exp RP stat                   { $$ = new WhileS
                             | FOR LP     DELIM     DELIM     RP stat { $$ = new ForStatement(nullptr, nullptr, nullptr, $6); }
                             ;
 
-jump-stat                   : GOTO IDENTIFIER DELIM
+jump-stat                   : GOTO IDENTIFIER DELIM // TODO: goto
                             | CONTINUE DELIM        { $$ = new ContinueStatement(); }
                             | BREAK DELIM           { $$ = new BreakStatement(); }
                             | RETURN exp DELIM      { $$ = new ReturnStatement($2); }
@@ -484,39 +513,39 @@ mult-exp		            : cast-exp { $$ = $1; }
                             ;
 
 cast-exp		            : unary-exp { $$ = $1; }
-                            | LP type-name RP cast-exp
+                            | LP type-name RP cast-exp // TODO: type casting
                             ;
 
 unary-exp		            : postfix-exp { $$ = $1; }
                             | INC unary-exp { $$ = new Expression($2, OP_INC_FRONT); }
                             | DEC unary-exp { $$ = new Expression($2, OP_DEC_FRONT); }
                             | unary-operator cast-exp { $$ = new Expression($2, $1); }
-                            | SIZEOF unary-exp
-                            | SIZEOF LP type-name RP
+                            | SIZEOF unary-exp // TODO: sizeof
+                            | SIZEOF LP type-name RP // TODO: sizeof
                             ;
 
-unary-operator              : ADDRESSOF { $$ = OP_ADDRESSOF; }
-                            | DEREFERENCE { $$ = OP_DEREFERENCE; }
-                            | POSITIVE { $$ = OP_POSITIVE; }
-                            | NEGATIVE { $$ = OP_NEGTIVE; }
-                            | NOT { $$ = OP_NOT; }
-                            | NOTNOT { $$ = OP_NOTNOT; }
+unary-operator              : ADDRESSOF     { $$ = OP_ADDRESSOF; }
+                            | DEREFERENCE   { $$ = OP_DEREFERENCE; }
+                            | POSITIVE      { $$ = OP_POSITIVE; }
+                            | NEGATIVE      { $$ = OP_NEGTIVE; }
+                            | NOT           { $$ = OP_NOT; }
+                            | NOTNOT        { $$ = OP_NOTNOT; }
                             ;
 
 postfix-exp		            : primary-exp { $$ = $1; }
                             | postfix-exp LB exp RB { $$ = new Expression($1, $3, OP_INDEX); }
                             | postfix-exp LP argument-exp-list RP { $$ = new FunctionCall($1, $3); }
                             | postfix-exp LP RP { $$ = new FunctionCall($1, nullptr); }
-                            | postfix-exp DOT IDENTIFIER
-                            | postfix-exp TO IDENTIFIER
+                            | postfix-exp DOT IDENTIFIER // TODO: struct dot
+                            | postfix-exp TO IDENTIFIER // TODO: struct pointer
                             | postfix-exp INC { $$ = new Expression($1, OP_INC_REAR); }
                             | postfix-exp DEC { $$ = new Expression($1, OP_DEC_REAR); }
                             ;
 
-primary-exp		            : IDENTIFIER { $$ = new Identifier(*$1); delete $1; }
-                            | const { $$ = $1; } // orignal rule: CONSTANT
-                            | STRING { $$ = new String(*$1); delete $1; }
-                            | LP exp RP { $$ = $2; }
+primary-exp		            : IDENTIFIER    { $$ = new Identifier(*$1); delete $1; }
+                            | const         { $$ = $1; } // orignal rule: CONSTANT
+                            | STRING        { $$ = new String(*$1); delete $1; }
+                            | LP exp RP     { $$ = $2; }
                             ;
 
 argument-exp-list	        : assignment-exp { $$ = new vector<Expression *>; $$->push_back($1); }

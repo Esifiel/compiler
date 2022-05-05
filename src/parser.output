@@ -431,7 +431,7 @@
     type-spec <type> (105)
         on left: 29 30 31 32 33 34 35 36 37 38 39 40
         on right: 16 17 51 52
-    type-qualifier (106)
+    type-qualifier <qual> (106)
         on left: 41 42
         on right: 18 19 53 54 80 81
     struct-or-union-spec (107)
@@ -470,10 +470,10 @@
     direct-declarator <node> (118)
         on left: 69 70 71 72 73 74 75
         on right: 67 68 71 72 73 74 75
-    pointer (119)
+    pointer <qual> (119)
         on left: 76 77 78 79
         on right: 67 78 79 98 99
-    type-qualifier-list (120)
+    type-qualifier-list <qual> (120)
         on left: 80 81
         on right: 76 78 81
     param-type-list <param> (121)

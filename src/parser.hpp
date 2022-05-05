@@ -181,6 +181,7 @@ union YYSTYPE
     Node *node;
 
     TypeSpecifier *type;
+    Qualifier *qual;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -200,7 +201,7 @@ union YYSTYPE
     vector<Expression *> *exprs;
     Number *number;
 
-#line 204 "parser.hpp"
+#line 205 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

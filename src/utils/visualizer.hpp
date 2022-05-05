@@ -43,6 +43,7 @@ private:
     void visitParameter(Parameter *p);
     void visitBreakStatement(BreakStatement *b);
     void visitContinueStatement(ContinueStatement *c);
+    void visitQualifier(Qualifier *q);
 };
 
 #endif

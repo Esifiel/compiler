@@ -1,6 +1,7 @@
 #include "../ast/expression.hpp"
 #include "../ast/type.hpp"
 #include "codegen.hpp"
+#include <stdio.h>
 
 // initialize the context
 CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(false), isleft(false)
@@ -11,10 +12,11 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     // top level (global) blocks
     blocks.push_front(map<string, Value *>());
 
-    // add some sys function
-
-    // printf
+    // add some libc variable and function
     vector<Type *> args;
+    GlobalVariable *v;
+    // printf
+    args.clear();
     args.push_back(Type::getInt8PtrTy(ctx));
     // true: is variable args
     FunctionType *functype = FunctionType::get(Type::getInt32Ty(ctx), args, true);
@@ -37,6 +39,71 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     func = Function::Create(functype, Function::ExternalLinkage, "puts", module);
     func->setCallingConv(CallingConv::C);
     functions["puts"] = func;
+
+    // strlen
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt32Ty(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "strlen", module);
+    func->setCallingConv(CallingConv::C);
+    functions["strlen"] = func;
+
+    // strcmp
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt32Ty(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "strcmp", module);
+    func->setCallingConv(CallingConv::C);
+    functions["strcmp"] = func;
+
+    // strcpy
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt8PtrTy(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "strcpy", module);
+    func->setCallingConv(CallingConv::C);
+    functions["strcpy"] = func;
+
+    // calloc
+    args.clear();
+    args.push_back(Type::getInt64Ty(ctx));
+    args.push_back(Type::getInt64Ty(ctx));
+    functype = FunctionType::get(Type::getInt8PtrTy(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "calloc", module);
+    func->setCallingConv(CallingConv::C);
+    functions["calloc"] = func;
+
+    // read
+    args.clear();
+    args.push_back(Type::getInt32Ty(ctx));
+    args.push_back(Type::getInt8PtrTy(ctx));
+    args.push_back(Type::getInt64Ty(ctx));
+    functype = FunctionType::get(Type::getInt64Ty(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "read", module);
+    func->setCallingConv(CallingConv::C);
+    functions["read"] = func;
+
+    // fgets
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    args.push_back(Type::getInt64Ty(ctx));
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt8PtrTy(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "fgets", module);
+    func->setCallingConv(CallingConv::C);
+    functions["fgets"] = func;
+
+    // stdin
+    v = new GlobalVariable(
+        *module,
+        Type::getInt8PtrTy(ctx),
+        false,
+        GlobalValue::ExternalLinkage,
+        0,
+        "stdin");
+    blocks.front()["stdin"] = v;
 }
 
 // destructor
@@ -215,35 +282,3 @@ Constant *CodeGenerator::Num2Constant(Number *num)
     else
         return nullptr;
 }
-
-// Constant *CodeGenerator::Expr2Constant(Expression *expr)
-// {
-//     if (expr->op != OP_NONE)
-//         error("Expr2Constant: not a leaf expression");
-
-//     if (expr->left->getName() == "\"Number\"")
-//         return Num2Constant((Number *)(expr->left));
-//     else if (expr->left->getName() == "\"Identifier\"")
-//         // if variable not exists, it means based on current context we cannot calculate the expression
-//         return (Constant *)GetVar(((Identifier *)(expr->left))->getIdName());
-//     else
-//         // not a recognized type of expression
-//         return nullptr;
-// }
-
-// // calculate an expr based on current context
-// Constant *CodeGenerator::CalculateExpr(Expression *expr)
-// {
-//     Constant *lv = nullptr, *rv = nullptr;
-//     // get left value
-//     if (expr->left)
-//         if (expr->left->op != OP_NONE)
-//             lv = CalculateExpr(expr->left);
-//         else
-//             lv = Expr2Constant(expr->left);
-//     // get right value
-//     if (expr->right)
-//         if (expr->right->op != OP_NONE)
-//             rv = CalculateExpr(expr->right);
-//         else
-//             rv = Expr2Constant(expr->right);

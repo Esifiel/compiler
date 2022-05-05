@@ -44,11 +44,12 @@ enum val_type
     VAL_INT,
     VAL_LONG,
     VAL_FLOAT,
-    VAL_DOUBLE  
+    VAL_DOUBLE
 };
 
 enum type_type
 {
+    TYPE_NONE,
     TYPE_CHAR,
     TYPE_SHORT,
     TYPE_INT,
@@ -60,7 +61,8 @@ enum type_type
     TYPE_ENUM,
     TYPE_UNION,
     TYPE_ARRAY,
-    TYPE_POINTER
+    TYPE_POINTER,
+    TYPE_QUALIFIER
 };
 
 class Node

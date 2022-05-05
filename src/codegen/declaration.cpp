@@ -28,7 +28,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     varname);
                 vector<Constant *> elements;
                 for (Expression *q = (*pi)->init; q; q = q->left)
-                    elements.push_back(ctx.Num2Constant((Number *)(q->codeGen(ctx))));
+                    elements.push_back(ctx.Num2Constant((Number *)q));
                 Constant *constarr = ConstantArray::get(array_t, elements);
                 v->setInitializer(constarr);
                 ctx.blocks.front()[varname] = v;
@@ -60,8 +60,12 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 ctx.blocks.front()[varname] = v;
             }
             else
+            {
                 // allocate space for new local variable
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(t, 0, varname.c_str());
+                if((*pi)->init)
+                    ctx.builder.CreateStore(ctx.blocks.front()[varname], (*pi)->init->codeGen(ctx));
+            }
         }
     }
 

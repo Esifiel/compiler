@@ -110,11 +110,31 @@ void Visualizer::visitType(TypeSpecifier *t)
     if (t)
     {
         out << head << t->getName() << sub;
-        if(t->type == TYPE_ARRAY || t->type == TYPE_ARRAY)
-        {
+        if(t->qual)
+            visitQualifier(t->qual);
+        if(t->type == TYPE_ARRAY)
             out << ((MyArrayType *)t)->size << sep;
+        if(t->type == TYPE_ARRAY || t->type == TYPE_POINTER)
             visitType(((IterableType *)t)->basictype);
-        }
+        out << subend << tail;
+    }
+}
+
+void Visualizer::visitQualifier(Qualifier *q)
+{
+    if(q)
+    {
+        out << head << q->getName() << sub;
+        if(q->isconst)
+            out << "\"const\"";
+        if(q->isconst && q->isvolatile)
+            out << sep;
+        if(q->isvolatile)
+            out << "\"volatile\"";
+        if((q->isconst || q->isvolatile) && q->pcnt)
+            out << sep;
+        if(q->pcnt)
+            out << q->pcnt;
         out << subend << tail;
     }
 }
@@ -124,6 +144,11 @@ void Visualizer::visitIdentifier(Identifier *i)
     if (i)
     {
         out << head << i->getName() << sub << "\"" + i->name + "\"";
+        if(i->qual)
+        {
+            out << sep;
+            visitQualifier(i->qual);
+        }
         if(i->init)
         {
             out << sep;

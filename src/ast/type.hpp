@@ -9,13 +9,26 @@
 using namespace std;
 using namespace llvm;
 
+class Qualifier : public Node
+{
+public:
+    bool isconst, isvolatile;
+    uint64_t pcnt;
+
+    Qualifier() : isconst(false), isvolatile(false), pcnt(0) {}
+    Qualifier(uint64_t i) : isconst(false), isvolatile(false), pcnt(i) {}
+    virtual string getName() { return "\"Qualifier\""; }
+};
+
 class TypeSpecifier : public Node
 {
 public:
     enum type_type type;
     bool isunsigned;
+    Qualifier *qual;
 
-    TypeSpecifier(enum type_type t) : type(t) { isunsigned = false; }
+    TypeSpecifier(enum type_type t) : type(t), isunsigned(false), qual(nullptr) {}
+    TypeSpecifier(enum type_type t, Qualifier *q) : type(t), isunsigned(false), qual(q) {}
 
     virtual string getName() { return "\"TypeSpecifier\""; }
     virtual Type *getType(CodeGenerator &ctx) = 0;
@@ -43,6 +56,7 @@ class IntType : public TypeSpecifier
 {
 public:
     IntType() : TypeSpecifier(TYPE_INT) {}
+    IntType(Qualifier *q) : TypeSpecifier(TYPE_INT, q) {}
 
     virtual string getName() { return "\"IntType\""; }
     virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getInt32Ty(); }
@@ -84,12 +98,12 @@ public:
     virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getVoidTy(); }
 };
 
-class StructType : public TypeSpecifier
+class MyStructType : public TypeSpecifier
 {
 public:
-    StructType() : TypeSpecifier(TYPE_STRUCT) {}
+    MyStructType() : TypeSpecifier(TYPE_STRUCT) {}
 
-    virtual string getName() { return "\"StructType\""; }
+    virtual string getName() { return "\"MyStructType\""; }
 };
 
 class EnumType : public TypeSpecifier
@@ -112,9 +126,8 @@ class IterableType : public TypeSpecifier
 {
 public:
     TypeSpecifier *basictype;
-    uint64_t dim;
 
-    IterableType(TypeSpecifier *bt, enum type_type type) : basictype(bt), TypeSpecifier(type), dim(0) {}
+    IterableType(TypeSpecifier *bt, enum type_type type) : basictype(bt), TypeSpecifier(type) {}
 };
 
 class MyArrayType : public IterableType
