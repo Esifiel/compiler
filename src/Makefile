@@ -30,29 +30,29 @@ scanner.cpp: $(NAME).l parser.hpp
 	$(LEX) -o $@ $<
 
 %.o: %.cpp
-	$(CC) -O3 -c $(LLVMFLAGS) -o $@ $<
+	$(CC) -g3 -c $(LLVMFLAGS) -o $@ $<
 
 $(NAME): $(OBJECTS)
 	@if [ ! -d tmp ]; then mkdir tmp; fi
 	@if [ ! -d obj ]; then mkdir obj; fi
 
-	$(CC) -O3 -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
+	$(CC) -g3 -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
 	# @./$(NAME) ../test/quicksort.c
-	# @clang --target=$(TARGET) ./obj/quicksort.bc -o ./obj/quicksort
+	# @clang --target=$(TARGET) ./obj/quicksort.ll -o ./obj/quicksort
 	# @cd tmp && opt -dot-cfg ../obj/quicksort.ll
 
 	# @./$(NAME) ../test/matrix-multiplication.c
-	# @clang --target=$(TARGET) ./obj/matrix-multiplication.bc -o ./obj/matrix-multiplication
+	# @clang --target=$(TARGET) ./obj/matrix-multiplication.ll -o ./obj/matrix-multiplication
 	# @cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
 
 	@./$(NAME) ../test/auto-advisor.c
-	# @clang --target=$(TARGET) ./obj/auto-advisor.bc -o ./obj/auto-advisor
+	@clang --target=$(TARGET) ./obj/auto-advisor.ll -o ./obj/auto-advisor
 	# @cd tmp && opt -dot-cfg ../obj/auto-advisor.ll
 
 	# @cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
 
-	# @./obj/auto-advisor
+	@./obj/auto-advisor
 
 clean:
 	@rm -f $(NAME)

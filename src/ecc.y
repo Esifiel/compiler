@@ -1,6 +1,7 @@
 %{
 #include "ast/program.hpp"
 Program *program;
+static map<string, Number *> constvar;
 %}
 
 %expect 1 // shift-reduce conflict: optional else-part for if-else statement
@@ -12,6 +13,7 @@ Program *program;
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <map>
 #include "ast/basic.hpp"
 #include "ast/expression.hpp"
 #include "ast/statement.hpp"
@@ -177,9 +179,17 @@ decl                        : decl-specs init-declarator-list DELIM {
                                                 t = new MyPointerType(t);
                                             Expression *tmp = size;
                                             size = size->right;
-                                            delete tmp;
+                                            // delete tmp
                                         }
                                         ts->push_back(t);
+                                    }
+
+                                    // constant variable
+                                    if($1->qual && $1->qual->isconst)
+                                    {
+                                        if(p->init->getName() != "\"Number\"")
+                                            yyerror("not constant initializer for const variable");
+                                        constvar[p->name] = (Number *)(p->init);
                                     }
                                 }
 
@@ -341,7 +351,6 @@ param-decl                  : decl-specs declarator {
                                             t = new MyPointerType(t);
                                         Expression *tmp = size;
                                         size = size->right;
-                                        delete tmp;
                                     }
                                     id->right = nullptr;
                                     $$ = new Parameter(t, id);
@@ -471,10 +480,12 @@ conditional-exp             : logical-or-exp { $$ = $1; }
                             ;
 
 const-exp           		: conditional-exp {
-                                // TODO: or a constant variable
-                                if($1->getName() != "\"Number\"")
+                                if($1->getName() == "\"Number\"")
+                                    $$ = (Number *)$1;
+                                else if($1->getName() == "\"Identifier\"" && constvar[((Identifier *)$1)->name])
+                                    $$ = (Number *)constvar[((Identifier *)$1)->name];
+                                else
                                     yyerror("const-exp is not a Number constant");
-                                $$ = (Number *)$1;
                             }
                             ;
 
@@ -627,7 +638,7 @@ static void debug(string s) {
 // constant folding
 static Expression *calculate(Expression *a, enum op_type op)
 {
-    if(a->getName() == "\"Number\"")
+    if(a->getName() == "\"Number\"" || (a->getName() == "\"Identifier\"" && constvar.find(((Identifier *)a)->name) != constvar.end() && (a = constvar[((Identifier *)a)->name])))
     {
         union union_num num;
         bool isfloatpoint = \
@@ -679,7 +690,10 @@ static Expression *calculate(Expression *a, enum op_type op)
 
 static Expression *calculate(Expression *a, Expression *b, enum op_type op)
 {
-    if(a->getName() == "\"Number\"" && b->getName() == "\"Number\"")
+    if(
+        (a->getName() == "\"Number\"" || (a->getName() == "\"Identifier\"" && constvar.find(((Identifier *)a)->name) != constvar.end() && (a = constvar[((Identifier *)a)->name]))) && \
+        (b->getName() == "\"Number\"" || (b->getName() == "\"Identifier\"" && constvar.find(((Identifier *)b)->name) != constvar.end() && (b = constvar[((Identifier *)b)->name])))
+    )
     {
         union union_num num;
         bool isfloatpoint = \
@@ -743,26 +757,37 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
             {
             case OP_ADD:
                 num.longValue = v1 + v2;
+                break;
             case OP_SUB:
                 num.longValue = v1 - v2;
+                break;
             case OP_MUL:
                 num.longValue = v1 * v2;
+                break;
             case OP_DIV:
                 num.longValue = v1 / v2;
+                break;
             case OP_MOD:
                 num.longValue = v1 % v2;
+                break;
             case OP_COMMA:
                 num.longValue = v2;
+                break;
             case OP_SL:
                 num.longValue = v1 >> v2;
+                break;
             case OP_SR:
                 num.longValue = v1 << v2;
+                break;
             case OP_AND:
                 num.longValue = v1 & v2;
+                break;
             case OP_OR:
                 num.longValue = v1 | v2;
+                break;
             case OP_XOR:
                 num.longValue = v1 ^ v2;
+                break;
             case OP_EQ:
                 num.longValue = v1 == v2;
                 break;
@@ -786,9 +811,13 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
                 break;
             case OP_ANDAND:
                 num.longValue = v1 && v2;
+                break;
             default:
                 yyerror("not supported operator for long type");
             }
+
+            cout << v1 << " " << v2 << " " << num.longValue << endl;
+
             return new Number(num, new LongType(), VAL_LONG);
         }
     
@@ -798,7 +827,11 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
 
 static Expression *calculate(Expression *a, Expression *b, Expression *c, enum op_type op)
 {
-    if(a->getName() == "\"Number\"" && b->getName() == "\"Number\"" && c->getName() == "\"Number\"")
+    if(
+        (a->getName() == "\"Number\"" || (a->getName() == "\"Identifier\"" && constvar.find(((Identifier *)a)->name) != constvar.end() && (a = constvar[((Identifier *)a)->name]))) && \
+        (b->getName() == "\"Number\"" || (b->getName() == "\"Identifier\"" && constvar.find(((Identifier *)b)->name) != constvar.end() && (b = constvar[((Identifier *)b)->name]))) && \
+        (c->getName() == "\"Number\"" || (c->getName() == "\"Identifier\"" && constvar.find(((Identifier *)c)->name) != constvar.end() && (c = constvar[((Identifier *)c)->name])))
+    )
     {
         union union_num num;
         bool isfloatpoint = \
@@ -825,6 +858,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
             default:
                 yyerror("not supported type");
             }
+            break;
         default:
             yyerror("not supported operator");
         }

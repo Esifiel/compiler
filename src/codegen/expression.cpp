@@ -51,13 +51,25 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
     // set the params
     vector<Value *> args;
     auto arg = func->args().begin();
-    for (auto &p : *varlist)
+    auto p = varlist->begin();
+    for (; p != varlist->end();p++)
     {
         // type conversion to args type
-        Value *tmp = p->codeGen(ctx);
-        if (arg != func->args().end())
+        Value *tmp = (*p)->codeGen(ctx);
+        if(arg != func->args().end())
         {
-            tmp = ctx.CreateCast(tmp, arg->getType());
+            if(tmp->getType()->isArrayTy() && arg->getType()->isPointerTy())
+            {
+                // pass array to pointer arg
+                bool tmpleft = ctx.isleft;
+                ctx.isleft = true;
+                tmp = (*p)->codeGen(ctx);
+                Value *idxlist[] = {ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0)};
+                tmp = ctx.builder.CreateGEP(tmp, ArrayRef<Value *>(idxlist, 2));
+                ctx.isleft = tmpleft;
+            }
+            else
+                tmp = ctx.CreateCast(tmp, arg->getType());
             arg++;
         }
         args.push_back(tmp);

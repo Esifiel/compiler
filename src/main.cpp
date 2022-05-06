@@ -48,28 +48,28 @@ int main(int argc, char *argv[], char **envp)
     cout << "[+] visualization done." << endl;
 
     // init llvm
-    // InitializeAllTargetInfos();
-    // InitializeAllTargets();
-    // InitializeAllTargetMCs();
-    // InitializeAllAsmParsers();
-    // InitializeAllAsmPrinters();
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmParsers();
+    InitializeAllAsmPrinters();
 
-    // CodeGenerator generator;
-    // // set host target
-    // generator.module->setTargetTriple(sys::getDefaultTargetTriple());
-    // // emit tagret code
-    // program->codeGen(generator);
-    // generator.dump();
+    CodeGenerator generator;
+    // set host target
+    generator.module->setTargetTriple(sys::getDefaultTargetTriple());
+    // emit tagret code
+    program->codeGen(generator);
+    generator.dump();
 
-    // // save the llvm bit code and plaintext IR
-    // error_code ec;
-    // raw_fd_ostream bc(string("./obj/") + object + string(".bc"), ec, sys::fs::F_None);
-    // WriteBitcodeToFile(*generator.module, bc);
-    // bc.flush();
-    // raw_fd_ostream ll(string("./obj/") + object + string(".ll"), ec, sys::fs::F_None);
-    // generator.module->print(ll, nullptr);
-    // ll.flush();
-    // cout << "[+] target code generated." << endl;
+    // save the llvm bit code and plaintext IR
+    error_code ec;
+    raw_fd_ostream bc(string("./obj/") + object + string(".bc"), ec, sys::fs::F_None);
+    WriteBitcodeToFile(*generator.module, bc);
+    bc.flush();
+    raw_fd_ostream ll(string("./obj/") + object + string(".ll"), ec, sys::fs::F_None);
+    generator.module->print(ll, nullptr);
+    ll.flush();
+    cout << "[+] target code generated." << endl;
 
     return 0;
 }

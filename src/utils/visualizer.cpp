@@ -465,7 +465,7 @@ void Visualizer::visitNumber(Number *n)
             out << "\"NaN\"";
             break;
         case VAL_CHAR:
-            out << n->charView();
+            out << "\"" << n->charView() << "\"";
             break;
         case VAL_SHORT:
             out << n->shortView();

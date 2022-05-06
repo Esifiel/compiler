@@ -1,0 +1,5 @@
+digraph "CFG for 'main' function" {
+	label="CFG for 'main' function";
+
+	Node0xa2f260 [shape=record,label="{entry:\l  %gpa = alloca double\l  store double 0.000000e+00, double* %gpa\l  %total = alloca i32\l  store i32 0, i32* %total\l  %try = alloca i32\l  store i32 0, i32* %try\l  %taken = alloca i32\l  store i32 0, i32* %taken\l  %remaining = alloca i32\l  store i32 0, i32* %remaining\l  %cnt = alloca i32\l  %i = alloca i32\l  ret i32 0\l}"];
+}

@@ -2,8 +2,6 @@
 #include "../ast/type.hpp"
 #include "codegen.hpp"
 
-// static ArrayType *
-
 Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
 {
     auto pt = types->begin();
@@ -22,7 +20,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 GlobalVariable *v = new GlobalVariable(
                     *ctx.module,
                     array_t,
-                    false, // not constant, TODO: add "const" specifier
+                    (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
                     GlobalValue::PrivateLinkage,
                     0,
                     varname);
@@ -47,13 +45,13 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 GlobalVariable *v = new GlobalVariable(
                     *ctx.module,
                     t,
-                    false, // not constant
+                    (*pt)->qual && (*pt)->qual->isconst ? true : false,
                     GlobalValue::PrivateLinkage,
                     0,
                     varname);
                 if ((*pi)->init)
                     // if initializer exist
-                    v->setInitializer(ctx.Num2Constant((Number *)((*pi)->init)));
+                    v->setInitializer((Constant *)(*pi)->init->codeGen(ctx));
                 else
                     // else initialize to 0
                     v->setInitializer(ConstantInt::get(t, 0));
@@ -64,7 +62,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 // allocate space for new local variable
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(t, 0, varname.c_str());
                 if((*pi)->init)
-                    ctx.builder.CreateStore(ctx.blocks.front()[varname], (*pi)->init->codeGen(ctx));
+                    ctx.builder.CreateStore(ctx.CreateCast((*pi)->init->codeGen(ctx), t), ctx.blocks.front()[varname]);
             }
         }
     }

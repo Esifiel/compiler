@@ -22,7 +22,9 @@ Value *CompoundStatement::codeGen(CodeGenerator &ctx)
 
 Value *ExpressionStatement::codeGen(CodeGenerator &ctx)
 {
-    return expr->codeGen(ctx);
+    if(expr)
+        expr->codeGen(ctx);
+    return nullptr;
 }
 
 Value *IfElseStatement::codeGen(CodeGenerator &ctx)
@@ -36,6 +38,9 @@ Value *IfElseStatement::codeGen(CodeGenerator &ctx)
     // branch condition
     ctx.builder.SetInsertPoint(ifcond);
     Value *cmpres = cond->codeGen(ctx);
+    if(cmpres->getType()->getIntegerBitWidth() != 1)
+        // logical comparision is ommitted
+        cmpres = ctx.CreateBinaryExpr(cmpres, ConstantInt::get(cmpres->getType(), 0), OP_NEQ);
     ctx.builder.CreateCondBr(cmpres, ifthen, ifelse);
 
     // if-statement
@@ -112,6 +117,9 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
     if (cond)
     {
         Value *condVal = cond->codeGen(ctx);
+        if(condVal->getType()->getIntegerBitWidth() != 1)
+            // logical comparision is ommitted
+            condVal = ctx.CreateBinaryExpr(condVal, ConstantInt::get(condVal->getType(), 0), OP_NEQ);
         ctx.builder.CreateCondBr(condVal, forloop, forout);
     }
     else

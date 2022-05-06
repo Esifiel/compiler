@@ -16,8 +16,12 @@ static inline void debug() {
 void replace(string &src, string sub, string tar)
 {
     string::size_type pos = 0;
-    while((pos = src.find(sub)) != string::npos)
+    int curpos = 0;
+    while((pos = src.find(sub, curpos)) != string::npos)
+    {
         src.replace(pos, sub.length(), tar);
+        curpos = pos + tar.length();
+    }
 }
 %}
 
@@ -145,7 +149,7 @@ void replace(string &src, string sub, string tar)
                                 }
 \'.\'                           {
                                     debug();
-                                    yylval.num.charValue = *yytext;
+                                    yylval.num.charValue = yytext[1];
                                     return NUMCHAR;
                                 }
 \".*\"                          {

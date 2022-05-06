@@ -104,6 +104,14 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
         0,
         "stdin");
     blocks.front()["stdin"] = v;
+
+    // atoi
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt32Ty(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "atoi", module);
+    func->setCallingConv(CallingConv::C);
+    functions["atoi"] = func;
 }
 
 // destructor
