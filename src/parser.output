@@ -434,16 +434,16 @@
     type-qualifier <qual> (106)
         on left: 41 42
         on right: 18 19 53 54 80 81
-    struct-or-union-spec (107)
+    struct-or-union-spec <aggrtype> (107)
         on left: 43 44 45
         on right: 38
-    struct-or-union (108)
+    struct-or-union <aggrtype> (108)
         on left: 46 47
         on right: 43 44 45
-    struct-decl-list (109)
+    struct-decl-list <members> (109)
         on left: 48 49
         on right: 43 44 49
-    struct-decl (110)
+    struct-decl <member> (110)
         on left: 50
         on right: 48 49
     spec-qualifier-list (111)

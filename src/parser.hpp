@@ -188,6 +188,9 @@ union YYSTYPE
 
     TypeSpecifier *type;
     Qualifier *qual;
+    AggregateType *aggrtype;
+    pair<TypeSpecifier *, vector<string>> *member;
+    vector<pair<TypeSpecifier *, vector<string>> *> *members;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -207,7 +210,7 @@ union YYSTYPE
     vector<Expression *> *exprs;
     Number *number;
 
-#line 211 "parser.hpp"
+#line 214 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

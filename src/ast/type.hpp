@@ -98,30 +98,6 @@ public:
     virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getVoidTy(); }
 };
 
-class MyStructType : public TypeSpecifier
-{
-public:
-    MyStructType() : TypeSpecifier(TYPE_STRUCT) {}
-
-    virtual string getName() { return "\"MyStructType\""; }
-};
-
-class EnumType : public TypeSpecifier
-{
-public:
-    EnumType() : TypeSpecifier(TYPE_ENUM) {}
-
-    virtual string getName() { return "\"EnumType\""; }
-};
-
-class UnionType : public TypeSpecifier
-{
-public:
-    UnionType() : TypeSpecifier(TYPE_UNION) {}
-
-    virtual string getName() { return "\"UnionType\""; }
-};
-
 class IterableType : public TypeSpecifier
 {
 public:
@@ -149,6 +125,46 @@ public:
 
     virtual string getName() { return "\"MyPointerType\""; }
     virtual Type *getType(CodeGenerator &ctx) { return PointerType::get(basictype->getType(ctx), 0); }
+};
+
+class AggregateType : public TypeSpecifier
+{
+public:
+    string name;
+    vector<pair<TypeSpecifier *, vector<Identifier *> *> *> *members;
+
+    AggregateType(enum type_type t) : name(""), members(nullptr), TypeSpecifier(t) {} 
+
+    virtual string getName() { return "\"AggregateType\""; }
+};
+
+class MyStructType : public AggregateType
+{
+public:
+    MyStructType() : AggregateType(TYPE_STRUCT) {}
+
+    virtual string getName() { return "\"MyStructType\""; }
+    virtual Type *getType(CodeGenerator &ctx) { return nullptr; }
+};
+
+class UnionType : public AggregateType
+{
+public:
+    UnionType() : AggregateType(TYPE_UNION) {}
+
+    virtual string getName() { return "\"UnionType\""; }
+    virtual Type *getType(CodeGenerator &ctx) { return nullptr; }
+};
+
+class EnumType : public TypeSpecifier
+{
+public:
+    string name;
+    
+    EnumType() : TypeSpecifier(TYPE_ENUM) {}
+
+    virtual string getName() { return "\"EnumType\""; }
+    virtual Type *getType(CodeGenerator &ctx) { return nullptr; }
 };
 
 #endif

@@ -46,6 +46,9 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 
     TypeSpecifier *type;
     Qualifier *qual;
+    AggregateType *aggrtype;
+    pair<TypeSpecifier *, vector<Identifier *>> *member;
+    vector<pair<TypeSpecifier *, vector<Identifier *> *> *> *members;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -87,8 +90,11 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 
 %type<program> program
 
-%type<type> type-spec decl-specs
-%type<qual> pointer type-qualifier type-qualifier-list
+%type<type> type-spec decl-specs spec-qualifier-list
+%type<qual> pointer type-qualifier type-qualifier-list 
+%type<aggrtype> struct-or-union-spec struct-or-union
+%type<members> struct-decl-list
+%type<member> struct-decl
 
 %type<declaration> external-decl translation-unit
 %type<variableDeclaration> decl
@@ -104,8 +110,8 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 
 %type<expression> exp assignment-exp postfix-exp conditional-exp primary-exp logical-or-exp logical-and-exp inclusive-or-exp exclusive-or-exp and-exp equality-exp relational-exp shift-expression additive-exp mult-exp cast-exp unary-exp initializer initializer-list
 %type<exprs> argument-exp-list
-%type<identifier> init-declarator
-%type<ids> id-list init-declarator-list
+%type<identifier> init-declarator struct-declarator
+%type<ids> id-list init-declarator-list struct-declarator-list
 %type<number> number const const-exp
 %type<node> direct-declarator declarator
 
@@ -243,35 +249,39 @@ type-qualifier              : CONST     { $$ = new Qualifier(); $$->isconst    =
                             | VOLATILE  { $$ = new Qualifier(); $$->isvolatile = true; }
                             ;
 
-struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC
-                            | struct-or-union LC struct-decl-list RC
-                            | struct-or-union IDENTIFIER
+struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC { $$ = $1; $$->name = *$2; delete $2; $$->members = $4; }
+                            | struct-or-union LC struct-decl-list RC { $$ = $1; $$->members = $3; } // annoymous struct
+                            | struct-or-union IDENTIFIER { $$ = $1; $$->name = *$2; delete $2; }
                             ;
 
-struct-or-union             : STRUCT
-                            | UNION
+struct-or-union             : STRUCT    { $$ = new MyStructType(); }
+                            | UNION     { $$ = new UnionType(); }
                             ;
 
-struct-decl-list            : struct-decl
-                            | struct-decl-list struct-decl
+struct-decl-list            : struct-decl { $$ = new vector<pair<TypeSpecifier *, vector<Identifier *>> *>(); $$->push_back($1); }
+                            | struct-decl-list struct-decl { $$ = $1; $$->push_back($2); }
                             ;
 
-struct-decl                 : spec-qualifier-list struct-declarator-list DELIM
+struct-decl                 : spec-qualifier-list struct-declarator-list DELIM { $$ = new pair<TypeSpecifier *, vector<Identifier *> *>($1, $3); }
                             ;
 
-spec-qualifier-list         : type-spec spec-qualifier-list
-                            | type-spec
-                            | type-qualifier spec-qualifier-list
-                            | type-qualifier
+spec-qualifier-list         : type-spec spec-qualifier-list { $$ = $1; $$->qual = $$->qual; delete $2; }
+                            | type-spec { $$ = $1; }
+                            | type-qualifier spec-qualifier-list // TODO: unknown
+                            | type-qualifier // TODO: unknown
                             ;
 
-struct-declarator-list      : struct-declarator
-                            | struct-declarator-list COMMA struct-declarator
+struct-declarator-list      : struct-declarator { $$ = new vector<Identifier *>(); $$->push_back($1); }
+                            | struct-declarator-list COMMA struct-declarator { $$ = $1; $$->push_back($3); }
                             ;
 
-struct-declarator           : declarator
-                            | declarator COLON const-exp
-                            | COLON const-exp
+struct-declarator           : declarator {
+                                if($1->getName() != "\"Identifier\"")
+                                    yyerror("not supported struct-declarator yet");
+                                $$ = (Identifier *)$1;
+                            }
+                            | declarator COLON const-exp // TODO: bit-fields
+                            | COLON const-exp // TODO: bit-fields
                             ;
                     
 enum-spec                   : ENUM IDENTIFIER LC enumerator-list RC
@@ -334,7 +344,7 @@ param-list                  : param-decl { $$ = $1; $$->tail = $$; }
 
 param-decl                  : decl-specs declarator {
                                 Identifier *id = ((Identifier *)$2);
-                                Expression *size = id->right; // TODO: constant folding
+                                Expression *size = id->right;
                                 if(!size && (id->qual && !id->qual->pcnt))
                                     $$ = new Parameter($1, id);
                                 else
