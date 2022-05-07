@@ -33,7 +33,8 @@ enum op_type
     OP_IFELSE,
     OP_CAST,
     OP_COMMA,
-    OP_INDEX
+    OP_INDEX,
+    OP_DOT, OP_TO
 };
 
 enum val_type

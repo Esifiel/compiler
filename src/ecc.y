@@ -47,8 +47,8 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
     TypeSpecifier *type;
     Qualifier *qual;
     AggregateType *aggrtype;
-    pair<TypeSpecifier *, vector<Identifier *>> *member;
-    vector<pair<TypeSpecifier *, vector<Identifier *> *> *> *members;
+    pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *member;
+    vector<pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *> *members;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -96,8 +96,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 %type<members> struct-decl-list
 %type<member> struct-decl
 
-%type<declaration> external-decl translation-unit
-%type<variableDeclaration> decl
+%type<declaration> external-decl translation-unit decl
 %type<functionDeclaration> function-definition
 %type<param> param-list param-type-list param-decl
 %type<vars> decl-list
@@ -163,7 +162,6 @@ decl                        : decl-specs init-declarator-list DELIM {
                                 for(auto &p : *$2)
                                 {
                                     Expression *size = p->right;
-                                    TypeSpecifier *t;
 
                                     // no array size defined and pointer qualifier
                                     if(!size && (p->qual && !p->qual->pcnt))
@@ -201,11 +199,11 @@ decl                        : decl-specs init-declarator-list DELIM {
 
                                 $$ = new VariableDeclaration(ts, $2);
                             }
-                            | decl-specs DELIM // TODO: unknown
+                            | decl-specs DELIM { $$ = new TypeDeclaration($1); } // type definition
                             ;
 
-decl-list                   : decl { $$ = new vector<VariableDeclaration *>; $$->push_back($1); }
-                            | decl-list decl { $1->push_back($2); $$ = $1; }
+decl-list                   : decl { $$ = new vector<VariableDeclaration *>; $$->push_back((VariableDeclaration *)$1); }
+                            | decl-list decl { $1->push_back((VariableDeclaration *)$2); $$ = $1; }
                             ;
 
 decl-specs                  : storage-class-specifier // TODO: storage
@@ -240,7 +238,7 @@ type-spec                   : CHAR      { $$ = new CharType();      }
                             | VOID      { $$ = new VoidType();      }
                             | SIGNED
                             | UNSIGNED
-                            | struct-or-union-spec
+                            | struct-or-union-spec { $$ = $1; }
                             | enum-spec
                             | TYPENAME
                             ;
@@ -258,11 +256,45 @@ struct-or-union             : STRUCT    { $$ = new MyStructType(); }
                             | UNION     { $$ = new UnionType(); }
                             ;
 
-struct-decl-list            : struct-decl { $$ = new vector<pair<TypeSpecifier *, vector<Identifier *>> *>(); $$->push_back($1); }
+struct-decl-list            : struct-decl { $$ = new vector<pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *>(); $$->push_back($1); }
                             | struct-decl-list struct-decl { $$ = $1; $$->push_back($2); }
                             ;
 
-struct-decl                 : spec-qualifier-list struct-declarator-list DELIM { $$ = new pair<TypeSpecifier *, vector<Identifier *> *>($1, $3); }
+struct-decl                 : spec-qualifier-list struct-declarator-list DELIM {
+                                vector<TypeSpecifier *> *ts = new vector<TypeSpecifier *>;
+
+                                for(auto &p : *$2)
+                                {
+                                    Expression *size = p->right;
+
+                                    // no array size defined and pointer qualifier
+                                    if(!size && (p->qual && !p->qual->pcnt))
+                                        ts->push_back($1);
+                                    else
+                                    {
+                                        // basic type
+                                        TypeSpecifier *t = $1;
+                                        // pointer qualifier
+                                        if(p->qual)
+                                            for(int i = 0; i < p->qual->pcnt; i++)
+                                                t = new MyPointerType(t);
+                                        // if array size defined
+                                        while(size)
+                                        {
+                                            if(((Number *)size)->valtype != VAL_NONE)
+                                                t = new MyArrayType(t, ((Number *)size)->longView());
+                                            else
+                                                t = new MyPointerType(t);
+                                            Expression *tmp = size;
+                                            size = size->right;
+                                            // delete tmp
+                                        }
+                                        ts->push_back(t);
+                                    }
+                                }
+
+                                $$ = new pair<vector<TypeSpecifier *> *, vector<Identifier *> *>(ts, $2);
+                            }
                             ;
 
 spec-qualifier-list         : type-spec spec-qualifier-list { $$ = $1; $$->qual = $$->qual; delete $2; }
@@ -591,8 +623,8 @@ postfix-exp		            : primary-exp { $$ = $1; }
                                     yyerror("called object is not a function or function pointer");
                                 $$ = new FunctionCall($1, nullptr);
                             }
-                            | postfix-exp DOT IDENTIFIER // TODO: struct dot
-                            | postfix-exp TO IDENTIFIER // TODO: struct pointer
+                            | postfix-exp DOT IDENTIFIER { $$ = new Expression($1, new Identifier(*$3), OP_DOT); delete $3; }
+                            | postfix-exp TO IDENTIFIER { $$ = new Expression($1, new Identifier(*$3), OP_TO); delete $3; }
                             | postfix-exp INC {
                                 if($1->getName() == "\"Number\"")
                                     yyerror("lvalue required as increment operand");

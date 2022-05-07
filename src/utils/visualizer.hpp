@@ -44,6 +44,8 @@ private:
     void visitBreakStatement(BreakStatement *b);
     void visitContinueStatement(ContinueStatement *c);
     void visitQualifier(Qualifier *q);
+    void visitTypeDeclaration(TypeDeclaration *t);
+    void visitAggregateType(AggregateType *t);
 };
 
 #endif

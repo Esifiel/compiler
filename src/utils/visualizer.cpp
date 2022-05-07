@@ -39,10 +39,22 @@ void Visualizer::visitDeclaration(Declaration *d)
                 visitFunctionDeclaration((FunctionDeclaration *)decl);
             else if (decl->getName() == "\"VariableDeclaration\"")
                 visitVariableDeclaration((VariableDeclaration *)decl);
+            else if (decl->getName() == "\"TypeDeclaration\"")
+                visitTypeDeclaration((TypeDeclaration *)decl);
             decl = decl->next;
             if (decl)
                 out << sep;
         }
+    }
+}
+
+void Visualizer::visitTypeDeclaration(TypeDeclaration *t)
+{
+    if(t)
+    {
+        out << head << t->getName() << sub;
+        visitType(t->type);
+        out << subend << tail;
     }
 }
 
@@ -105,6 +117,27 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
     }
 }
 
+void Visualizer::visitAggregateType(AggregateType *t)
+{
+    if(t)
+    {
+        out << "\"" << t->name << "\"";
+        if(t->members && t->members->size() > 0)
+            for(auto &p : *t->members)
+            {
+                out << sep;
+                auto pt = p->first->begin();
+                auto pi = p->second->begin();
+                for (; pt != p->first->end() && pi != p->second->end(); pt++, pi++)
+                {
+                    visitType(*pt);
+                    out << sep;
+                    visitIdentifier(*pi);
+                }
+            }
+    }
+}
+
 void Visualizer::visitType(TypeSpecifier *t)
 {
     if (t)
@@ -116,6 +149,8 @@ void Visualizer::visitType(TypeSpecifier *t)
             out << ((MyArrayType *)t)->size << sep;
         if(t->type == TYPE_ARRAY || t->type == TYPE_POINTER)
             visitType(((IterableType *)t)->basictype);
+        if(t->type == TYPE_STRUCT)
+            visitAggregateType((AggregateType *)t);
         out << subend << tail;
     }
 }
@@ -416,6 +451,12 @@ void Visualizer::visitOp(enum op_type op)
         break;
     case OP_INDEX:
         out << "[]";
+        break;
+    case OP_DOT:
+        out << ".";
+        break;
+    case OP_TO:
+        out << "->";
         break;
     default:
         break;

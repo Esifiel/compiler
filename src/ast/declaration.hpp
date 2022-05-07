@@ -69,9 +69,9 @@ public:
 class TypeDeclaration : public Declaration
 {
 public:
-    Identifier *name;
+    TypeSpecifier *type;
 
-    TypeDeclaration(Identifier *v) : name(v) {}
+    TypeDeclaration(TypeSpecifier *t) : type(t) {}
 
     virtual string getName() { return "\"TypeDeclaration\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;

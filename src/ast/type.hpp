@@ -131,7 +131,7 @@ class AggregateType : public TypeSpecifier
 {
 public:
     string name;
-    vector<pair<TypeSpecifier *, vector<Identifier *> *> *> *members;
+    vector<pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *> *members;
 
     AggregateType(enum type_type t) : name(""), members(nullptr), TypeSpecifier(t) {} 
 

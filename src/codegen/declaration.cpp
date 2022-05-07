@@ -70,11 +70,6 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
     return nullptr;
 }
 
-Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
-{
-    return nullptr;
-}
-
 Value *Parameter::codeGen(CodeGenerator &ctx)
 {
     return (Value *)(type->getType(ctx));
@@ -142,4 +137,9 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     ctx.blocks.pop_front();
 
     return func;
+}
+
+Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
+{
+    return nullptr;
 }

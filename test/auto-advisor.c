@@ -195,6 +195,9 @@
 
 int main()
 {
+    char *hello = "hello, world";
+    char buf[0x10] = {0};
+    
     struct stu {
         int id;
         double gpa;
