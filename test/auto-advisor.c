@@ -204,12 +204,17 @@ int main()
         char name[0x10];
     };
 
-    struct stu *xiaoming = malloc(0x20);
-    xiaoming->id = 2333;
-    xiaoming->gpa = 3.5;
-    strcpy(xiaoming->name, "mingming");
+    int i;
 
-    printf("%d\n%lf\n%s\n", xiaoming->id, xiaoming->gpa, xiaoming->name);
+    struct stu xiaoming[0x10];
+    xiaoming[0].id = 2333;
+    xiaoming[1].gpa = 3.5;
+    strcpy(xiaoming[2].name, "mingming");
+
+    strcpy(xiaoming[1].name, "not mingming");
+
+    printf("%d\n%lf\n%s\n", xiaoming[0].id, xiaoming[1].gpa, xiaoming[2].name);
+    printf("%d\n%lf\n%s\n", xiaoming[2].id, xiaoming[0].gpa, xiaoming[1].name);
 
     buf[1] = 'c';
 

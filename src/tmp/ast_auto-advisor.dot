@@ -76,118 +76,180 @@ digraph AST {
 	Identifier35 -> name
 	VariableDeclaration37 [label=VariableDeclaration]
 	CompoundStatement -> VariableDeclaration37
-	MyPointerType38 [label=MyPointerType]
-	VariableDeclaration37 -> MyPointerType38
-	MyStructType39 [label=MyStructType]
-	MyPointerType38 -> MyStructType39
-	stu40 [label=stu]
-	MyStructType39 -> stu40
-	Identifier41 [label=Identifier]
-	VariableDeclaration37 -> Identifier41
-	xiaoming [label=xiaoming]
-	Identifier41 -> xiaoming
-	Qualifier43 [label=Qualifier]
-	Identifier41 -> Qualifier43
-	144 [label=1]
-	Qualifier43 -> 144
-	FunctionCall [label=FunctionCall]
-	Identifier41 -> FunctionCall
+	IntType38 [label=IntType]
+	VariableDeclaration37 -> IntType38
+	Identifier39 [label=Identifier]
+	VariableDeclaration37 -> Identifier39
+	i [label=i]
+	Identifier39 -> i
+	VariableDeclaration41 [label=VariableDeclaration]
+	CompoundStatement -> VariableDeclaration41
+	MyArrayType42 [label=MyArrayType]
+	VariableDeclaration41 -> MyArrayType42
+	1643 [label=16]
+	MyArrayType42 -> 1643
+	MyStructType44 [label=MyStructType]
+	MyArrayType42 -> MyStructType44
+	stu45 [label=stu]
+	MyStructType44 -> stu45
 	Identifier46 [label=Identifier]
-	FunctionCall -> Identifier46
-	malloc [label=malloc]
-	Identifier46 -> malloc
-	Number48 [label=Number]
-	FunctionCall -> Number48
-	32 [label=32]
-	Number48 -> 32
+	VariableDeclaration41 -> Identifier46
+	xiaoming [label=xiaoming]
+	Identifier46 -> xiaoming
 	ExpressionStatement [label=ExpressionStatement]
 	CompoundStatement -> ExpressionStatement
 	Expression [label=Expression]
 	ExpressionStatement -> Expression
-	Expression52 [label=Expression]
-	Expression -> Expression52
-	Identifier53 [label=Identifier]
-	Expression52 -> Identifier53
-	xiaoming54 [label=xiaoming]
-	Identifier53 -> xiaoming54
+	Expression50 [label=Expression]
+	Expression -> Expression50
+	Expression51 [label=Expression]
+	Expression50 -> Expression51
+	Identifier52 [label=Identifier]
+	Expression51 -> Identifier52
+	xiaoming53 [label=xiaoming]
+	Identifier52 -> xiaoming53
 	op [label=op]
-	Expression52 -> op
-	"->" [label="->"]
-	op -> "->"
-	Identifier57 [label=Identifier]
-	Expression52 -> Identifier57
-	id58 [label=id]
-	Identifier57 -> id58
-	op59 [label=op]
-	Expression -> op59
+	Expression51 -> op
+	"[]" [label="[]"]
+	op -> "[]"
+	Number56 [label=Number]
+	Expression51 -> Number56
+	057 [label=0]
+	Number56 -> 057
+	op58 [label=op]
+	Expression50 -> op58
+	"." [label="."]
+	op58 -> "."
+	Identifier60 [label=Identifier]
+	Expression50 -> Identifier60
+	id61 [label=id]
+	Identifier60 -> id61
+	op62 [label=op]
+	Expression -> op62
 	"=" [label="="]
-	op59 -> "="
-	Number61 [label=Number]
-	Expression -> Number61
+	op62 -> "="
+	Number64 [label=Number]
+	Expression -> Number64
 	2333 [label=2333]
-	Number61 -> 2333
-	ExpressionStatement63 [label=ExpressionStatement]
-	CompoundStatement -> ExpressionStatement63
-	Expression64 [label=Expression]
-	ExpressionStatement63 -> Expression64
-	Expression65 [label=Expression]
-	Expression64 -> Expression65
-	Identifier66 [label=Identifier]
-	Expression65 -> Identifier66
-	xiaoming67 [label=xiaoming]
-	Identifier66 -> xiaoming67
-	op68 [label=op]
-	Expression65 -> op68
-	"->69" [label="->"]
-	op68 -> "->69"
+	Number64 -> 2333
+	ExpressionStatement66 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement66
+	Expression67 [label=Expression]
+	ExpressionStatement66 -> Expression67
+	Expression68 [label=Expression]
+	Expression67 -> Expression68
+	Expression69 [label=Expression]
+	Expression68 -> Expression69
 	Identifier70 [label=Identifier]
-	Expression65 -> Identifier70
-	gpa71 [label=gpa]
-	Identifier70 -> gpa71
+	Expression69 -> Identifier70
+	xiaoming71 [label=xiaoming]
+	Identifier70 -> xiaoming71
 	op72 [label=op]
-	Expression64 -> op72
-	"=73" [label="="]
-	op72 -> "=73"
+	Expression69 -> op72
+	"[]73" [label="[]"]
+	op72 -> "[]73"
 	Number74 [label=Number]
-	Expression64 -> Number74
-	3.5 [label=3.5]
-	Number74 -> 3.5
-	ExpressionStatement76 [label=ExpressionStatement]
-	CompoundStatement -> ExpressionStatement76
-	FunctionCall77 [label=FunctionCall]
-	ExpressionStatement76 -> FunctionCall77
+	Expression69 -> Number74
+	175 [label=1]
+	Number74 -> 175
+	op76 [label=op]
+	Expression68 -> op76
+	.77 [label="."]
+	op76 -> .77
 	Identifier78 [label=Identifier]
-	FunctionCall77 -> Identifier78
+	Expression68 -> Identifier78
+	gpa79 [label=gpa]
+	Identifier78 -> gpa79
+	op80 [label=op]
+	Expression67 -> op80
+	"=81" [label="="]
+	op80 -> "=81"
+	Number82 [label=Number]
+	Expression67 -> Number82
+	3.5 [label=3.5]
+	Number82 -> 3.5
+	ExpressionStatement84 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement84
+	FunctionCall [label=FunctionCall]
+	ExpressionStatement84 -> FunctionCall
+	Identifier86 [label=Identifier]
+	FunctionCall -> Identifier86
 	strcpy [label=strcpy]
-	Identifier78 -> strcpy
-	Expression80 [label=Expression]
-	FunctionCall77 -> Expression80
-	Identifier81 [label=Identifier]
-	Expression80 -> Identifier81
-	xiaoming82 [label=xiaoming]
-	Identifier81 -> xiaoming82
-	op83 [label=op]
-	Expression80 -> op83
-	"->84" [label="->"]
-	op83 -> "->84"
-	Identifier85 [label=Identifier]
-	Expression80 -> Identifier85
-	name86 [label=name]
-	Identifier85 -> name86
-	String87 [label=String]
-	FunctionCall77 -> String87
+	Identifier86 -> strcpy
+	Expression88 [label=Expression]
+	FunctionCall -> Expression88
+	Expression89 [label=Expression]
+	Expression88 -> Expression89
+	Identifier90 [label=Identifier]
+	Expression89 -> Identifier90
+	xiaoming91 [label=xiaoming]
+	Identifier90 -> xiaoming91
+	op92 [label=op]
+	Expression89 -> op92
+	"[]93" [label="[]"]
+	op92 -> "[]93"
+	Number94 [label=Number]
+	Expression89 -> Number94
+	2 [label=2]
+	Number94 -> 2
+	op96 [label=op]
+	Expression88 -> op96
+	.97 [label="."]
+	op96 -> .97
+	Identifier98 [label=Identifier]
+	Expression88 -> Identifier98
+	name99 [label=name]
+	Identifier98 -> name99
+	String100 [label=String]
+	FunctionCall -> String100
 	mingming [label=mingming]
-	String87 -> mingming
-	ExpressionStatement89 [label=ExpressionStatement]
-	CompoundStatement -> ExpressionStatement89
-	FunctionCall90 [label=FunctionCall]
-	ExpressionStatement89 -> FunctionCall90
-	Identifier91 [label=Identifier]
-	FunctionCall90 -> Identifier91
+	String100 -> mingming
+	ExpressionStatement102 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement102
+	FunctionCall103 [label=FunctionCall]
+	ExpressionStatement102 -> FunctionCall103
+	Identifier104 [label=Identifier]
+	FunctionCall103 -> Identifier104
+	strcpy105 [label=strcpy]
+	Identifier104 -> strcpy105
+	Expression106 [label=Expression]
+	FunctionCall103 -> Expression106
+	Expression107 [label=Expression]
+	Expression106 -> Expression107
+	Identifier108 [label=Identifier]
+	Expression107 -> Identifier108
+	xiaoming109 [label=xiaoming]
+	Identifier108 -> xiaoming109
+	op110 [label=op]
+	Expression107 -> op110
+	"[]111" [label="[]"]
+	op110 -> "[]111"
+	Number112 [label=Number]
+	Expression107 -> Number112
+	1113 [label=1]
+	Number112 -> 1113
+	op114 [label=op]
+	Expression106 -> op114
+	.115 [label="."]
+	op114 -> .115
+	Identifier116 [label=Identifier]
+	Expression106 -> Identifier116
+	name117 [label=name]
+	Identifier116 -> name117
+	String118 [label=String]
+	FunctionCall103 -> String118
+	"not mingming" [label="not mingming"]
+	String118 -> "not mingming"
+	ExpressionStatement120 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement120
+	FunctionCall121 [label=FunctionCall]
+	ExpressionStatement120 -> FunctionCall121
+	Identifier122 [label=Identifier]
+	FunctionCall121 -> Identifier122
 	printf [label=printf]
-	Identifier91 -> printf
-	String93 [label=String]
-	FunctionCall90 -> String93
+	Identifier122 -> printf
+	String124 [label=String]
+	FunctionCall121 -> String124
 	"%d
 %lf
 %s
@@ -195,82 +257,205 @@ digraph AST {
 %lf
 %s
 "]
-	String93 -> "%d
+	String124 -> "%d
 %lf
 %s
 "
-	Expression95 [label=Expression]
-	FunctionCall90 -> Expression95
-	Identifier96 [label=Identifier]
-	Expression95 -> Identifier96
-	xiaoming97 [label=xiaoming]
-	Identifier96 -> xiaoming97
-	op98 [label=op]
-	Expression95 -> op98
-	"->99" [label="->"]
-	op98 -> "->99"
-	Identifier100 [label=Identifier]
-	Expression95 -> Identifier100
-	id101 [label=id]
-	Identifier100 -> id101
-	Expression102 [label=Expression]
-	FunctionCall90 -> Expression102
-	Identifier103 [label=Identifier]
-	Expression102 -> Identifier103
-	xiaoming104 [label=xiaoming]
-	Identifier103 -> xiaoming104
-	op105 [label=op]
-	Expression102 -> op105
-	"->106" [label="->"]
-	op105 -> "->106"
-	Identifier107 [label=Identifier]
-	Expression102 -> Identifier107
-	gpa108 [label=gpa]
-	Identifier107 -> gpa108
-	Expression109 [label=Expression]
-	FunctionCall90 -> Expression109
-	Identifier110 [label=Identifier]
-	Expression109 -> Identifier110
-	xiaoming111 [label=xiaoming]
-	Identifier110 -> xiaoming111
-	op112 [label=op]
-	Expression109 -> op112
-	"->113" [label="->"]
-	op112 -> "->113"
-	Identifier114 [label=Identifier]
-	Expression109 -> Identifier114
-	name115 [label=name]
-	Identifier114 -> name115
-	ExpressionStatement116 [label=ExpressionStatement]
-	CompoundStatement -> ExpressionStatement116
-	Expression117 [label=Expression]
-	ExpressionStatement116 -> Expression117
-	Expression118 [label=Expression]
-	Expression117 -> Expression118
-	Identifier119 [label=Identifier]
-	Expression118 -> Identifier119
-	buf120 [label=buf]
-	Identifier119 -> buf120
-	op121 [label=op]
-	Expression118 -> op121
-	"[]" [label="[]"]
-	op121 -> "[]"
-	Number123 [label=Number]
-	Expression118 -> Number123
-	1124 [label=1]
-	Number123 -> 1124
-	op125 [label=op]
-	Expression117 -> op125
-	"=126" [label="="]
-	op125 -> "=126"
-	Number127 [label=Number]
-	Expression117 -> Number127
+	Expression126 [label=Expression]
+	FunctionCall121 -> Expression126
+	Expression127 [label=Expression]
+	Expression126 -> Expression127
+	Identifier128 [label=Identifier]
+	Expression127 -> Identifier128
+	xiaoming129 [label=xiaoming]
+	Identifier128 -> xiaoming129
+	op130 [label=op]
+	Expression127 -> op130
+	"[]131" [label="[]"]
+	op130 -> "[]131"
+	Number132 [label=Number]
+	Expression127 -> Number132
+	0133 [label=0]
+	Number132 -> 0133
+	op134 [label=op]
+	Expression126 -> op134
+	.135 [label="."]
+	op134 -> .135
+	Identifier136 [label=Identifier]
+	Expression126 -> Identifier136
+	id137 [label=id]
+	Identifier136 -> id137
+	Expression138 [label=Expression]
+	FunctionCall121 -> Expression138
+	Expression139 [label=Expression]
+	Expression138 -> Expression139
+	Identifier140 [label=Identifier]
+	Expression139 -> Identifier140
+	xiaoming141 [label=xiaoming]
+	Identifier140 -> xiaoming141
+	op142 [label=op]
+	Expression139 -> op142
+	"[]143" [label="[]"]
+	op142 -> "[]143"
+	Number144 [label=Number]
+	Expression139 -> Number144
+	1145 [label=1]
+	Number144 -> 1145
+	op146 [label=op]
+	Expression138 -> op146
+	.147 [label="."]
+	op146 -> .147
+	Identifier148 [label=Identifier]
+	Expression138 -> Identifier148
+	gpa149 [label=gpa]
+	Identifier148 -> gpa149
+	Expression150 [label=Expression]
+	FunctionCall121 -> Expression150
+	Expression151 [label=Expression]
+	Expression150 -> Expression151
+	Identifier152 [label=Identifier]
+	Expression151 -> Identifier152
+	xiaoming153 [label=xiaoming]
+	Identifier152 -> xiaoming153
+	op154 [label=op]
+	Expression151 -> op154
+	"[]155" [label="[]"]
+	op154 -> "[]155"
+	Number156 [label=Number]
+	Expression151 -> Number156
+	2157 [label=2]
+	Number156 -> 2157
+	op158 [label=op]
+	Expression150 -> op158
+	.159 [label="."]
+	op158 -> .159
+	Identifier160 [label=Identifier]
+	Expression150 -> Identifier160
+	name161 [label=name]
+	Identifier160 -> name161
+	ExpressionStatement162 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement162
+	FunctionCall163 [label=FunctionCall]
+	ExpressionStatement162 -> FunctionCall163
+	Identifier164 [label=Identifier]
+	FunctionCall163 -> Identifier164
+	printf165 [label=printf]
+	Identifier164 -> printf165
+	String166 [label=String]
+	FunctionCall163 -> String166
+	"%d
+%lf
+%s
+167" [label="%d
+%lf
+%s
+"]
+	String166 -> "%d
+%lf
+%s
+167"
+	Expression168 [label=Expression]
+	FunctionCall163 -> Expression168
+	Expression169 [label=Expression]
+	Expression168 -> Expression169
+	Identifier170 [label=Identifier]
+	Expression169 -> Identifier170
+	xiaoming171 [label=xiaoming]
+	Identifier170 -> xiaoming171
+	op172 [label=op]
+	Expression169 -> op172
+	"[]173" [label="[]"]
+	op172 -> "[]173"
+	Number174 [label=Number]
+	Expression169 -> Number174
+	2175 [label=2]
+	Number174 -> 2175
+	op176 [label=op]
+	Expression168 -> op176
+	.177 [label="."]
+	op176 -> .177
+	Identifier178 [label=Identifier]
+	Expression168 -> Identifier178
+	id179 [label=id]
+	Identifier178 -> id179
+	Expression180 [label=Expression]
+	FunctionCall163 -> Expression180
+	Expression181 [label=Expression]
+	Expression180 -> Expression181
+	Identifier182 [label=Identifier]
+	Expression181 -> Identifier182
+	xiaoming183 [label=xiaoming]
+	Identifier182 -> xiaoming183
+	op184 [label=op]
+	Expression181 -> op184
+	"[]185" [label="[]"]
+	op184 -> "[]185"
+	Number186 [label=Number]
+	Expression181 -> Number186
+	0187 [label=0]
+	Number186 -> 0187
+	op188 [label=op]
+	Expression180 -> op188
+	.189 [label="."]
+	op188 -> .189
+	Identifier190 [label=Identifier]
+	Expression180 -> Identifier190
+	gpa191 [label=gpa]
+	Identifier190 -> gpa191
+	Expression192 [label=Expression]
+	FunctionCall163 -> Expression192
+	Expression193 [label=Expression]
+	Expression192 -> Expression193
+	Identifier194 [label=Identifier]
+	Expression193 -> Identifier194
+	xiaoming195 [label=xiaoming]
+	Identifier194 -> xiaoming195
+	op196 [label=op]
+	Expression193 -> op196
+	"[]197" [label="[]"]
+	op196 -> "[]197"
+	Number198 [label=Number]
+	Expression193 -> Number198
+	1199 [label=1]
+	Number198 -> 1199
+	op200 [label=op]
+	Expression192 -> op200
+	.201 [label="."]
+	op200 -> .201
+	Identifier202 [label=Identifier]
+	Expression192 -> Identifier202
+	name203 [label=name]
+	Identifier202 -> name203
+	ExpressionStatement204 [label=ExpressionStatement]
+	CompoundStatement -> ExpressionStatement204
+	Expression205 [label=Expression]
+	ExpressionStatement204 -> Expression205
+	Expression206 [label=Expression]
+	Expression205 -> Expression206
+	Identifier207 [label=Identifier]
+	Expression206 -> Identifier207
+	buf208 [label=buf]
+	Identifier207 -> buf208
+	op209 [label=op]
+	Expression206 -> op209
+	"[]210" [label="[]"]
+	op209 -> "[]210"
+	Number211 [label=Number]
+	Expression206 -> Number211
+	1212 [label=1]
+	Number211 -> 1212
+	op213 [label=op]
+	Expression205 -> op213
+	"=214" [label="="]
+	op213 -> "=214"
+	Number215 [label=Number]
+	Expression205 -> Number215
 	c [label=c]
-	Number127 -> c
+	Number215 -> c
 	ReturnStatement [label=ReturnStatement]
 	CompoundStatement -> ReturnStatement
-	Number130 [label=Number]
-	ReturnStatement -> Number130
-	0131 [label=0]
-	Number130 -> 0131
+	Number218 [label=Number]
+	ReturnStatement -> Number218
+	0219 [label=0]
+	Number218 -> 0219
 }

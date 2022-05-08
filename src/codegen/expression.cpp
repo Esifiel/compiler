@@ -85,6 +85,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     bool tmpleft;
     Type *t;
     vector<string> members;
+    Expression *expr;
 
     switch (op)
     {
@@ -239,17 +240,20 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         return var;
     case OP_DOT:
     case OP_TO:
-        varname = ((Identifier *)left)->name;
-        var = ctx.GetVar(varname);
+        tmpleft = ctx.isleft;
+        ctx.isleft = true;
+        var = left->codeGen(ctx);
+        ctx.isleft = tmpleft;
+        
+        // get varname
+        expr = left;
+        while(expr->getName() != "\"Identifier\"")
+            expr = expr->left;
+
+        // find member offset and get pointer
+        members = ctx.structtypes[ctx.structvars[((Identifier *)expr)->name]->name];
         if (op == OP_TO)
             var = ctx.builder.CreateLoad(var);
-        var->getType()->print(outs());
-        cout << endl;
-        cout << varname << endl;
-        // find member offset and get pointer
-        members = ctx.structtypes[ctx.structvars[varname]->name];
-
-        cout << "here" << endl;
         var = ctx.builder.CreateGEP(
             var,
             {ctx.builder.getInt32(0),

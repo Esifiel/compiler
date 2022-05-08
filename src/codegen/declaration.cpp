@@ -35,10 +35,6 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 // TODO: local variable initialize not supported yet
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(array_t, 0, varname.c_str());
         }
-        // else if((*pt)->type == TYPE_POINTER && ((MyPointerType *)*pt)->basictype->type == TYPE_STRUCT)
-        // {
-
-        // }
         else if((*pt)->type == TYPE_STRUCT)
         {
             // struct type
@@ -62,7 +58,6 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             }
             else
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(stype, 0, varname.c_str());
-            ctx.structvars[varname] = mst;
         }
         else
         {
@@ -93,9 +88,18 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 if((*pi)->init)
                     ctx.builder.CreateStore(ctx.CreateCast((*pi)->init->codeGen(ctx), t), ctx.blocks.front()[varname]);
             }
-            // if is struct type pointer, record in list too
-            if((*pt)->type == TYPE_POINTER && ((MyPointerType *)*pt)->basictype->type == TYPE_STRUCT)
-                ctx.structvars[varname] = (AggregateType *)(((MyPointerType *)*pt)->basictype);
+        }
+
+        // collect struct type variable
+        if((*pt)->type == TYPE_STRUCT)
+            ctx.structvars[varname] = (AggregateType *)*pt;
+        else if((*pt)->type == TYPE_POINTER || (*pt)->type == TYPE_ARRAY)
+        {
+            TypeSpecifier *bt = *pt;
+            while(bt->type == TYPE_POINTER || bt->type == TYPE_ARRAY)
+                bt = ((IterableType *)bt)->basictype;
+            if(bt->type == TYPE_STRUCT)
+                ctx.structvars[varname] = (AggregateType *)bt;
         }
     }
 
