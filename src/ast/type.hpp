@@ -2,12 +2,14 @@
 #define _TYPE_HPP_
 
 #include "basic.hpp"
-#include "../codegen/codegen.hpp"
+#include "expression.hpp"
 #include <llvm/IR/Type.h>
 #include <vector>
 
 using namespace std;
 using namespace llvm;
+
+class CodeGenerator;
 
 class Qualifier : public Node
 {
@@ -40,7 +42,7 @@ public:
     CharType() : TypeSpecifier(TYPE_CHAR) {}
 
     virtual string getName() { return "\"CharType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getInt8Ty(); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class ShortType : public TypeSpecifier
@@ -49,7 +51,7 @@ public:
     ShortType() : TypeSpecifier(TYPE_SHORT) {}
 
     virtual string getName() { return "\"ShortType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getInt16Ty(); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class IntType : public TypeSpecifier
@@ -59,7 +61,7 @@ public:
     IntType(Qualifier *q) : TypeSpecifier(TYPE_INT, q) {}
 
     virtual string getName() { return "\"IntType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getInt32Ty(); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class LongType : public TypeSpecifier
@@ -68,7 +70,7 @@ public:
     LongType() : TypeSpecifier(TYPE_LONG) {}
 
     virtual string getName() { return "\"LongType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getInt64Ty(); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class FloatType : public TypeSpecifier
@@ -77,7 +79,7 @@ public:
     FloatType() : TypeSpecifier(TYPE_FLOAT) {}
 
     virtual string getName() { return "\"FloatType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getFloatTy(); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class DoubleType : public TypeSpecifier
@@ -86,7 +88,7 @@ public:
     DoubleType() : TypeSpecifier(TYPE_DOUBLE) {}
 
     virtual string getName() { return "\"DoubleType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getDoubleTy(); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class VoidType : public TypeSpecifier
@@ -95,7 +97,7 @@ public:
     VoidType() : TypeSpecifier(TYPE_VOID) {}
 
     virtual string getName() { return "\"VoidType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ctx.builder.getVoidTy(); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class IterableType : public TypeSpecifier
@@ -115,7 +117,7 @@ public:
     MyArrayType(TypeSpecifier *t, uint64_t sz) : IterableType(t, TYPE_ARRAY), size(sz) {}
 
     virtual string getName() { return "\"MyArrayType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return ArrayType::get(basictype->getType(ctx), size); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class MyPointerType : public IterableType
@@ -124,7 +126,7 @@ public:
     MyPointerType(TypeSpecifier *t) : IterableType(t, TYPE_POINTER) {}
 
     virtual string getName() { return "\"MyPointerType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return PointerType::get(basictype->getType(ctx), 0); }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class AggregateType : public TypeSpecifier
@@ -144,7 +146,7 @@ public:
     MyStructType() : AggregateType(TYPE_STRUCT) {}
 
     virtual string getName() { return "\"MyStructType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return nullptr; }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class UnionType : public AggregateType
@@ -153,7 +155,7 @@ public:
     UnionType() : AggregateType(TYPE_UNION) {}
 
     virtual string getName() { return "\"UnionType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return nullptr; }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 class EnumType : public TypeSpecifier
@@ -164,7 +166,7 @@ public:
     EnumType() : TypeSpecifier(TYPE_ENUM) {}
 
     virtual string getName() { return "\"EnumType\""; }
-    virtual Type *getType(CodeGenerator &ctx) { return nullptr; }
+    virtual Type *getType(CodeGenerator &ctx);
 };
 
 #endif

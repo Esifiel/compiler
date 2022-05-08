@@ -2,6 +2,7 @@
 #include "codegen.hpp"
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -34,12 +35,9 @@ Value *Identifier::codeGen(CodeGenerator &ctx)
     else
     {
         // return as right value
-        if(((AllocaInst *)var)->getAllocatedType()->isArrayTy())
-        {
+        if(var->getType()->getPointerElementType()->isArrayTy())
             // if the variable is ArrayType, return as a pointer type (pointer of first element)
-            Value *idxlist[] = {ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0)};
-            return ctx.builder.CreateGEP(var, ArrayRef<Value *>(idxlist, 2));
-        }
+            return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
         return ctx.builder.CreateLoad(var);
     }
 }
@@ -86,6 +84,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     Value *idxlist[2];
     bool tmpleft;
     Type *t;
+    vector<string> members;
 
     switch (op)
     {
@@ -128,20 +127,13 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         }
         return ctx.CreateBinaryExpr(lv, rv, op);
     case OP_ANDAND:
-        lv = left->codeGen(ctx);
-        rv = right->codeGen(ctx);
-        return ctx.CreateBinaryExpr(
-            ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
-            ctx.CreateBinaryExpr(rv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
-            OP_AND
-        );
     case OP_OROR:
         lv = left->codeGen(ctx);
         rv = right->codeGen(ctx);
         return ctx.CreateBinaryExpr(
             ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
             ctx.CreateBinaryExpr(rv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
-            OP_OR
+            op
         );
     case OP_NOTNOT:
         return ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_EQ);
@@ -155,20 +147,11 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     //     break;
     case OP_INC_REAR:
     case OP_DEC_REAR:
-        varname = ((Identifier *)left)->name;
-        var = ctx.GetVar(varname);
+        ctx.isleft = true;
+        var = left->codeGen(ctx);
+        ctx.isleft = false;
         oldval = ctx.builder.CreateLoad(var);
-        switch (op)
-        {
-        case OP_INC_REAR:
-            newval = ctx.CreateUnaryExpr(oldval, OP_INC_REAR);
-            break;
-        case OP_DEC_REAR:
-            newval = ctx.CreateUnaryExpr(oldval, OP_DEC_REAR);
-            break;
-        default:
-            return nullptr;
-        }
+        newval = ctx.CreateUnaryExpr(oldval, op);
         ctx.builder.CreateStore(newval, var);
         return oldval;
     case OP_INC_FRONT:
@@ -187,53 +170,17 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         var = left->codeGen(ctx);
         ctx.isleft = false;
         oldval = ctx.builder.CreateLoad(var);
-        switch (op)
-        {
-        case OP_INC_FRONT:
-            newval = ctx.CreateUnaryExpr(oldval, OP_INC_FRONT);
-        case OP_DEC_FRONT:
-            newval = ctx.CreateUnaryExpr(oldval, OP_DEC_FRONT);
-        case OP_MULASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_MUL);
-            break;
-        case OP_DIVASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_DIV);
-            break;
-        case OP_MODASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_MOD);
-            break;
-        case OP_ADDASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_ADD);
-            break;
-        case OP_SUBASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SUB);
-            break;
-        case OP_SLASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SL);
-            break;
-        case OP_SRASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SR);
-            break;
-        case OP_ANDASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_AND);
-            break;
-        case OP_XORASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_XOR);
-            break;
-        case OP_ORASSIGN:
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_OR);
-            break;
-        default:
-            return nullptr;
-        }
+        if(right)
+            newval = ctx.CreateUnaryExpr(oldval, op);
+        else
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), op);
         ctx.builder.CreateStore(newval, var);
         return newval;
     case OP_ASSIGN:
         ctx.isleft = true;
         var = left->codeGen(ctx);
         ctx.isleft = false;
-        t = ((AllocaInst *)var)->getAllocatedType();
-        newval = ctx.CreateCast(right->codeGen(ctx),t->isArrayTy() ? var->getType()->getPointerElementType() : t);
+        newval = ctx.CreateCast(right->codeGen(ctx), var->getType()->getPointerElementType());
         ctx.builder.CreateStore(newval, var);
         return newval;
     // case OP_IFELSE:
@@ -251,7 +198,6 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         ctx.isleft = true;
         var = left->codeGen(ctx);
         ctx.isleft = tmpleft;
-
         // pointer or array
         if (var->getType()->getPointerElementType()->isPointerTy())
         {
@@ -292,6 +238,27 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         var = left->codeGen(ctx);
         ctx.isleft = false;
         return var;
+    case OP_DOT:
+        varname = ((Identifier *)left)->name;
+        var = ctx.GetVar(varname);
+        // find member offset and get pointer
+        members = ctx.structtypes[ctx.structvars[varname]->name];
+        var = ctx.builder.CreateGEP(
+            var,
+            {
+                ctx.builder.getInt32(0),
+                ctx.builder.getInt32(find(members.begin(), members.end(), ((Identifier *)right)->name) - members.begin())
+            }
+        );
+        if(ctx.isleft)
+            return var;
+        else
+            if(var->getType()->getPointerElementType()->isArrayTy())
+                return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
+            else
+                return ctx.builder.CreateLoad(var);
+    case OP_TO:
+        
     default:
         return nullptr;
     }

@@ -9,6 +9,9 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     module = new Module("main", ctx);
     functions.clear();
     blocks.clear();
+    typealias.clear();
+    structtypes.clear();
+    structvars.clear();
     // top level (global) blocks
     blocks.push_front(map<string, Value *>());
 
@@ -119,6 +122,9 @@ CodeGenerator::~CodeGenerator()
 {
     blocks.clear();
     functions.clear();
+    typealias.clear();
+    structtypes.clear();
+    structvars.clear();
     delete module;
 }
 
@@ -225,10 +231,6 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
         return isfloatpoint ? builder.CreateFCmp(CmpInst::FCMP_OGE, a, b) : builder.CreateICmp(CmpInst::ICMP_SGE, a, b);
     case OP_NEQ:
         return isfloatpoint ? builder.CreateFCmp(CmpInst::FCMP_ONE, a, b) : builder.CreateICmp(CmpInst::ICMP_NE, a, b);
-    case OP_ANDAND:
-        return nullptr;
-    case OP_OROR:
-        return nullptr;
     case OP_AND:
         return builder.CreateBinOp(Instruction::BinaryOps::And, a, b);
     case OP_OR:

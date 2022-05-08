@@ -211,5 +211,7 @@ int main()
 
     printf("%d\n%lf\n%s\n", xiaoming.id, xiaoming.gpa, xiaoming.name);
 
+    buf[1] = 'c';
+
     return 0;
 }

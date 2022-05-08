@@ -19,6 +19,8 @@
 #include <llvm/IR/CallingConv.h>
 #include <llvm/IR/IRPrintingPasses.h>
 #include <llvm/IR/CFG.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/TypeFinder.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/MCJIT.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
@@ -32,6 +34,7 @@
 #include <stack>
 #include <list>
 #include "../ast/expression.hpp"
+#include "../ast/type.hpp"
 
 using namespace llvm;
 using namespace std;
@@ -51,6 +54,9 @@ public:
     list<pair<BasicBlock *, BasicBlock *>> loopctx; // for jump statement
     bool isglobal;  // global definition
     bool isleft;    // left value
+    map<string, string> typealias;
+    map<string, vector<string>> structtypes;
+    map<string, AggregateType *> structvars;
 
     CodeGenerator();
     ~CodeGenerator();

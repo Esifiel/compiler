@@ -1,5 +1,6 @@
 %{
 #include "ast/program.hpp"
+#include <map>
 Program *program;
 static map<string, Number *> constvar;
 %}
@@ -13,7 +14,6 @@ static map<string, Number *> constvar;
 #include <string>
 #include <vector>
 #include <stdint.h>
-#include <map>
 #include "ast/basic.hpp"
 #include "ast/expression.hpp"
 #include "ast/statement.hpp"

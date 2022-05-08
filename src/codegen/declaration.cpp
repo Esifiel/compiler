@@ -35,6 +35,31 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 // TODO: local variable initialize not supported yet
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(array_t, 0, varname.c_str());
         }
+        else if((*pt)->type == TYPE_STRUCT)
+        {
+            // struct type
+            MyStructType *mst = (MyStructType *)*pt;
+            StructType *stype = ctx.module->getTypeByName(mst->name);
+            if (ctx.isglobal)
+            {
+                GlobalVariable *v = new GlobalVariable(
+                    *ctx.module,
+                    stype,
+                    (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
+                    GlobalValue::PrivateLinkage,
+                    0,
+                    varname);
+                vector<Constant *> elements;
+                for (Expression *q = (*pi)->init; q; q = q->left)
+                    elements.push_back(ctx.Num2Constant((Number *)q));
+                Constant *constarr = ConstantStruct::get(stype, elements);
+                v->setInitializer(constarr);
+                ctx.blocks.front()[varname] = v;
+            }
+            else
+                ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(stype, 0, varname.c_str());
+            ctx.structvars[varname] = mst;
+        }
         else
         {
             // normal type
@@ -141,5 +166,28 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 
 Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
 {
+    if(type->type == TYPE_STRUCT)
+    {
+        MyStructType *mst = (MyStructType *)type;
+        ctx.structtypes[mst->name] = vector<string>();
+        // create struct type for assigned name
+        StructType *stype = StructType::create(ctx.ctx, mst->name);
+        if(mst->members)
+        {
+            // set members
+            vector<Type *> elements;
+            for(auto &p : *mst->members)
+            {
+                for(auto &q : *p->first)
+                    elements.push_back(q->getType(ctx));
+                // record field name in context
+                for(auto &q : *p->second)
+                    ctx.structtypes[mst->name].push_back(q->name);
+            }
+            stype->setBody(elements);
+        }
+        // if no member, just a forward declaration, set as opaque type (default)
+    }
+
     return nullptr;
 }

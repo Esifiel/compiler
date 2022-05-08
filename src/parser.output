@@ -410,7 +410,7 @@
     function-definition <functionDeclaration> (98)
         on left: 6 7 8 9
         on right: 4
-    decl <variableDeclaration> (99)
+    decl <declaration> (99)
         on left: 10 11
         on right: 5 12 13
     decl-list <vars> (100)
@@ -446,13 +446,13 @@
     struct-decl <member> (110)
         on left: 50
         on right: 48 49
-    spec-qualifier-list (111)
+    spec-qualifier-list <type> (111)
         on left: 51 52 53 54
         on right: 50 51 53 96 97
-    struct-declarator-list (112)
+    struct-declarator-list <ids> (112)
         on left: 55 56
         on right: 50 56
-    struct-declarator (113)
+    struct-declarator <identifier> (113)
         on left: 57 58 59
         on right: 55 56
     enum-spec (114)

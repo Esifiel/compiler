@@ -44,13 +44,12 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 11 "ecc.y"
+#line 12 "ecc.y"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <stdint.h>
-#include <map>
 #include "ast/basic.hpp"
 #include "ast/expression.hpp"
 #include "ast/statement.hpp"
@@ -72,7 +71,7 @@ static Expression *calculate(Expression *a, enum op_type op);
 static Expression *calculate(Expression *a, Expression *b, enum op_type op);
 static Expression *calculate(Expression *a, Expression *b, Expression *c, enum op_type op);
 
-#line 76 "parser.hpp"
+#line 75 "parser.hpp"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -189,8 +188,8 @@ union YYSTYPE
     TypeSpecifier *type;
     Qualifier *qual;
     AggregateType *aggrtype;
-    pair<TypeSpecifier *, vector<string>> *member;
-    vector<pair<TypeSpecifier *, vector<string>> *> *members;
+    pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *member;
+    vector<pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *> *members;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -210,7 +209,7 @@ union YYSTYPE
     vector<Expression *> *exprs;
     Number *number;
 
-#line 214 "parser.hpp"
+#line 213 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
