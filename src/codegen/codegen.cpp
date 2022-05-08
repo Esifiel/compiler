@@ -78,6 +78,14 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     func->setCallingConv(CallingConv::C);
     functions["calloc"] = func;
 
+    // malloc
+    args.clear();
+    args.push_back(Type::getInt64Ty(ctx));
+    functype = FunctionType::get(Type::getInt8PtrTy(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "malloc", module);
+    func->setCallingConv(CallingConv::C);
+    functions["malloc"] = func;
+
     // read
     args.clear();
     args.push_back(Type::getInt32Ty(ctx));

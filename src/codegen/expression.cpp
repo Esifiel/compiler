@@ -35,7 +35,7 @@ Value *Identifier::codeGen(CodeGenerator &ctx)
     else
     {
         // return as right value
-        if(var->getType()->getPointerElementType()->isArrayTy())
+        if (var->getType()->getPointerElementType()->isArrayTy())
             // if the variable is ArrayType, return as a pointer type (pointer of first element)
             return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
         return ctx.builder.CreateLoad(var);
@@ -50,13 +50,13 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
     vector<Value *> args;
     auto arg = func->args().begin();
     auto p = varlist->begin();
-    for (; p != varlist->end();p++)
+    for (; p != varlist->end(); p++)
     {
         // type conversion to args type
         Value *tmp = (*p)->codeGen(ctx);
-        if(arg != func->args().end())
+        if (arg != func->args().end())
         {
-            if(tmp->getType()->isArrayTy() && arg->getType()->isPointerTy())
+            if (tmp->getType()->isArrayTy() && arg->getType()->isPointerTy())
             {
                 // pass array to pointer arg
                 bool tmpleft = ctx.isleft;
@@ -109,7 +109,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         lv = left->codeGen(ctx);
         if (lv->getType()->isPointerTy())
             return ctx.builder.CreateGEP(lv, right->codeGen(ctx));
-        if(lv->getType()->isArrayTy())
+        if (lv->getType()->isArrayTy())
         {
             // TODO: getting array's GEP may need to be refactored as a static function
             idxlist[1] = right->codeGen(ctx);
@@ -119,7 +119,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         rv = right->codeGen(ctx);
         if (rv->getType()->isPointerTy())
             return ctx.builder.CreateGEP(rv, lv);
-        if(rv->getType()->isArrayTy())
+        if (rv->getType()->isArrayTy())
         {
             idxlist[1] = lv;
             idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
@@ -133,8 +133,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         return ctx.CreateBinaryExpr(
             ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
             ctx.CreateBinaryExpr(rv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
-            op
-        );
+            op);
     case OP_NOTNOT:
         return ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_EQ);
     case OP_NOT:
@@ -170,7 +169,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         var = left->codeGen(ctx);
         ctx.isleft = false;
         oldval = ctx.builder.CreateLoad(var);
-        if(right)
+        if (right)
             newval = ctx.CreateUnaryExpr(oldval, op);
         else
             newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), op);
@@ -239,26 +238,28 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         ctx.isleft = false;
         return var;
     case OP_DOT:
+    case OP_TO:
         varname = ((Identifier *)left)->name;
         var = ctx.GetVar(varname);
+        if (op == OP_TO)
+            var = ctx.builder.CreateLoad(var);
+        var->getType()->print(outs());
+        cout << endl;
+        cout << varname << endl;
         // find member offset and get pointer
         members = ctx.structtypes[ctx.structvars[varname]->name];
+
+        cout << "here" << endl;
         var = ctx.builder.CreateGEP(
             var,
-            {
-                ctx.builder.getInt32(0),
-                ctx.builder.getInt32(find(members.begin(), members.end(), ((Identifier *)right)->name) - members.begin())
-            }
-        );
-        if(ctx.isleft)
+            {ctx.builder.getInt32(0),
+             ctx.builder.getInt32(find(members.begin(), members.end(), ((Identifier *)right)->name) - members.begin())});
+        if (ctx.isleft)
             return var;
+        else if (var->getType()->getPointerElementType()->isArrayTy())
+            return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
         else
-            if(var->getType()->getPointerElementType()->isArrayTy())
-                return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
-            else
-                return ctx.builder.CreateLoad(var);
-    case OP_TO:
-        
+            return ctx.builder.CreateLoad(var);
     default:
         return nullptr;
     }
