@@ -72,15 +72,14 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 %token  CHAR SHORT INT LONG FLOAT DOUBLE STRUCT ENUM UNION VOID
 %token  AUTO REGISTER EXTERN CONST UNSIGNED SIGNED VOLATILE STATIC
 %token  IF ELSE FOR DO WHILE BREAK CONTINUE SWITCH CASE DEFAULT GOTO
-%token  ADD SUB MUL DIV MOD
+%token  ADD SUB MULORDEREFERENCE DIV MOD
         ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN
-        AND OR XOR NOT SL SR
+        ANDORADDRESSOF OR XOR NOT SL SR
         ANDASSIGN ORASSIGN XORASSIGN SLASSIGN SRASSIGN
         ANDAND OROR NOTNOT LT GT GEQ LEQ NEQ EQ
         ASSIGN
         INC DEC
         POSITIVE NEGATIVE
-%token  DEREFERENCE ADDRESSOF
 %token  TYPEDEF SIZEOF RETURN DOTDOTDOT
 %token  DELIM COMMA COLON QUESTION DOT TO LP RP LB RB LC RC
 %token<num> NUMCHAR NUMSHORT NUMINT NUMLONG NUMFLOAT NUMDOUBLE
@@ -119,12 +118,12 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 %left ANDAND
 %left OR
 %left XOR
-%left AND
+%left ANDORADDRESSOF
 %left EQ NEQ
 %left GT GEQ LT LEQ
 %left SL SR
 %left ADD SUB
-%left MUL DIV MOD
+%left MULORDEREFERENCE DIV MOD
 %right INC DEC NOTNOT NOT SIZEOF
 
 %start program
@@ -346,14 +345,14 @@ direct-declarator           : IDENTIFIER { $$ = new Identifier(*$1); delete $1; 
                             | direct-declarator LP                 RP { $$ = new FunctionDeclaration(nullptr, (Identifier *)$1, nullptr, nullptr); }
                             ;
 
-pointer			            : DEREFERENCE type-qualifier-list { $$ = $2; $$->pcnt++; }
-                            | DEREFERENCE { $$ = new Qualifier(1); }
-                            | DEREFERENCE type-qualifier-list pointer {
+pointer			            : MULORDEREFERENCE type-qualifier-list { $$ = $2; $$->pcnt++; }
+                            | MULORDEREFERENCE { $$ = new Qualifier(1); }
+                            | MULORDEREFERENCE type-qualifier-list pointer {
                                 $$ = $2;
                                 $$->pcnt += $3->pcnt + 1;
                                 delete $3;
                             }
-                            | DEREFERENCE pointer { $$ = $2; $$->pcnt++; }
+                            | MULORDEREFERENCE pointer { $$ = $2; $$->pcnt++; }
                             ;
 
 type-qualifier-list	        : type-qualifier { $$ = $1; }
@@ -548,7 +547,7 @@ exclusive-or-exp	        : and-exp { $$ = $1; }
                             ;
 
 and-exp			            : equality-exp { $$ = $1; }
-                            | and-exp AND equality-exp { $$ = calculate($1, $3, OP_AND); }
+                            | and-exp ANDORADDRESSOF equality-exp { $$ = calculate($1, $3, OP_AND); }
                             ;
 
 equality-exp		        : relational-exp { $$ = $1;}
@@ -574,7 +573,7 @@ additive-exp		        : mult-exp { $$ = $1; }
                             ;
 
 mult-exp		            : cast-exp { $$ = $1; }
-                            | mult-exp MUL cast-exp { $$ = calculate($1, $3, OP_MUL); }
+                            | mult-exp MULORDEREFERENCE cast-exp { $$ = calculate($1, $3, OP_MUL); }
                             | mult-exp DIV cast-exp { $$ = calculate($1, $3, OP_DIV); }
                             | mult-exp MOD cast-exp { $$ = calculate($1, $3, OP_MOD); }
                             ;
@@ -599,10 +598,10 @@ unary-exp		            : postfix-exp { $$ = $1; }
                             | SIZEOF LP type-name RP // TODO: sizeof
                             ;
 
-unary-operator              : ADDRESSOF     { $$ = OP_ADDRESSOF; }
-                            | DEREFERENCE   { $$ = OP_DEREFERENCE; }
+unary-operator              : ANDORADDRESSOF     { $$ = OP_ADDRESSOF; }
+                            | MULORDEREFERENCE   { $$ = OP_DEREFERENCE; }
                             | POSITIVE      { $$ = OP_POSITIVE; }
-                            | NEGATIVE      { $$ = OP_NEGTIVE; }
+                            | NEGATIVE      { $$ = OP_NEGATIVE; }
                             | NOT           { $$ = OP_NOT; }
                             | NOTNOT        { $$ = OP_NOTNOT; }
                             ;
@@ -689,9 +688,9 @@ static Expression *calculate(Expression *a, enum op_type op)
 
         switch(op)
         {
-        case ADDRESSOF:
+        case OP_ADDRESSOF:
             yyerror("lvalue required as unary '&' operand");
-        case DEREFERENCE:
+        case OP_DEREFERENCE:
             yyerror("invalid type argument of unary '*' operand");
         case POSITIVE:
             if(isfloatpoint)
@@ -699,19 +698,19 @@ static Expression *calculate(Expression *a, enum op_type op)
             else
                 num.longValue = +((Number *)a)->longView();
             break;
-        case NEGATIVE:
+        case OP_NEGATIVE:
             if(isfloatpoint)
                 num.doubleValue = -((Number *)a)->doubleView();
             else
                 num.longValue = -((Number *)a)->longView();
             break;
-        case NOT:
+        case OP_NOT:
             if(isfloatpoint)
                 yyerror("logical not is not supported for double type");
             else
                 num.longValue = ~((Number *)a)->longView();
             break;
-        case NOTNOT:
+        case OP_NOTNOT:
             if(isfloatpoint)
                 num.doubleValue = !((Number *)a)->doubleView();
             else
@@ -857,8 +856,6 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
             default:
                 yyerror("not supported operator for long type");
             }
-
-            cout << v1 << " " << v2 << " " << num.longValue << endl;
 
             return new Number(num, new LongType(), VAL_LONG);
         }

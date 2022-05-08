@@ -104,10 +104,10 @@
    74                  | direct-declarator LP param-type-list RP
    75                  | direct-declarator LP RP
 
-   76 pointer: DEREFERENCE type-qualifier-list
-   77        | DEREFERENCE
-   78        | DEREFERENCE type-qualifier-list pointer
-   79        | DEREFERENCE pointer
+   76 pointer: MULORDEREFERENCE type-qualifier-list
+   77        | MULORDEREFERENCE
+   78        | MULORDEREFERENCE type-qualifier-list pointer
+   79        | MULORDEREFERENCE pointer
 
    80 type-qualifier-list: type-qualifier
    81                    | type-qualifier-list type-qualifier
@@ -228,7 +228,7 @@
   170                 | exclusive-or-exp XOR and-exp
 
   171 and-exp: equality-exp
-  172        | and-exp AND equality-exp
+  172        | and-exp ANDORADDRESSOF equality-exp
 
   173 equality-exp: relational-exp
   174             | equality-exp EQ relational-exp
@@ -249,7 +249,7 @@
   186             | additive-exp SUB mult-exp
 
   187 mult-exp: cast-exp
-  188         | mult-exp MUL cast-exp
+  188         | mult-exp MULORDEREFERENCE cast-exp
   189         | mult-exp DIV cast-exp
   190         | mult-exp MOD cast-exp
 
@@ -263,8 +263,8 @@
   197          | SIZEOF unary-exp
   198          | SIZEOF LP type-name RP
 
-  199 unary-operator: ADDRESSOF
-  200               | DEREFERENCE
+  199 unary-operator: ANDORADDRESSOF
+  200               | MULORDEREFERENCE
   201               | POSITIVE
   202               | NEGATIVE
   203               | NOT
@@ -332,7 +332,7 @@
     GOTO (286) 140
     ADD (287) 185
     SUB (288) 186
-    MUL (289) 188
+    MULORDEREFERENCE (289) 76 77 78 79 188 200
     DIV (290) 189
     MOD (291) 190
     ADDASSIGN (292) 153
@@ -340,7 +340,7 @@
     MULASSIGN (294) 150
     DIVASSIGN (295) 151
     MODASSIGN (296) 152
-    AND (297) 172
+    ANDORADDRESSOF (297) 172 199
     OR (298) 168
     XOR (299) 170
     NOT (300) 203
@@ -365,235 +365,233 @@
     DEC (319) 195 212
     POSITIVE (320) 201
     NEGATIVE (321) 202
-    DEREFERENCE (322) 76 77 78 79 200
-    ADDRESSOF (323) 199
-    TYPEDEF (324) 24
-    SIZEOF (325) 197 198
-    RETURN (326) 143 144
-    DOTDOTDOT (327) 83
-    DELIM (328) 10 11 50 119 120 131 132 133 134 135 136 137 138 139 140 141 142 143 144
-    COMMA (329) 21 56 64 83 85 90 93 95 146 218
-    COLON (330) 58 59 116 117 118 161
-    QUESTION (331) 161
-    DOT (332) 209
-    TO (333) 210
-    LP (334) 70 73 74 75 101 106 107 108 109 127 128 129 130 131 132 133 134 135 136 137 138 139 192 198 207 208 216
-    RP (335) 70 73 74 75 101 106 107 108 109 127 128 129 130 131 132 133 134 135 136 137 138 139 192 198 207 208 216
-    LB (336) 71 72 102 103 104 105 206
-    RB (337) 71 72 102 103 104 105 206
-    LC (338) 43 44 60 61 92 93 121 122 123 124
-    RC (339) 43 44 60 61 92 93 121 122 123 124
-    NUMCHAR <num> (340) 220
-    NUMSHORT <num> (341) 221
-    NUMINT <num> (342) 222
-    NUMLONG <num> (343) 223
-    NUMFLOAT <num> (344) 224
-    NUMDOUBLE <num> (345) 225
-    STRING <stringValue> (346) 215
-    IDENTIFIER <stringValue> (347) 43 45 60 62 65 66 69 89 90 116 140 209 210 213
-    TYPENAME <stringValue> (348) 40
+    TYPEDEF (322) 24
+    SIZEOF (323) 197 198
+    RETURN (324) 143 144
+    DOTDOTDOT (325) 83
+    DELIM (326) 10 11 50 119 120 131 132 133 134 135 136 137 138 139 140 141 142 143 144
+    COMMA (327) 21 56 64 83 85 90 93 95 146 218
+    COLON (328) 58 59 116 117 118 161
+    QUESTION (329) 161
+    DOT (330) 209
+    TO (331) 210
+    LP (332) 70 73 74 75 101 106 107 108 109 127 128 129 130 131 132 133 134 135 136 137 138 139 192 198 207 208 216
+    RP (333) 70 73 74 75 101 106 107 108 109 127 128 129 130 131 132 133 134 135 136 137 138 139 192 198 207 208 216
+    LB (334) 71 72 102 103 104 105 206
+    RB (335) 71 72 102 103 104 105 206
+    LC (336) 43 44 60 61 92 93 121 122 123 124
+    RC (337) 43 44 60 61 92 93 121 122 123 124
+    NUMCHAR <num> (338) 220
+    NUMSHORT <num> (339) 221
+    NUMINT <num> (340) 222
+    NUMLONG <num> (341) 223
+    NUMFLOAT <num> (342) 224
+    NUMDOUBLE <num> (343) 225
+    STRING <stringValue> (344) 215
+    IDENTIFIER <stringValue> (345) 43 45 60 62 65 66 69 89 90 116 140 209 210 213
+    TYPENAME <stringValue> (346) 40
 
 
 非终结语词，附有它们出现处的规则
 
-    $accept (94)
+    $accept (92)
         on left: 0
-    program <program> (95)
+    program <program> (93)
         on left: 1
         on right: 0
-    translation-unit <declaration> (96)
+    translation-unit <declaration> (94)
         on left: 2 3
         on right: 1 3
-    external-decl <declaration> (97)
+    external-decl <declaration> (95)
         on left: 4 5
         on right: 2 3
-    function-definition <functionDeclaration> (98)
+    function-definition <functionDeclaration> (96)
         on left: 6 7 8 9
         on right: 4
-    decl <declaration> (99)
+    decl <declaration> (97)
         on left: 10 11
         on right: 5 12 13
-    decl-list <vars> (100)
+    decl-list <vars> (98)
         on left: 12 13
         on right: 6 8 13 121 123
-    decl-specs <type> (101)
+    decl-specs <type> (99)
         on left: 14 15 16 17 18 19
         on right: 6 7 10 11 15 17 19 86 87 88
-    init-declarator-list <ids> (102)
+    init-declarator-list <ids> (100)
         on left: 20 21
         on right: 10 21
-    init-declarator <identifier> (103)
+    init-declarator <identifier> (101)
         on left: 22 23
         on right: 20 21
-    storage-class-specifier (104)
+    storage-class-specifier (102)
         on left: 24 25 26 27 28
         on right: 14 15
-    type-spec <type> (105)
+    type-spec <type> (103)
         on left: 29 30 31 32 33 34 35 36 37 38 39 40
         on right: 16 17 51 52
-    type-qualifier <qual> (106)
+    type-qualifier <qual> (104)
         on left: 41 42
         on right: 18 19 53 54 80 81
-    struct-or-union-spec <aggrtype> (107)
+    struct-or-union-spec <aggrtype> (105)
         on left: 43 44 45
         on right: 38
-    struct-or-union <aggrtype> (108)
+    struct-or-union <aggrtype> (106)
         on left: 46 47
         on right: 43 44 45
-    struct-decl-list <members> (109)
+    struct-decl-list <members> (107)
         on left: 48 49
         on right: 43 44 49
-    struct-decl <member> (110)
+    struct-decl <member> (108)
         on left: 50
         on right: 48 49
-    spec-qualifier-list <type> (111)
+    spec-qualifier-list <type> (109)
         on left: 51 52 53 54
         on right: 50 51 53 96 97
-    struct-declarator-list <ids> (112)
+    struct-declarator-list <ids> (110)
         on left: 55 56
         on right: 50 56
-    struct-declarator <identifier> (113)
+    struct-declarator <identifier> (111)
         on left: 57 58 59
         on right: 55 56
-    enum-spec (114)
+    enum-spec (112)
         on left: 60 61 62
         on right: 39
-    enumerator-list (115)
+    enumerator-list (113)
         on left: 63 64
         on right: 60 61 64
-    enumerator (116)
+    enumerator (114)
         on left: 65 66
         on right: 63 64
-    declarator <node> (117)
+    declarator <node> (115)
         on left: 67 68
         on right: 6 7 8 9 22 23 57 58 70 86
-    direct-declarator <node> (118)
+    direct-declarator <node> (116)
         on left: 69 70 71 72 73 74 75
         on right: 67 68 71 72 73 74 75
-    pointer <qual> (119)
+    pointer <qual> (117)
         on left: 76 77 78 79
         on right: 67 78 79 98 99
-    type-qualifier-list <qual> (120)
+    type-qualifier-list <qual> (118)
         on left: 80 81
         on right: 76 78 81
-    param-type-list <param> (121)
+    param-type-list <param> (119)
         on left: 82 83
         on right: 74 106 107
-    param-list <param> (122)
+    param-list <param> (120)
         on left: 84 85
         on right: 82 83 85
-    param-decl <param> (123)
+    param-decl <param> (121)
         on left: 86 87 88
         on right: 84 85
-    id-list <ids> (124)
+    id-list <ids> (122)
         on left: 89 90
         on right: 73 90
-    initializer <expression> (125)
+    initializer <expression> (123)
         on left: 91 92 93
         on right: 23 94 95
-    initializer-list <expression> (126)
+    initializer-list <expression> (124)
         on left: 94 95
         on right: 92 93 95
-    type-name (127)
+    type-name (125)
         on left: 96 97
         on right: 192 198
-    abstract-declarator (128)
+    abstract-declarator (126)
         on left: 98 99 100
         on right: 87 96 101
-    direct-abstract-declarator (129)
+    direct-abstract-declarator (127)
         on left: 101 102 103 104 105 106 107 108 109
         on right: 99 100 102 104 106 108
-    stat <statement> (130)
+    stat <statement> (128)
         on left: 110 111 112 113 114 115
         on right: 116 117 118 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
-    labeled-stat <statement> (131)
+    labeled-stat <statement> (129)
         on left: 116 117 118
         on right: 110
-    exp-stat <expressionStatement> (132)
+    exp-stat <expressionStatement> (130)
         on left: 119 120
         on right: 111
-    compound-stat <compoundStatement> (133)
+    compound-stat <compoundStatement> (131)
         on left: 121 122 123 124
         on right: 6 7 8 9 112
-    stat-list <statement> (134)
+    stat-list <statement> (132)
         on left: 125 126
         on right: 121 122 126
-    selection-stat <selectionStatement> (135)
+    selection-stat <selectionStatement> (133)
         on left: 127 128 129
         on right: 113
-    iteration-stat <iterationStatement> (136)
+    iteration-stat <iterationStatement> (134)
         on left: 130 131 132 133 134 135 136 137 138 139
         on right: 114
-    jump-stat <statement> (137)
+    jump-stat <statement> (135)
         on left: 140 141 142 143 144
         on right: 115
-    exp <expression> (138)
+    exp <expression> (136)
         on left: 145 146
         on right: 119 127 128 129 130 131 132 133 134 135 136 137 138 143 146 161 206 216
-    assignment-exp <expression> (139)
+    assignment-exp <expression> (137)
         on left: 147 148
         on right: 91 145 146 148 217 218
-    assignment-operator <op> (140)
+    assignment-operator <op> (138)
         on left: 149 150 151 152 153 154 155 156 157 158 159
         on right: 148
-    conditional-exp <expression> (141)
+    conditional-exp <expression> (139)
         on left: 160 161
         on right: 147 161 162
-    const-exp <number> (142)
+    const-exp <number> (140)
         on left: 162
         on right: 58 59 66 71 102 103 117
-    logical-or-exp <expression> (143)
+    logical-or-exp <expression> (141)
         on left: 163 164
         on right: 160 161 164
-    logical-and-exp <expression> (144)
+    logical-and-exp <expression> (142)
         on left: 165 166
         on right: 163 164 166
-    inclusive-or-exp <expression> (145)
+    inclusive-or-exp <expression> (143)
         on left: 167 168
         on right: 165 166 168
-    exclusive-or-exp <expression> (146)
+    exclusive-or-exp <expression> (144)
         on left: 169 170
         on right: 167 168 170
-    and-exp <expression> (147)
+    and-exp <expression> (145)
         on left: 171 172
         on right: 169 170 172
-    equality-exp <expression> (148)
+    equality-exp <expression> (146)
         on left: 173 174 175
         on right: 171 172 174 175
-    relational-exp <expression> (149)
+    relational-exp <expression> (147)
         on left: 176 177 178 179 180
         on right: 173 174 175 177 178 179 180
-    shift-expression <expression> (150)
+    shift-expression <expression> (148)
         on left: 181 182 183
         on right: 176 177 178 179 180 182 183
-    additive-exp <expression> (151)
+    additive-exp <expression> (149)
         on left: 184 185 186
         on right: 181 182 183 185 186
-    mult-exp <expression> (152)
+    mult-exp <expression> (150)
         on left: 187 188 189 190
         on right: 184 185 186 188 189 190
-    cast-exp <expression> (153)
+    cast-exp <expression> (151)
         on left: 191 192
         on right: 187 188 189 190 192 196
-    unary-exp <expression> (154)
+    unary-exp <expression> (152)
         on left: 193 194 195 196 197 198
         on right: 148 191 194 195 197
-    unary-operator <op> (155)
+    unary-operator <op> (153)
         on left: 199 200 201 202 203 204
         on right: 196
-    postfix-exp <expression> (156)
+    postfix-exp <expression> (154)
         on left: 205 206 207 208 209 210 211 212
         on right: 193 206 207 208 209 210 211 212
-    primary-exp <expression> (157)
+    primary-exp <expression> (155)
         on left: 213 214 215 216
         on right: 205
-    argument-exp-list <exprs> (158)
+    argument-exp-list <exprs> (156)
         on left: 217 218
         on right: 207 218
-    const <number> (159)
+    const <number> (157)
         on left: 219
         on right: 214
-    number <number> (160)
+    number <number> (158)
         on left: 220 221 222 223 224 225
         on right: 219
 
@@ -602,29 +600,29 @@
 
     0 $accept: . program $end
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    AUTO         偏移，并进入状态 11
-    REGISTER     偏移，并进入状态 12
-    EXTERN       偏移，并进入状态 13
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    STATIC       偏移，并进入状态 18
-    DEREFERENCE  偏移，并进入状态 19
-    TYPEDEF      偏移，并进入状态 20
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    AUTO              偏移，并进入状态 11
+    REGISTER          偏移，并进入状态 12
+    EXTERN            偏移，并进入状态 13
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    STATIC            偏移，并进入状态 18
+    MULORDEREFERENCE  偏移，并进入状态 19
+    TYPEDEF           偏移，并进入状态 20
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
+    TYPENAME          偏移，并进入状态 23
 
     program                  转到状态 24
     translation-unit         转到状态 25
@@ -774,14 +772,14 @@
 
 状态 19
 
-   76 pointer: DEREFERENCE . type-qualifier-list
-   77        | DEREFERENCE .
-   78        | DEREFERENCE . type-qualifier-list pointer
-   79        | DEREFERENCE . pointer
+   76 pointer: MULORDEREFERENCE . type-qualifier-list
+   77        | MULORDEREFERENCE .
+   78        | MULORDEREFERENCE . type-qualifier-list pointer
+   79        | MULORDEREFERENCE . pointer
 
-    CONST        偏移，并进入状态 14
-    VOLATILE     偏移，并进入状态 17
-    DEREFERENCE  偏移，并进入状态 19
+    CONST             偏移，并进入状态 14
+    VOLATILE          偏移，并进入状态 17
+    MULORDEREFERENCE  偏移，并进入状态 19
 
     $default  使用规则 77 以归约 (pointer)
 
@@ -801,9 +799,9 @@
 
    70 direct-declarator: LP . declarator RP
 
-    DEREFERENCE  偏移，并进入状态 19
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
+    MULORDEREFERENCE  偏移，并进入状态 19
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
 
     declarator         转到状态 44
     direct-declarator  转到状态 37
@@ -836,29 +834,29 @@
     1 program: translation-unit .
     3 translation-unit: translation-unit . external-decl
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    AUTO         偏移，并进入状态 11
-    REGISTER     偏移，并进入状态 12
-    EXTERN       偏移，并进入状态 13
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    STATIC       偏移，并进入状态 18
-    DEREFERENCE  偏移，并进入状态 19
-    TYPEDEF      偏移，并进入状态 20
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    AUTO              偏移，并进入状态 11
+    REGISTER          偏移，并进入状态 12
+    EXTERN            偏移，并进入状态 13
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    STATIC            偏移，并进入状态 18
+    MULORDEREFERENCE  偏移，并进入状态 19
+    TYPEDEF           偏移，并进入状态 20
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
+    TYPENAME          偏移，并进入状态 23
 
     $default  使用规则 1 以归约 (program)
 
@@ -905,10 +903,10 @@
    10 decl: decl-specs . init-declarator-list DELIM
    11     | decl-specs . DELIM
 
-    DEREFERENCE  偏移，并进入状态 19
-    DELIM        偏移，并进入状态 47
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
+    MULORDEREFERENCE  偏移，并进入状态 19
+    DELIM             偏移，并进入状态 47
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
 
     init-declarator-list  转到状态 48
     init-declarator       转到状态 49
@@ -1145,20 +1143,20 @@
 
 状态 42
 
-   79 pointer: DEREFERENCE pointer .
+   79 pointer: MULORDEREFERENCE pointer .
 
     $default  使用规则 79 以归约 (pointer)
 
 
 状态 43
 
-   76 pointer: DEREFERENCE type-qualifier-list .
-   78        | DEREFERENCE type-qualifier-list . pointer
+   76 pointer: MULORDEREFERENCE type-qualifier-list .
+   78        | MULORDEREFERENCE type-qualifier-list . pointer
    81 type-qualifier-list: type-qualifier-list . type-qualifier
 
-    CONST        偏移，并进入状态 14
-    VOLATILE     偏移，并进入状态 17
-    DEREFERENCE  偏移，并进入状态 19
+    CONST             偏移，并进入状态 14
+    VOLATILE          偏移，并进入状态 17
+    MULORDEREFERENCE  偏移，并进入状态 19
 
     $default  使用规则 76 以归约 (pointer)
 
@@ -1322,58 +1320,58 @@
   123              | LC . decl-list RC
   124              | LC . RC
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    AUTO         偏移，并进入状态 11
-    REGISTER     偏移，并进入状态 12
-    EXTERN       偏移，并进入状态 13
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    STATIC       偏移，并进入状态 18
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    TYPEDEF      偏移，并进入状态 20
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    RC           偏移，并进入状态 104
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    AUTO              偏移，并进入状态 11
+    REGISTER          偏移，并进入状态 12
+    EXTERN            偏移，并进入状态 13
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    STATIC            偏移，并进入状态 18
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    TYPEDEF           偏移，并进入状态 20
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    RC                偏移，并进入状态 104
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
+    TYPENAME          偏移，并进入状态 23
 
     decl                     转到状态 57
     decl-list                转到状态 113
@@ -1464,10 +1462,10 @@
    10 decl: decl-specs . init-declarator-list DELIM
    11     | decl-specs . DELIM
 
-    DEREFERENCE  偏移，并进入状态 19
-    DELIM        偏移，并进入状态 47
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
+    MULORDEREFERENCE  偏移，并进入状态 19
+    DELIM             偏移，并进入状态 47
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
 
     init-declarator-list  转到状态 48
     init-declarator       转到状态 49
@@ -1530,25 +1528,25 @@
    71 direct-declarator: direct-declarator LB . const-exp RB
    72                  | direct-declarator LB . RB
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RB           偏移，并进入状态 152
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RB                偏移，并进入状态 152
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
     const-exp         转到状态 155
@@ -1631,7 +1629,7 @@
 
 状态 69
 
-   78 pointer: DEREFERENCE type-qualifier-list pointer .
+   78 pointer: MULORDEREFERENCE type-qualifier-list pointer .
 
     $default  使用规则 78 以归约 (pointer)
 
@@ -1654,9 +1652,9 @@
 
    21 init-declarator-list: init-declarator-list COMMA . init-declarator
 
-    DEREFERENCE  偏移，并进入状态 19
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
+    MULORDEREFERENCE  偏移，并进入状态 19
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
 
     init-declarator    转到状态 161
     declarator         转到状态 144
@@ -1668,25 +1666,25 @@
 
    23 init-declarator: declarator ASSIGN . initializer
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 162
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 162
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     initializer       转到状态 163
     assignment-exp    转到状态 164
@@ -1859,10 +1857,10 @@
 
    50 struct-decl: spec-qualifier-list . struct-declarator-list DELIM
 
-    DEREFERENCE  偏移，并进入状态 19
-    COLON        偏移，并进入状态 170
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
+    MULORDEREFERENCE  偏移，并进入状态 19
+    COLON             偏移，并进入状态 170
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
 
     struct-declarator-list  转到状态 171
     struct-declarator       转到状态 172
@@ -1927,37 +1925,37 @@
 
   131 iteration-stat: DO . stat WHILE LP exp RP DELIM
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 177
     labeled-stat      转到状态 115
@@ -2020,24 +2018,24 @@
 
   117 labeled-stat: CASE . const-exp COLON stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
     const-exp         转到状态 182
@@ -2076,40 +2074,54 @@
 
 状态 92
 
+  200 unary-operator: MULORDEREFERENCE .
+
+    $default  使用规则 200 以归约 (unary-operator)
+
+
+状态 93
+
+  199 unary-operator: ANDORADDRESSOF .
+
+    $default  使用规则 199 以归约 (unary-operator)
+
+
+状态 94
+
   203 unary-operator: NOT .
 
     $default  使用规则 203 以归约 (unary-operator)
 
 
-状态 93
+状态 95
 
   204 unary-operator: NOTNOT .
 
     $default  使用规则 204 以归约 (unary-operator)
 
 
-状态 94
+状态 96
 
   194 unary-exp: INC . unary-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 185
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 185
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     unary-exp       转到状态 186
     unary-operator  转到状态 137
@@ -2119,28 +2131,28 @@
     number          转到状态 141
 
 
-状态 95
+状态 97
 
   195 unary-exp: DEC . unary-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 185
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 185
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     unary-exp       转到状态 187
     unary-operator  转到状态 137
@@ -2150,32 +2162,18 @@
     number          转到状态 141
 
 
-状态 96
+状态 98
 
   201 unary-operator: POSITIVE .
 
     $default  使用规则 201 以归约 (unary-operator)
 
 
-状态 97
+状态 99
 
   202 unary-operator: NEGATIVE .
 
     $default  使用规则 202 以归约 (unary-operator)
-
-
-状态 98
-
-  200 unary-operator: DEREFERENCE .
-
-    $default  使用规则 200 以归约 (unary-operator)
-
-
-状态 99
-
-  199 unary-operator: ADDRESSOF .
-
-    $default  使用规则 199 以归约 (unary-operator)
 
 
 状态 100
@@ -2183,24 +2181,24 @@
   197 unary-exp: SIZEOF . unary-exp
   198          | SIZEOF . LP type-name RP
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 188
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 188
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     unary-exp       转到状态 189
     unary-operator  转到状态 137
@@ -2215,25 +2213,25 @@
   143 jump-stat: RETURN . exp DELIM
   144          | RETURN . DELIM
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    DELIM        偏移，并进入状态 190
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    DELIM             偏移，并进入状态 190
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 191
     assignment-exp    转到状态 123
@@ -2269,39 +2267,39 @@
   192 cast-exp: LP . type-name RP cast-exp
   216 primary-exp: LP . exp RP
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
+    TYPENAME          偏移，并进入状态 23
 
     type-spec             转到状态 76
     type-qualifier        转到状态 77
@@ -2404,58 +2402,58 @@
   121 compound-stat: LC decl-list . stat-list RC
   123              | LC decl-list . RC
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    AUTO         偏移，并进入状态 11
-    REGISTER     偏移，并进入状态 12
-    EXTERN       偏移，并进入状态 13
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    STATIC       偏移，并进入状态 18
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    TYPEDEF      偏移，并进入状态 20
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    RC           偏移，并进入状态 196
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    AUTO              偏移，并进入状态 11
+    REGISTER          偏移，并进入状态 12
+    EXTERN            偏移，并进入状态 13
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    STATIC            偏移，并进入状态 18
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    TYPEDEF           偏移，并进入状态 20
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    RC                偏移，并进入状态 196
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
+    TYPENAME          偏移，并进入状态 23
 
     decl                     转到状态 142
     decl-specs               转到状态 59
@@ -2528,38 +2526,38 @@
   122 compound-stat: LC stat-list . RC
   126 stat-list: stat-list . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    RC           偏移，并进入状态 198
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    RC                偏移，并进入状态 198
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 199
     labeled-stat      转到状态 115
@@ -2679,9 +2677,9 @@
 状态 129
 
   169 exclusive-or-exp: and-exp .
-  172 and-exp: and-exp . AND equality-exp
+  172 and-exp: and-exp . ANDORADDRESSOF equality-exp
 
-    AND  偏移，并进入状态 207
+    ANDORADDRESSOF  偏移，并进入状态 207
 
     $default  使用规则 169 以归约 (exclusive-or-exp)
 
@@ -2741,13 +2739,13 @@
 状态 134
 
   184 additive-exp: mult-exp .
-  188 mult-exp: mult-exp . MUL cast-exp
+  188 mult-exp: mult-exp . MULORDEREFERENCE cast-exp
   189         | mult-exp . DIV cast-exp
   190         | mult-exp . MOD cast-exp
 
-    MUL  偏移，并进入状态 218
-    DIV  偏移，并进入状态 219
-    MOD  偏移，并进入状态 220
+    MULORDEREFERENCE  偏移，并进入状态 218
+    DIV               偏移，并进入状态 219
+    MOD               偏移，并进入状态 220
 
     $default  使用规则 184 以归约 (additive-exp)
 
@@ -2785,24 +2783,24 @@
 
   196 unary-exp: unary-operator . cast-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     cast-exp        转到状态 233
     unary-exp       转到状态 156
@@ -2899,10 +2897,10 @@
    87           | decl-specs . abstract-declarator
    88           | decl-specs .
 
-    DEREFERENCE  偏移，并进入状态 19
-    LP           偏移，并进入状态 240
-    LB           偏移，并进入状态 241
-    IDENTIFIER   偏移，并进入状态 22
+    MULORDEREFERENCE  偏移，并进入状态 19
+    LP                偏移，并进入状态 240
+    LB                偏移，并进入状态 241
+    IDENTIFIER        偏移，并进入状态 22
 
     $default  使用规则 88 以归约 (param-decl)
 
@@ -2986,24 +2984,24 @@
 
    66 enumerator: IDENTIFIER ASSIGN . const-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
     const-exp         转到状态 251
@@ -3063,25 +3061,25 @@
    92 initializer: LC . initializer-list RC
    93            | LC . initializer-list COMMA RC
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 162
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 162
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     initializer       转到状态 254
     initializer-list  转到状态 255
@@ -3159,24 +3157,24 @@
 
    59 struct-declarator: COLON . const-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
     const-exp         转到状态 256
@@ -3261,24 +3259,24 @@
   127 selection-stat: IF LP . exp RP stat
   128               | IF LP . exp RP stat ELSE stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 261
     assignment-exp    转到状态 123
@@ -3313,25 +3311,25 @@
   138               | FOR LP . DELIM DELIM exp RP stat
   139               | FOR LP . DELIM DELIM RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    DELIM        偏移，并进入状态 262
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    DELIM             偏移，并进入状态 262
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 263
     assignment-exp    转到状态 123
@@ -3366,24 +3364,24 @@
 
   130 iteration-stat: WHILE LP . exp RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 265
     assignment-exp    转到状态 123
@@ -3425,24 +3423,24 @@
 
   129 selection-stat: SWITCH LP . exp RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 266
     assignment-exp    转到状态 123
@@ -3477,37 +3475,37 @@
 
   118 labeled-stat: DEFAULT COLON . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 268
     labeled-stat      转到状态 115
@@ -3549,24 +3547,24 @@
 
   216 primary-exp: LP . exp RP
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 194
     assignment-exp    转到状态 123
@@ -3609,39 +3607,39 @@
   198 unary-exp: SIZEOF LP . type-name RP
   216 primary-exp: LP . exp RP
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
+    TYPENAME          偏移，并进入状态 23
 
     type-spec             转到状态 76
     type-qualifier        转到状态 77
@@ -3700,9 +3698,9 @@
    96 type-name: spec-qualifier-list . abstract-declarator
    97          | spec-qualifier-list .
 
-    DEREFERENCE  偏移，并进入状态 19
-    LP           偏移，并进入状态 272
-    LB           偏移，并进入状态 241
+    MULORDEREFERENCE  偏移，并进入状态 19
+    LP                偏移，并进入状态 272
+    LB                偏移，并进入状态 241
 
     $default  使用规则 97 以归约 (type-name)
 
@@ -3731,37 +3729,37 @@
 
   116 labeled-stat: IDENTIFIER COLON . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 277
     labeled-stat      转到状态 115
@@ -3804,38 +3802,38 @@
   121 compound-stat: LC decl-list stat-list . RC
   126 stat-list: stat-list . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    RC           偏移，并进入状态 278
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    RC                偏移，并进入状态 278
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 199
     labeled-stat      转到状态 115
@@ -3891,24 +3889,24 @@
 
   146 exp: exp COMMA . assignment-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     assignment-exp    转到状态 279
     conditional-exp   转到状态 124
@@ -3935,24 +3933,24 @@
 
   164 logical-or-exp: logical-or-exp OROR . logical-and-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     logical-and-exp   转到状态 280
     inclusive-or-exp  转到状态 127
@@ -3976,24 +3974,24 @@
 
   161 conditional-exp: logical-or-exp QUESTION . exp COLON conditional-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 281
     assignment-exp    转到状态 123
@@ -4021,24 +4019,24 @@
 
   166 logical-and-exp: logical-and-exp ANDAND . inclusive-or-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     inclusive-or-exp  转到状态 282
     exclusive-or-exp  转到状态 128
@@ -4061,24 +4059,24 @@
 
   168 inclusive-or-exp: inclusive-or-exp OR . exclusive-or-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exclusive-or-exp  转到状态 283
     and-exp           转到状态 129
@@ -4100,24 +4098,24 @@
 
   170 exclusive-or-exp: exclusive-or-exp XOR . and-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     and-exp           转到状态 284
     equality-exp      转到状态 130
@@ -4136,26 +4134,26 @@
 
 状态 207
 
-  172 and-exp: and-exp AND . equality-exp
+  172 and-exp: and-exp ANDORADDRESSOF . equality-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     equality-exp      转到状态 285
     relational-exp    转到状态 131
@@ -4175,24 +4173,24 @@
 
   175 equality-exp: equality-exp NEQ . relational-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     relational-exp    转到状态 286
     shift-expression  转到状态 132
@@ -4211,24 +4209,24 @@
 
   174 equality-exp: equality-exp EQ . relational-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     relational-exp    转到状态 287
     shift-expression  转到状态 132
@@ -4247,24 +4245,24 @@
 
   177 relational-exp: relational-exp LT . shift-expression
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     shift-expression  转到状态 288
     additive-exp      转到状态 133
@@ -4282,24 +4280,24 @@
 
   178 relational-exp: relational-exp GT . shift-expression
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     shift-expression  转到状态 289
     additive-exp      转到状态 133
@@ -4317,24 +4315,24 @@
 
   180 relational-exp: relational-exp GEQ . shift-expression
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     shift-expression  转到状态 290
     additive-exp      转到状态 133
@@ -4352,24 +4350,24 @@
 
   179 relational-exp: relational-exp LEQ . shift-expression
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     shift-expression  转到状态 291
     additive-exp      转到状态 133
@@ -4387,24 +4385,24 @@
 
   182 shift-expression: shift-expression SL . additive-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     additive-exp    转到状态 292
     mult-exp        转到状态 134
@@ -4421,24 +4419,24 @@
 
   183 shift-expression: shift-expression SR . additive-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     additive-exp    转到状态 293
     mult-exp        转到状态 134
@@ -4455,24 +4453,24 @@
 
   185 additive-exp: additive-exp ADD . mult-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     mult-exp        转到状态 294
     cast-exp        转到状态 135
@@ -4488,24 +4486,24 @@
 
   186 additive-exp: additive-exp SUB . mult-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     mult-exp        转到状态 295
     cast-exp        转到状态 135
@@ -4519,26 +4517,26 @@
 
 状态 218
 
-  188 mult-exp: mult-exp MUL . cast-exp
+  188 mult-exp: mult-exp MULORDEREFERENCE . cast-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     cast-exp        转到状态 296
     unary-exp       转到状态 156
@@ -4553,24 +4551,24 @@
 
   189 mult-exp: mult-exp DIV . cast-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     cast-exp        转到状态 297
     unary-exp       转到状态 156
@@ -4585,24 +4583,24 @@
 
   190 mult-exp: mult-exp MOD . cast-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     cast-exp        转到状态 298
     unary-exp       转到状态 156
@@ -4694,24 +4692,24 @@
 
   148 assignment-exp: unary-exp assignment-operator . assignment-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     assignment-exp    转到状态 299
     conditional-exp   转到状态 124
@@ -4774,25 +4772,25 @@
   207 postfix-exp: postfix-exp LP . argument-exp-list RP
   208            | postfix-exp LP . RP
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RP           偏移，并进入状态 302
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RP                偏移，并进入状态 302
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     assignment-exp     转到状态 303
     conditional-exp    转到状态 124
@@ -4820,24 +4818,24 @@
 
   206 postfix-exp: postfix-exp LB . exp RB
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 305
     assignment-exp    转到状态 123
@@ -4868,31 +4866,31 @@
   107                           | LP . param-type-list RP
   109                           | LP . RP
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    AUTO         偏移，并进入状态 11
-    REGISTER     偏移，并进入状态 12
-    EXTERN       偏移，并进入状态 13
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    STATIC       偏移，并进入状态 18
-    DEREFERENCE  偏移，并进入状态 19
-    TYPEDEF      偏移，并进入状态 20
-    LP           偏移，并进入状态 240
-    RP           偏移，并进入状态 306
-    LB           偏移，并进入状态 241
-    IDENTIFIER   偏移，并进入状态 22
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    AUTO              偏移，并进入状态 11
+    REGISTER          偏移，并进入状态 12
+    EXTERN            偏移，并进入状态 13
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    STATIC            偏移，并进入状态 18
+    MULORDEREFERENCE  偏移，并进入状态 19
+    TYPEDEF           偏移，并进入状态 20
+    LP                偏移，并进入状态 240
+    RP                偏移，并进入状态 306
+    LB                偏移，并进入状态 241
+    IDENTIFIER        偏移，并进入状态 22
+    TYPENAME          偏移，并进入状态 23
 
     decl-specs                  转到状态 147
     storage-class-specifier     转到状态 30
@@ -4916,25 +4914,25 @@
   103 direct-abstract-declarator: LB . const-exp RB
   105                           | LB . RB
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RB           偏移，并进入状态 309
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RB                偏移，并进入状态 309
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
     const-exp         转到状态 310
@@ -5122,10 +5120,10 @@
 
    56 struct-declarator-list: struct-declarator-list COMMA . struct-declarator
 
-    DEREFERENCE  偏移，并进入状态 19
-    COLON        偏移，并进入状态 170
-    LP           偏移，并进入状态 21
-    IDENTIFIER   偏移，并进入状态 22
+    MULORDEREFERENCE  偏移，并进入状态 19
+    COLON             偏移，并进入状态 170
+    LP                偏移，并进入状态 21
+    IDENTIFIER        偏移，并进入状态 22
 
     struct-declarator  转到状态 319
     declarator         转到状态 173
@@ -5137,24 +5135,24 @@
 
    58 struct-declarator: declarator COLON . const-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
     const-exp         转到状态 320
@@ -5201,25 +5199,25 @@
   138               | FOR LP DELIM . DELIM exp RP stat
   139               | FOR LP DELIM . DELIM RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    DELIM        偏移，并进入状态 322
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    DELIM             偏移，并进入状态 322
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 323
     assignment-exp    转到状态 123
@@ -5284,37 +5282,37 @@
 
   117 labeled-stat: CASE const-exp COLON . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 328
     labeled-stat      转到状态 115
@@ -5379,30 +5377,30 @@
   107                           | LP . param-type-list RP
   109                           | LP . RP
 
-    CHAR         偏移，并进入状态 1
-    SHORT        偏移，并进入状态 2
-    INT          偏移，并进入状态 3
-    LONG         偏移，并进入状态 4
-    FLOAT        偏移，并进入状态 5
-    DOUBLE       偏移，并进入状态 6
-    STRUCT       偏移，并进入状态 7
-    ENUM         偏移，并进入状态 8
-    UNION        偏移，并进入状态 9
-    VOID         偏移，并进入状态 10
-    AUTO         偏移，并进入状态 11
-    REGISTER     偏移，并进入状态 12
-    EXTERN       偏移，并进入状态 13
-    CONST        偏移，并进入状态 14
-    UNSIGNED     偏移，并进入状态 15
-    SIGNED       偏移，并进入状态 16
-    VOLATILE     偏移，并进入状态 17
-    STATIC       偏移，并进入状态 18
-    DEREFERENCE  偏移，并进入状态 19
-    TYPEDEF      偏移，并进入状态 20
-    LP           偏移，并进入状态 272
-    RP           偏移，并进入状态 306
-    LB           偏移，并进入状态 241
-    TYPENAME     偏移，并进入状态 23
+    CHAR              偏移，并进入状态 1
+    SHORT             偏移，并进入状态 2
+    INT               偏移，并进入状态 3
+    LONG              偏移，并进入状态 4
+    FLOAT             偏移，并进入状态 5
+    DOUBLE            偏移，并进入状态 6
+    STRUCT            偏移，并进入状态 7
+    ENUM              偏移，并进入状态 8
+    UNION             偏移，并进入状态 9
+    VOID              偏移，并进入状态 10
+    AUTO              偏移，并进入状态 11
+    REGISTER          偏移，并进入状态 12
+    EXTERN            偏移，并进入状态 13
+    CONST             偏移，并进入状态 14
+    UNSIGNED          偏移，并进入状态 15
+    SIGNED            偏移，并进入状态 16
+    VOLATILE          偏移，并进入状态 17
+    STATIC            偏移，并进入状态 18
+    MULORDEREFERENCE  偏移，并进入状态 19
+    TYPEDEF           偏移，并进入状态 20
+    LP                偏移，并进入状态 272
+    RP                偏移，并进入状态 306
+    LB                偏移，并进入状态 241
+    TYPENAME          偏移，并进入状态 23
 
     decl-specs                  转到状态 147
     storage-class-specifier     转到状态 30
@@ -5443,24 +5441,24 @@
 
   192 cast-exp: LP type-name RP . cast-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     cast-exp        转到状态 330
     unary-exp       转到状态 156
@@ -5541,16 +5539,16 @@
 状态 284
 
   170 exclusive-or-exp: exclusive-or-exp XOR and-exp .
-  172 and-exp: and-exp . AND equality-exp
+  172 and-exp: and-exp . ANDORADDRESSOF equality-exp
 
-    AND  偏移，并进入状态 207
+    ANDORADDRESSOF  偏移，并进入状态 207
 
     $default  使用规则 170 以归约 (exclusive-or-exp)
 
 
 状态 285
 
-  172 and-exp: and-exp AND equality-exp .
+  172 and-exp: and-exp ANDORADDRESSOF equality-exp .
   174 equality-exp: equality-exp . EQ relational-exp
   175             | equality-exp . NEQ relational-exp
 
@@ -5667,13 +5665,13 @@
 状态 294
 
   185 additive-exp: additive-exp ADD mult-exp .
-  188 mult-exp: mult-exp . MUL cast-exp
+  188 mult-exp: mult-exp . MULORDEREFERENCE cast-exp
   189         | mult-exp . DIV cast-exp
   190         | mult-exp . MOD cast-exp
 
-    MUL  偏移，并进入状态 218
-    DIV  偏移，并进入状态 219
-    MOD  偏移，并进入状态 220
+    MULORDEREFERENCE  偏移，并进入状态 218
+    DIV               偏移，并进入状态 219
+    MOD               偏移，并进入状态 220
 
     $default  使用规则 185 以归约 (additive-exp)
 
@@ -5681,20 +5679,20 @@
 状态 295
 
   186 additive-exp: additive-exp SUB mult-exp .
-  188 mult-exp: mult-exp . MUL cast-exp
+  188 mult-exp: mult-exp . MULORDEREFERENCE cast-exp
   189         | mult-exp . DIV cast-exp
   190         | mult-exp . MOD cast-exp
 
-    MUL  偏移，并进入状态 218
-    DIV  偏移，并进入状态 219
-    MOD  偏移，并进入状态 220
+    MULORDEREFERENCE  偏移，并进入状态 218
+    DIV               偏移，并进入状态 219
+    MOD               偏移，并进入状态 220
 
     $default  使用规则 186 以归约 (additive-exp)
 
 
 状态 296
 
-  188 mult-exp: mult-exp MUL cast-exp .
+  188 mult-exp: mult-exp MULORDEREFERENCE cast-exp .
 
     $default  使用规则 188 以归约 (mult-exp)
 
@@ -5859,25 +5857,25 @@
   102 direct-abstract-declarator: direct-abstract-declarator LB . const-exp RB
   104                           | direct-abstract-declarator LB . RB
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RB           偏移，并进入状态 340
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RB                偏移，并进入状态 340
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
     const-exp         转到状态 341
@@ -5926,26 +5924,26 @@
    93 initializer: LC initializer-list COMMA . RC
    95 initializer-list: initializer-list COMMA . initializer
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 162
-    RC           偏移，并进入状态 342
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 162
+    RC                偏移，并进入状态 342
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     initializer       转到状态 343
     assignment-exp    转到状态 164
@@ -5995,37 +5993,37 @@
   127 selection-stat: IF LP exp RP . stat
   128               | IF LP exp RP . stat ELSE stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 344
     labeled-stat      转到状态 115
@@ -6061,25 +6059,25 @@
   138 iteration-stat: FOR LP DELIM DELIM . exp RP stat
   139               | FOR LP DELIM DELIM . RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RP           偏移，并进入状态 345
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RP                偏移，并进入状态 345
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 346
     assignment-exp    转到状态 123
@@ -6120,25 +6118,25 @@
   134               | FOR LP exp DELIM . DELIM exp RP stat
   136               | FOR LP exp DELIM . DELIM RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    DELIM        偏移，并进入状态 348
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    DELIM             偏移，并进入状态 348
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 349
     assignment-exp    转到状态 123
@@ -6166,24 +6164,24 @@
 
   131 iteration-stat: DO stat WHILE LP . exp RP DELIM
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 350
     assignment-exp    转到状态 123
@@ -6211,37 +6209,37 @@
 
   130 iteration-stat: WHILE LP exp RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 351
     labeled-stat      转到状态 115
@@ -6276,37 +6274,37 @@
 
   129 selection-stat: SWITCH LP exp RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 352
     labeled-stat      转到状态 115
@@ -6362,24 +6360,24 @@
 
   161 conditional-exp: logical-or-exp QUESTION exp COLON . conditional-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 353
     logical-or-exp    转到状态 125
@@ -6405,24 +6403,24 @@
 
   218 argument-exp-list: argument-exp-list COMMA . assignment-exp
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     assignment-exp    转到状态 354
     conditional-exp   转到状态 124
@@ -6537,37 +6535,37 @@
 
   139 iteration-stat: FOR LP DELIM DELIM RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 358
     labeled-stat      转到状态 115
@@ -6612,25 +6610,25 @@
   135 iteration-stat: FOR LP DELIM exp DELIM . exp RP stat
   137               | FOR LP DELIM exp DELIM . RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RP           偏移，并进入状态 360
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RP                偏移，并进入状态 360
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 361
     assignment-exp    转到状态 123
@@ -6659,25 +6657,25 @@
   134 iteration-stat: FOR LP exp DELIM DELIM . exp RP stat
   136               | FOR LP exp DELIM DELIM . RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RP           偏移，并进入状态 362
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RP                偏移，并进入状态 362
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 363
     assignment-exp    转到状态 123
@@ -6766,37 +6764,37 @@
 
   128 selection-stat: IF LP exp RP stat ELSE . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 366
     labeled-stat      转到状态 115
@@ -6838,37 +6836,37 @@
 
   138 iteration-stat: FOR LP DELIM DELIM exp RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 367
     labeled-stat      转到状态 115
@@ -6903,37 +6901,37 @@
 
   137 iteration-stat: FOR LP DELIM exp DELIM RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 368
     labeled-stat      转到状态 115
@@ -6977,37 +6975,37 @@
 
   136 iteration-stat: FOR LP exp DELIM DELIM RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 370
     labeled-stat      转到状态 115
@@ -7052,25 +7050,25 @@
   132 iteration-stat: FOR LP exp DELIM exp DELIM . exp RP stat
   133               | FOR LP exp DELIM exp DELIM . RP stat
 
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    LP           偏移，并进入状态 103
-    RP           偏移，并进入状态 372
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 153
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RP                偏移，并进入状态 372
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
 
     exp               转到状态 373
     assignment-exp    转到状态 123
@@ -7126,37 +7124,37 @@
 
   135 iteration-stat: FOR LP DELIM exp DELIM exp RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 375
     labeled-stat      转到状态 115
@@ -7198,37 +7196,37 @@
 
   134 iteration-stat: FOR LP exp DELIM DELIM exp RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 376
     labeled-stat      转到状态 115
@@ -7263,37 +7261,37 @@
 
   133 iteration-stat: FOR LP exp DELIM exp DELIM RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 377
     labeled-stat      转到状态 115
@@ -7365,37 +7363,37 @@
 
   132 iteration-stat: FOR LP exp DELIM exp DELIM exp RP . stat
 
-    IF           偏移，并进入状态 82
-    FOR          偏移，并进入状态 83
-    DO           偏移，并进入状态 84
-    WHILE        偏移，并进入状态 85
-    BREAK        偏移，并进入状态 86
-    CONTINUE     偏移，并进入状态 87
-    SWITCH       偏移，并进入状态 88
-    CASE         偏移，并进入状态 89
-    DEFAULT      偏移，并进入状态 90
-    GOTO         偏移，并进入状态 91
-    NOT          偏移，并进入状态 92
-    NOTNOT       偏移，并进入状态 93
-    INC          偏移，并进入状态 94
-    DEC          偏移，并进入状态 95
-    POSITIVE     偏移，并进入状态 96
-    NEGATIVE     偏移，并进入状态 97
-    DEREFERENCE  偏移，并进入状态 98
-    ADDRESSOF    偏移，并进入状态 99
-    SIZEOF       偏移，并进入状态 100
-    RETURN       偏移，并进入状态 101
-    DELIM        偏移，并进入状态 102
-    LP           偏移，并进入状态 103
-    LC           偏移，并进入状态 56
-    NUMCHAR      偏移，并进入状态 105
-    NUMSHORT     偏移，并进入状态 106
-    NUMINT       偏移，并进入状态 107
-    NUMLONG      偏移，并进入状态 108
-    NUMFLOAT     偏移，并进入状态 109
-    NUMDOUBLE    偏移，并进入状态 110
-    STRING       偏移，并进入状态 111
-    IDENTIFIER   偏移，并进入状态 112
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
 
     stat              转到状态 379
     labeled-stat      转到状态 115

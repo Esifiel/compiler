@@ -109,7 +109,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
     GOTO = 286,
     ADD = 287,
     SUB = 288,
-    MUL = 289,
+    MULORDEREFERENCE = 289,
     DIV = 290,
     MOD = 291,
     ADDASSIGN = 292,
@@ -117,7 +117,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
     MULASSIGN = 294,
     DIVASSIGN = 295,
     MODASSIGN = 296,
-    AND = 297,
+    ANDORADDRESSOF = 297,
     OR = 298,
     XOR = 299,
     NOT = 300,
@@ -142,33 +142,31 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
     DEC = 319,
     POSITIVE = 320,
     NEGATIVE = 321,
-    DEREFERENCE = 322,
-    ADDRESSOF = 323,
-    TYPEDEF = 324,
-    SIZEOF = 325,
-    RETURN = 326,
-    DOTDOTDOT = 327,
-    DELIM = 328,
-    COMMA = 329,
-    COLON = 330,
-    QUESTION = 331,
-    DOT = 332,
-    TO = 333,
-    LP = 334,
-    RP = 335,
-    LB = 336,
-    RB = 337,
-    LC = 338,
-    RC = 339,
-    NUMCHAR = 340,
-    NUMSHORT = 341,
-    NUMINT = 342,
-    NUMLONG = 343,
-    NUMFLOAT = 344,
-    NUMDOUBLE = 345,
-    STRING = 346,
-    IDENTIFIER = 347,
-    TYPENAME = 348
+    TYPEDEF = 322,
+    SIZEOF = 323,
+    RETURN = 324,
+    DOTDOTDOT = 325,
+    DELIM = 326,
+    COMMA = 327,
+    COLON = 328,
+    QUESTION = 329,
+    DOT = 330,
+    TO = 331,
+    LP = 332,
+    RP = 333,
+    LB = 334,
+    RB = 335,
+    LC = 336,
+    RC = 337,
+    NUMCHAR = 338,
+    NUMSHORT = 339,
+    NUMINT = 340,
+    NUMLONG = 341,
+    NUMFLOAT = 342,
+    NUMDOUBLE = 343,
+    STRING = 344,
+    IDENTIFIER = 345,
+    TYPENAME = 346
   };
 #endif
 
@@ -209,7 +207,7 @@ union YYSTYPE
     vector<Expression *> *exprs;
     Number *number;
 
-#line 213 "parser.hpp"
+#line 211 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

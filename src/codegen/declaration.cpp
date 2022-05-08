@@ -6,11 +6,19 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
 {
     auto pt = types->begin();
     auto pi = ids->begin();
-
+    
     for (; pt != types->end() && pi != ids->end(); pt++, pi++)
     {
         string varname = (*pi)->name;
 
+        // if type is a undefined struct type, declare a opaque type first
+        if((*pt)->getRootType()->type == TYPE_STRUCT && !ctx.module->getTypeByName(((AggregateType *)(*pt)->getRootType())->name))
+        {
+            TypeDeclaration td = TypeDeclaration((*pt)->getRootType());
+            td.codeGen(ctx);
+        }
+
+        // do declaration
         if ((*pt)->type == TYPE_ARRAY)
         {
             // array type
@@ -91,16 +99,8 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
         }
 
         // collect struct type variable
-        if((*pt)->type == TYPE_STRUCT)
-            ctx.structvars[varname] = (AggregateType *)*pt;
-        else if((*pt)->type == TYPE_POINTER || (*pt)->type == TYPE_ARRAY)
-        {
-            TypeSpecifier *bt = *pt;
-            while(bt->type == TYPE_POINTER || bt->type == TYPE_ARRAY)
-                bt = ((IterableType *)bt)->basictype;
-            if(bt->type == TYPE_STRUCT)
-                ctx.structvars[varname] = (AggregateType *)bt;
-        }
+        if((*pt)->getRootType()->type == TYPE_STRUCT)
+            ctx.structvars[varname] = (AggregateType *)((*pt)->getRootType());
     }
 
     return nullptr;

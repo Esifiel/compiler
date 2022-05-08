@@ -386,7 +386,7 @@ void Visualizer::visitOp(enum op_type op)
         out << "+";
         break;
     case OP_SUB:
-    case OP_NEGTIVE:
+    case OP_NEGATIVE:
         out << "-";
         break;
     case OP_MUL:

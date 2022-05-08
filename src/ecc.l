@@ -37,6 +37,7 @@ void replace(string &src, string sub, string tar)
 "."                             { debug(); return DOT; }
 "->"                            { debug(); return TO; }
 "..."                           { debug(); return DOTDOTDOT; }
+"!"                             { debug(); return NOTNOT; }
 
 "auto"                          { debug(); return AUTO; }
 "double"                        { debug(); return DOUBLE; }
@@ -73,10 +74,10 @@ void replace(string &src, string sub, string tar)
 
 "+"                             { debug(); return ADD; }
 "-"                             { debug(); return SUB; }
-"*"                             { debug(); return MUL; }
+"*"                             { debug(); return MULORDEREFERENCE; }
 "/"                             { debug(); return DIV; }
 "%"                             { debug(); return MOD; }
-"&"                             { debug(); return AND; }
+"&"                             { debug(); return ANDORADDRESSOF; }
 "|"                             { debug(); return OR; }
 "~"                             { debug(); return NOT; }
 "^"                             { debug(); return XOR; }
@@ -110,17 +111,6 @@ void replace(string &src, string sub, string tar)
 "]"                             { debug(); return RB; }
 "{"                             { debug(); return LC; }
 "}"                             { debug(); return RC; }
-
-"&"[^ ]                         {
-                                    debug();
-                                    unput(yytext[1]);
-                                    return ADDRESSOF;
-                                }
-"*"[^ ]                         {
-                                    debug();
-                                    unput(yytext[1]);
-                                    return DEREFERENCE;
-                                }
 
 -?(0|([1-9][0-9]*))             {
                                     debug();

@@ -62,7 +62,7 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
                 bool tmpleft = ctx.isleft;
                 ctx.isleft = true;
                 tmp = (*p)->codeGen(ctx);
-                Value *idxlist[] = {ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0)};
+                Value *idxlist[] = {ctx.builder.getInt64(0), ctx.builder.getInt64(0)};
                 tmp = ctx.builder.CreateGEP(tmp, ArrayRef<Value *>(idxlist, 2));
                 ctx.isleft = tmpleft;
             }
@@ -128,21 +128,31 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         }
         return ctx.CreateBinaryExpr(lv, rv, op);
     case OP_ANDAND:
+        lv = left->codeGen(ctx);
+        rv = right->codeGen(ctx);
+        return ctx.CreateBinaryExpr(
+            ctx.CreateBinaryExpr(lv, ctx.builder.getInt64(0), OP_NEQ),
+            ctx.CreateBinaryExpr(rv, ctx.builder.getInt64(0), OP_NEQ),
+            OP_AND);
     case OP_OROR:
         lv = left->codeGen(ctx);
         rv = right->codeGen(ctx);
         return ctx.CreateBinaryExpr(
-            ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
-            ctx.CreateBinaryExpr(rv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_NEQ),
-            op);
+            ctx.CreateBinaryExpr(lv, ctx.builder.getInt64(0), OP_NEQ),
+            ctx.CreateBinaryExpr(rv, ctx.builder.getInt64(0), OP_NEQ),
+            OP_OR);
     case OP_NOTNOT:
-        return ctx.CreateBinaryExpr(lv, ConstantInt::get(Type::getInt64Ty(ctx.ctx), 0), OP_EQ);
+        lv = left->codeGen(ctx);
+        return ctx.CreateBinaryExpr(
+            lv,
+            lv->getType()->isPointerTy() ? dyn_cast<Value>(ConstantPointerNull::get(dyn_cast<PointerType>(lv->getType()))) : dyn_cast<Value>(ctx.builder.getInt64(0)),
+            OP_EQ);
     case OP_NOT:
-        return ctx.CreateUnaryExpr(lv, OP_NOT);
+        return ctx.CreateUnaryExpr(left->codeGen(ctx), OP_NOT);
     // case OP_POSITIVE:
     //     out << "+";
     //
-    // case OP_NEGTIVE:
+    // case OP_NEGATIVE:
     //     out << "-";
     //     break;
     case OP_INC_REAR:
@@ -170,10 +180,48 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         var = left->codeGen(ctx);
         ctx.isleft = false;
         oldval = ctx.builder.CreateLoad(var);
-        if (right)
-            newval = ctx.CreateUnaryExpr(oldval, op);
-        else
-            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), op);
+        switch (op)
+        {
+        case OP_INC_FRONT:
+            newval = ctx.CreateUnaryExpr(oldval, OP_INC_FRONT);
+            break;
+        case OP_DEC_FRONT:
+            newval = ctx.CreateUnaryExpr(oldval, OP_DEC_FRONT);
+            break;
+        case OP_MULASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_MUL);
+            break;
+        case OP_DIVASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_DIV);
+            break;
+        case OP_MODASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_MOD);
+            break;
+        case OP_ADDASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_ADD);
+            break;
+        case OP_SUBASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SUB);
+            break;
+        case OP_SLASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SL);
+            break;
+        case OP_SRASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_SR);
+            break;
+        case OP_ANDASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_AND);
+            break;
+        case OP_XORASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_XOR);
+            break;
+        case OP_ORASSIGN:
+            newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_OR);
+            break;
+        default:
+            newval = nullptr;
+            break;
+        }
         ctx.builder.CreateStore(newval, var);
         return newval;
     case OP_ASSIGN:
@@ -244,10 +292,10 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         ctx.isleft = true;
         var = left->codeGen(ctx);
         ctx.isleft = tmpleft;
-        
+
         // get varname
         expr = left;
-        while(expr->getName() != "\"Identifier\"")
+        while (expr->getName() != "\"Identifier\"")
             expr = expr->left;
 
         // find member offset and get pointer
