@@ -29,8 +29,9 @@ parser.hpp: parser.cpp
 scanner.cpp: $(NAME).l parser.hpp
 	$(LEX) -o $@ $<
 
+-include *.d
 %.o: %.cpp
-	$(CC) -g3 -c $(LLVMFLAGS) -o $@ $<
+	$(CC) -g3 -c $(LLVMFLAGS) -MMD -o $@ $<
 
 $(NAME): $(OBJECTS)
 	@if [ ! -d tmp ]; then mkdir tmp; fi

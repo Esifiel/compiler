@@ -492,7 +492,7 @@
     initializer-list <expression> (124)
         on left: 94 95
         on right: 92 93 95
-    type-name (125)
+    type-name <type> (125)
         on left: 96 97
         on right: 192 198
     abstract-declarator (126)

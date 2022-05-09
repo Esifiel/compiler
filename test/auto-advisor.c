@@ -50,26 +50,28 @@ void extract(char pyfa[][MAXLEN], int n)
             char *subvec2[MAXLEN] = {0};
 
             struct dep *p, *tmp;
+            int groups, items, ii, jj;
 
             // dummy head
-            // p = dependency[i] = (struct dep *)calloc(sizeof(struct dep), 1);
+            dependency[i] = (struct dep *)calloc(sizeof(struct dep), 1);
+            p = dependency[i];
 
-            // int groups = split(vec[2], ';', subvec1);
-            // for (int ii = 0; ii < groups; ii++)
-            // {
-            //     p->another = (struct dep *)calloc(sizeof(struct dep), 1);
-            //     tmp = p->another;
+            groups = split(vec[2], ';', subvec1);
+            for (ii = 0; ii < groups; ii++)
+            {
+                p->another = (struct dep *)calloc(sizeof(struct dep), 1);
+                tmp = p->another;
 
-            //     int items = split(subvec1[ii], ',', subvec2);
-            //     for (int jj = 0; jj < items; jj++)
-            //     {
-            //         tmp->next = (struct dep *)calloc(sizeof(struct dep), 1);
-            //         strcpy(tmp->next->name, subvec2[jj]);
-            //         tmp = tmp->next;
-            //     }
+                items = split(subvec1[ii], ',', subvec2);
+                for (jj = 0; jj < items; jj++)
+                {
+                    tmp->next = (struct dep *)calloc(sizeof(struct dep), 1);
+                    strcpy(tmp->next->name, subvec2[jj]);
+                    tmp = tmp->next;
+                }
 
-            //     p = p->another;
-            // }
+                p = p->another;
+            }
         }
         // course grade
         if (vec[3][0] && vec[3][0] != '\n')
@@ -100,21 +102,23 @@ void dump(int index)
 
 int main()
 {
-    double gpa = 0;
-    int total = 0, try = 0, taken = 0, remaining = 0;
-    char pyfa[MAXN][MAXLEN];
-    int cnt;
-    int i, j;
+    printf("%d\n", sizeof(int));
 
-    // get input
-    for (cnt = 0; fgets(pyfa[cnt], MAXLEN - 1, stdin), strcmp(pyfa[cnt], "\n"); cnt++)
-        ;
+    // double gpa = 0;
+    // int total = 0, try = 0, taken = 0, remaining = 0;
+    // char pyfa[MAXN][MAXLEN];
+    // int cnt;
+    // int i, j;
 
-    // get info
-    extract(pyfa, cnt);
+    // // get input
+    // for (cnt = 0; fgets(pyfa[cnt], MAXLEN - 1, stdin), strcmp(pyfa[cnt], "\n"); cnt++)
+    //     ;
 
-    for(i = 0; i < cnt; i++)
-        dump(i);
+    // // get info
+    // extract(pyfa, cnt);
+
+    // for(i = 0; i < cnt; i++)
+    //     dump(i);
 
     // for (i = 0; i < cnt; i++)
     // {

@@ -44,7 +44,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 12 "ecc.y"
+#line 13 "ecc.y"
 
 #include <iostream>
 #include <string>
@@ -174,7 +174,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 39 "ecc.y"
+#line 40 "ecc.y"
 
     union union_num num;
     string *stringValue;

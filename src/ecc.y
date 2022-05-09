@@ -3,6 +3,7 @@
 #include <map>
 Program *program;
 static map<string, Number *> constvar;
+static map<string, AggregateType *> aggrdef;
 %}
 
 %expect 1 // shift-reduce conflict: optional else-part for if-else statement
@@ -89,7 +90,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 
 %type<program> program
 
-%type<type> type-spec decl-specs spec-qualifier-list
+%type<type> type-spec decl-specs spec-qualifier-list type-name
 %type<qual> pointer type-qualifier type-qualifier-list 
 %type<aggrtype> struct-or-union-spec struct-or-union
 %type<members> struct-decl-list
@@ -246,9 +247,32 @@ type-qualifier              : CONST     { $$ = new Qualifier(); $$->isconst    =
                             | VOLATILE  { $$ = new Qualifier(); $$->isvolatile = true; }
                             ;
 
-struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC { $$ = $1; $$->name = *$2; delete $2; $$->members = $4; }
+struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC {
+                                if(aggrdef.find(*$2) != aggrdef.end())
+                                    // if the struct has been defined, fetch it directly
+                                    $$ = aggrdef[*$2];
+                                else
+                                {
+                                    $$ = $1;
+                                    $$->name = *$2;
+                                    // add struct definition into map
+                                    aggrdef[*$2] = $$;
+                                }
+                                delete $2;
+                                $$->members = $4;
+                            }
                             | struct-or-union LC struct-decl-list RC { $$ = $1; $$->members = $3; } // annoymous struct
-                            | struct-or-union IDENTIFIER { $$ = $1; $$->name = *$2; delete $2; }
+                            | struct-or-union IDENTIFIER {
+                                if(aggrdef.find(*$2) != aggrdef.end())
+                                    $$ = aggrdef[*$2];
+                                else
+                                {
+                                    $$ = $1;
+                                    $$->name = *$2;
+                                    aggrdef[*$2] = $$;
+                                    delete $2;
+                                }
+                            }
                             ;
 
 struct-or-union             : STRUCT    { $$ = new MyStructType(); }
@@ -421,7 +445,7 @@ initializer-list            : initializer { $$ = $1; }
                             ;
 
 type-name                   : spec-qualifier-list abstract-declarator
-                            | spec-qualifier-list
+                            | spec-qualifier-list { $$ = $1; }
                             ;
 
 abstract-declarator         : pointer
@@ -595,7 +619,7 @@ unary-exp		            : postfix-exp { $$ = $1; }
                             }
                             | unary-operator cast-exp { $$ = calculate($2, $1); }
                             | SIZEOF unary-exp // TODO: sizeof
-                            | SIZEOF LP type-name RP // TODO: sizeof
+                            | SIZEOF LP type-name RP { yylval.num.longValue = $3->getSize(); $$ = new Number(yylval.num, new LongType(), VAL_LONG); }
                             ;
 
 unary-operator              : ANDORADDRESSOF     { $$ = OP_ADDRESSOF; }
