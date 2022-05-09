@@ -142,6 +142,28 @@ void replace(string &src, string sub, string tar)
                                     yylval.num.charValue = yytext[1];
                                     return NUMCHAR;
                                 }
+\'\\[nta\\\']\'                 {
+                                    debug();
+                                    switch(yytext[2])
+                                    {
+                                    case 'n':
+                                        yylval.num.charValue = '\n';
+                                        break;
+                                    case 't':
+                                        yylval.num.charValue = '\t';
+                                        break;
+                                    case '\\':
+                                        yylval.num.charValue = '\\';
+                                        break;
+                                    case '\'':
+                                        yylval.num.charValue = '\'';
+                                        break;
+                                    default:
+                                        yylval.num.charValue = '\0';
+                                        break;
+                                    }
+                                    return NUMCHAR;
+                                }
 \".*\"                          {
                                     debug();
                                     // strip " and translate escape char

@@ -262,6 +262,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         }
         else if (var->getType()->getPointerElementType()->isArrayTy())
         {
+            // need left value
             if (ctx.isleft)
             {
                 ctx.isleft = false;
@@ -274,7 +275,12 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             {
                 idxlist[1] = right->codeGen(ctx);
                 idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
-                return ctx.builder.CreateLoad(ctx.builder.CreateGEP(var, ArrayRef<Value *>(idxlist, 2)));
+                var = ctx.builder.CreateGEP(var, ArrayRef<Value *>(idxlist, 2));
+                if(var->getType()->getPointerElementType()->isArrayTy())
+                    // **all array will be returned as pointer**
+                    return ctx.builder.CreateGEP(var, {ctx.builder.getInt64(0), ctx.builder.getInt64(0)});
+                else
+                    return ctx.builder.CreateLoad(var);
             }
         }
         else
@@ -301,6 +307,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         // find member offset and get pointer
         members = ctx.structtypes[ctx.structvars[((Identifier *)expr)->name]->name];
         if (op == OP_TO)
+            // the difference between . and -> on codegen level is only a load inst
             var = ctx.builder.CreateLoad(var);
         var = ctx.builder.CreateGEP(
             var,
@@ -312,6 +319,16 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
         else
             return ctx.builder.CreateLoad(var);
+    case OP_IFELSE:
+        var = addition->codeGen(ctx);
+        // select inst of LLVM IR
+        if(var->getType()->isPointerTy() || var->getType()->getIntegerBitWidth() != 1)
+            // logical operator is omitted
+            var = ctx.CreateBinaryExpr(
+                var,
+                var->getType()->isPointerTy() ? dyn_cast<Value>(ConstantPointerNull::get(dyn_cast<PointerType>(lv->getType()))) : dyn_cast<Value>(ctx.builder.getInt64(0)),
+                OP_NEQ);
+        return ctx.builder.CreateSelect(var, left->codeGen(ctx), right->codeGen(ctx));
     default:
         return nullptr;
     }

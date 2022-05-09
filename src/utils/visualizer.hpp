@@ -46,6 +46,7 @@ private:
     void visitQualifier(Qualifier *q);
     void visitTypeDeclaration(TypeDeclaration *t);
     void visitAggregateType(AggregateType *t);
+    void visitCaseStatement(CaseStatement *c);
 };
 
 #endif

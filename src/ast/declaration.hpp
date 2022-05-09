@@ -42,9 +42,10 @@ class Parameter : public Declaration
 public:
     TypeSpecifier *type;
     Identifier *id;
+    bool isvariableargs;
 
-    Parameter(TypeSpecifier *t) : type(t), id(nullptr) {}
-    Parameter(TypeSpecifier *t, Identifier *i) : type(t), id(i) {}
+    Parameter(TypeSpecifier *t) : type(t), id(nullptr), isvariableargs(false) {}
+    Parameter(TypeSpecifier *t, Identifier *i) : type(t), id(i), isvariableargs(false) {}
 
     virtual string getName() { return "\"Parameter\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx) override;

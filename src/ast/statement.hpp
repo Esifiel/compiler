@@ -147,4 +147,16 @@ public:
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
+class CaseStatement : public Statement
+{
+public:
+    Expression *val;
+    Statement *stmt;
+
+    CaseStatement(Expression *e, Statement *s) : val(e), stmt(s) {}
+
+    virtual string getName() { return "\"CaseStatement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
 #endif

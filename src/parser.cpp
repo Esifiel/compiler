@@ -2477,16 +2477,22 @@ yyreduce:
 #line 2478 "parser.cpp"
     break;
 
+  case 84:
+#line 369 "ecc.y"
+                                                         { (yyval.param) = (yyvsp[-2].param); (yyval.param)->isvariableargs = true; }
+#line 2484 "parser.cpp"
+    break;
+
   case 85:
 #line 372 "ecc.y"
                                          { (yyval.param) = (yyvsp[0].param); (yyval.param)->tail = (yyval.param); }
-#line 2484 "parser.cpp"
+#line 2490 "parser.cpp"
     break;
 
   case 86:
 #line 373 "ecc.y"
                                                           { (yyval.param) = (yyvsp[-2].param); (yyval.param)->tail->next = (yyvsp[0].param); (yyval.param)->tail = (yyvsp[0].param); }
-#line 2490 "parser.cpp"
+#line 2496 "parser.cpp"
     break;
 
   case 87:
@@ -2515,49 +2521,49 @@ yyreduce:
                                     (yyval.param) = new Parameter(t, id);
                                 }
                             }
-#line 2519 "parser.cpp"
+#line 2525 "parser.cpp"
     break;
 
   case 89:
 #line 401 "ecc.y"
                                          { (yyval.param) = new Parameter((yyvsp[0].type)); }
-#line 2525 "parser.cpp"
+#line 2531 "parser.cpp"
     break;
 
   case 90:
 #line 404 "ecc.y"
                                                  { (yyval.ids) = new vector<Identifier *>; (yyval.ids)->push_back(new Identifier(*(yyvsp[0].stringValue))); delete (yyvsp[0].stringValue); }
-#line 2531 "parser.cpp"
+#line 2537 "parser.cpp"
     break;
 
   case 91:
 #line 405 "ecc.y"
                                                        { (yyvsp[-2].ids)->push_back(new Identifier(*(yyvsp[0].stringValue))); (yyval.ids) = (yyvsp[-2].ids); delete (yyvsp[0].stringValue);  }
-#line 2537 "parser.cpp"
+#line 2543 "parser.cpp"
     break;
 
   case 92:
 #line 408 "ecc.y"
                                                            { (yyval.expression) = (yyvsp[0].expression); }
-#line 2543 "parser.cpp"
+#line 2549 "parser.cpp"
     break;
 
   case 93:
 #line 409 "ecc.y"
                                                            { (yyval.expression) = (yyvsp[-1].expression); }
-#line 2549 "parser.cpp"
+#line 2555 "parser.cpp"
     break;
 
   case 94:
 #line 410 "ecc.y"
                                                            { (yyval.expression) = (yyvsp[-2].expression); }
-#line 2555 "parser.cpp"
+#line 2561 "parser.cpp"
     break;
 
   case 95:
 #line 413 "ecc.y"
                                           { (yyval.expression) = (yyvsp[0].expression); }
-#line 2561 "parser.cpp"
+#line 2567 "parser.cpp"
     break;
 
   case 96:
@@ -2569,205 +2575,223 @@ yyreduce:
                                 p->left = (yyvsp[0].expression);
                                 (yyval.expression) = (yyvsp[-2].expression);
                             }
-#line 2573 "parser.cpp"
+#line 2579 "parser.cpp"
     break;
 
   case 111:
 #line 443 "ecc.y"
                                              { (yyval.statement) = (yyvsp[0].statement); }
-#line 2579 "parser.cpp"
+#line 2585 "parser.cpp"
     break;
 
   case 112:
 #line 444 "ecc.y"
                                              { (yyval.statement) = (yyvsp[0].expressionStatement); }
-#line 2585 "parser.cpp"
+#line 2591 "parser.cpp"
     break;
 
   case 113:
 #line 445 "ecc.y"
                                              { (yyval.statement) = (yyvsp[0].compoundStatement); }
-#line 2591 "parser.cpp"
+#line 2597 "parser.cpp"
     break;
 
   case 114:
 #line 446 "ecc.y"
                                              { (yyval.statement) = (yyvsp[0].selectionStatement); }
-#line 2597 "parser.cpp"
+#line 2603 "parser.cpp"
     break;
 
   case 115:
 #line 447 "ecc.y"
                                              { (yyval.statement) = (yyvsp[0].iterationStatement); }
-#line 2603 "parser.cpp"
+#line 2609 "parser.cpp"
     break;
 
   case 116:
 #line 448 "ecc.y"
                                              { (yyval.statement) = (yyvsp[0].statement); }
-#line 2609 "parser.cpp"
+#line 2615 "parser.cpp"
+    break;
+
+  case 118:
+#line 452 "ecc.y"
+                                                        { (yyval.statement) = new CaseStatement((yyvsp[-2].number), (yyvsp[0].statement)); }
+#line 2621 "parser.cpp"
+    break;
+
+  case 119:
+#line 453 "ecc.y"
+                                                 { (yyval.statement) = (yyvsp[0].statement); }
+#line 2627 "parser.cpp"
     break;
 
   case 120:
 #line 456 "ecc.y"
                                             { (yyval.expressionStatement) = new ExpressionStatement((yyvsp[-1].expression)); }
-#line 2615 "parser.cpp"
+#line 2633 "parser.cpp"
     break;
 
   case 121:
 #line 457 "ecc.y"
                                         { (yyval.expressionStatement) = new ExpressionStatement(); }
-#line 2621 "parser.cpp"
+#line 2639 "parser.cpp"
     break;
 
   case 122:
 #line 460 "ecc.y"
                                                         { (yyval.compoundStatement) = new CompoundStatement((yyvsp[-2].vars), (yyvsp[-1].statement)); }
-#line 2627 "parser.cpp"
+#line 2645 "parser.cpp"
     break;
 
   case 123:
 #line 461 "ecc.y"
                                                         { (yyval.compoundStatement) = new CompoundStatement(nullptr, (yyvsp[-1].statement)); }
-#line 2633 "parser.cpp"
+#line 2651 "parser.cpp"
     break;
 
   case 124:
 #line 462 "ecc.y"
                                                         { (yyval.compoundStatement) = new CompoundStatement((yyvsp[-1].vars), nullptr); }
-#line 2639 "parser.cpp"
+#line 2657 "parser.cpp"
     break;
 
   case 125:
 #line 463 "ecc.y"
                                                         { (yyval.compoundStatement) = new CompoundStatement(nullptr, nullptr); }
-#line 2645 "parser.cpp"
+#line 2663 "parser.cpp"
     break;
 
   case 126:
 #line 466 "ecc.y"
                                    { (yyval.statement) = (yyvsp[0].statement); (yyval.statement)->tail = (yyval.statement); }
-#line 2651 "parser.cpp"
+#line 2669 "parser.cpp"
     break;
 
   case 127:
 #line 467 "ecc.y"
                                              { (yyval.statement) = (yyvsp[-1].statement); (yyval.statement)->tail->next = (yyvsp[0].statement); (yyval.statement)->tail = (yyvsp[0].statement); }
-#line 2657 "parser.cpp"
+#line 2675 "parser.cpp"
     break;
 
   case 128:
 #line 470 "ecc.y"
-                                                              { (yyvsp[0].statement)->next = nullptr; (yyval.selectionStatement) = new IfElseStatement((yyvsp[-2].expression), (yyvsp[0].statement)); }
-#line 2663 "parser.cpp"
+                                                                { (yyvsp[0].statement)->next = nullptr; (yyval.selectionStatement) = new IfElseStatement((yyvsp[-2].expression), (yyvsp[0].statement)); }
+#line 2681 "parser.cpp"
     break;
 
   case 129:
 #line 471 "ecc.y"
-                                                          { (yyvsp[-2].statement)->next = (yyvsp[0].statement); (yyval.selectionStatement) = new IfElseStatement((yyvsp[-4].expression), (yyvsp[-2].statement)); }
-#line 2669 "parser.cpp"
+                                                            { (yyvsp[-2].statement)->next = (yyvsp[0].statement); (yyval.selectionStatement) = new IfElseStatement((yyvsp[-4].expression), (yyvsp[-2].statement)); }
+#line 2687 "parser.cpp"
+    break;
+
+  case 130:
+#line 472 "ecc.y"
+                                                            { (yyval.selectionStatement) = new SwitchCaseStatement((yyvsp[-2].expression), (yyvsp[0].statement)); }
+#line 2693 "parser.cpp"
     break;
 
   case 131:
 #line 475 "ecc.y"
                                                                          { (yyval.iterationStatement) = new WhileStatement((yyvsp[-2].expression), (yyvsp[0].statement)); }
-#line 2675 "parser.cpp"
+#line 2699 "parser.cpp"
     break;
 
   case 132:
 #line 476 "ecc.y"
                                                                      { (yyval.iterationStatement) = new DoWhileStatement((yyvsp[-2].expression), (yyvsp[-5].statement)); }
-#line 2681 "parser.cpp"
+#line 2705 "parser.cpp"
     break;
 
   case 133:
 #line 477 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement((yyvsp[-6].expression), (yyvsp[-4].expression), (yyvsp[-2].expression), (yyvsp[0].statement)); }
-#line 2687 "parser.cpp"
+#line 2711 "parser.cpp"
     break;
 
   case 134:
 #line 478 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement((yyvsp[-5].expression), (yyvsp[-3].expression), nullptr, (yyvsp[0].statement)); }
-#line 2693 "parser.cpp"
+#line 2717 "parser.cpp"
     break;
 
   case 135:
 #line 479 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement((yyvsp[-5].expression), nullptr, (yyvsp[-2].expression), (yyvsp[0].statement)); }
-#line 2699 "parser.cpp"
+#line 2723 "parser.cpp"
     break;
 
   case 136:
 #line 480 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement(nullptr, (yyvsp[-4].expression), (yyvsp[-2].expression), (yyvsp[0].statement)); }
-#line 2705 "parser.cpp"
+#line 2729 "parser.cpp"
     break;
 
   case 137:
 #line 481 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement((yyvsp[-4].expression), nullptr, nullptr, (yyvsp[0].statement)); }
-#line 2711 "parser.cpp"
+#line 2735 "parser.cpp"
     break;
 
   case 138:
 #line 482 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement(nullptr, (yyvsp[-3].expression), nullptr, (yyvsp[0].statement)); }
-#line 2717 "parser.cpp"
+#line 2741 "parser.cpp"
     break;
 
   case 139:
 #line 483 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement(nullptr, nullptr, (yyvsp[-2].expression), (yyvsp[0].statement)); }
-#line 2723 "parser.cpp"
+#line 2747 "parser.cpp"
     break;
 
   case 140:
 #line 484 "ecc.y"
                                                                      { (yyval.iterationStatement) = new ForStatement(nullptr, nullptr, nullptr, (yyvsp[0].statement)); }
-#line 2729 "parser.cpp"
+#line 2753 "parser.cpp"
     break;
 
   case 142:
 #line 488 "ecc.y"
                                                     { (yyval.statement) = new ContinueStatement(); }
-#line 2735 "parser.cpp"
+#line 2759 "parser.cpp"
     break;
 
   case 143:
 #line 489 "ecc.y"
                                                     { (yyval.statement) = new BreakStatement(); }
-#line 2741 "parser.cpp"
+#line 2765 "parser.cpp"
     break;
 
   case 144:
 #line 490 "ecc.y"
                                                     { (yyval.statement) = new ReturnStatement((yyvsp[-1].expression)); }
-#line 2747 "parser.cpp"
+#line 2771 "parser.cpp"
     break;
 
   case 145:
 #line 491 "ecc.y"
                                                     { (yyval.statement) = new ReturnStatement(); }
-#line 2753 "parser.cpp"
+#line 2777 "parser.cpp"
     break;
 
   case 146:
 #line 494 "ecc.y"
                                                          { (yyval.expression) = (yyvsp[0].expression); }
-#line 2759 "parser.cpp"
+#line 2783 "parser.cpp"
     break;
 
   case 147:
 #line 495 "ecc.y"
                                                        { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_COMMA); }
-#line 2765 "parser.cpp"
+#line 2789 "parser.cpp"
     break;
 
   case 148:
 #line 498 "ecc.y"
                                                   { (yyval.expression) = (yyvsp[0].expression); }
-#line 2771 "parser.cpp"
+#line 2795 "parser.cpp"
     break;
 
   case 149:
@@ -2777,85 +2801,85 @@ yyreduce:
                                     yyerror("lvalue required as left operand of assignment");
                                 (yyval.expression) = new Expression((yyvsp[-2].expression), (yyvsp[0].expression), (yyvsp[-1].op));
                             }
-#line 2781 "parser.cpp"
+#line 2805 "parser.cpp"
     break;
 
   case 150:
 #line 506 "ecc.y"
                                             { (yyval.op) = OP_ASSIGN; }
-#line 2787 "parser.cpp"
+#line 2811 "parser.cpp"
     break;
 
   case 151:
 #line 507 "ecc.y"
                                         { (yyval.op) = OP_MULASSIGN; }
-#line 2793 "parser.cpp"
+#line 2817 "parser.cpp"
     break;
 
   case 152:
 #line 508 "ecc.y"
                                         { (yyval.op) = OP_DIVASSIGN; }
-#line 2799 "parser.cpp"
+#line 2823 "parser.cpp"
     break;
 
   case 153:
 #line 509 "ecc.y"
                                         { (yyval.op) = OP_MODASSIGN; }
-#line 2805 "parser.cpp"
+#line 2829 "parser.cpp"
     break;
 
   case 154:
 #line 510 "ecc.y"
                                         { (yyval.op) = OP_ADDASSIGN; }
-#line 2811 "parser.cpp"
+#line 2835 "parser.cpp"
     break;
 
   case 155:
 #line 511 "ecc.y"
                                         { (yyval.op) = OP_SUBASSIGN; }
-#line 2817 "parser.cpp"
+#line 2841 "parser.cpp"
     break;
 
   case 156:
 #line 512 "ecc.y"
                                         { (yyval.op) = OP_SLASSIGN; }
-#line 2823 "parser.cpp"
+#line 2847 "parser.cpp"
     break;
 
   case 157:
 #line 513 "ecc.y"
                                         { (yyval.op) = OP_SRASSIGN; }
-#line 2829 "parser.cpp"
+#line 2853 "parser.cpp"
     break;
 
   case 158:
 #line 514 "ecc.y"
                                         { (yyval.op) = OP_ANDASSIGN; }
-#line 2835 "parser.cpp"
+#line 2859 "parser.cpp"
     break;
 
   case 159:
 #line 515 "ecc.y"
                                         { (yyval.op) = OP_XORASSIGN; }
-#line 2841 "parser.cpp"
+#line 2865 "parser.cpp"
     break;
 
   case 160:
 #line 516 "ecc.y"
                                         { (yyval.op) = OP_ORASSIGN; }
-#line 2847 "parser.cpp"
+#line 2871 "parser.cpp"
     break;
 
   case 161:
 #line 519 "ecc.y"
                                              { (yyval.expression) = (yyvsp[0].expression); }
-#line 2853 "parser.cpp"
+#line 2877 "parser.cpp"
     break;
 
   case 162:
 #line 520 "ecc.y"
                                                                                 { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), (yyvsp[-4].expression), OP_IFELSE); }
-#line 2859 "parser.cpp"
+#line 2883 "parser.cpp"
     break;
 
   case 163:
@@ -2868,187 +2892,187 @@ yyreduce:
                                 else
                                     yyerror("const-exp is not a Number constant");
                             }
-#line 2872 "parser.cpp"
+#line 2896 "parser.cpp"
     break;
 
   case 164:
 #line 533 "ecc.y"
                                                   { (yyval.expression) = (yyvsp[0].expression); }
-#line 2878 "parser.cpp"
+#line 2902 "parser.cpp"
     break;
 
   case 165:
 #line 534 "ecc.y"
                                                                   { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_OROR); }
-#line 2884 "parser.cpp"
+#line 2908 "parser.cpp"
     break;
 
   case 166:
 #line 537 "ecc.y"
                                                    { (yyval.expression) = (yyvsp[0].expression); }
-#line 2890 "parser.cpp"
+#line 2914 "parser.cpp"
     break;
 
   case 167:
 #line 538 "ecc.y"
                                                                       { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_ANDAND); }
-#line 2896 "parser.cpp"
+#line 2920 "parser.cpp"
     break;
 
   case 168:
 #line 541 "ecc.y"
                                                    { (yyval.expression) = (yyvsp[0].expression); }
-#line 2902 "parser.cpp"
+#line 2926 "parser.cpp"
     break;
 
   case 169:
 #line 542 "ecc.y"
                                                                    { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_OR); }
-#line 2908 "parser.cpp"
+#line 2932 "parser.cpp"
     break;
 
   case 170:
 #line 545 "ecc.y"
                                           { (yyval.expression) = (yyvsp[0].expression); }
-#line 2914 "parser.cpp"
+#line 2938 "parser.cpp"
     break;
 
   case 171:
 #line 546 "ecc.y"
                                                            { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_XOR); }
-#line 2920 "parser.cpp"
+#line 2944 "parser.cpp"
     break;
 
   case 172:
 #line 549 "ecc.y"
                                                    { (yyval.expression) = (yyvsp[0].expression); }
-#line 2926 "parser.cpp"
+#line 2950 "parser.cpp"
     break;
 
   case 173:
 #line 550 "ecc.y"
                                                                   { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_AND); }
-#line 2932 "parser.cpp"
+#line 2956 "parser.cpp"
     break;
 
   case 174:
 #line 553 "ecc.y"
                                                  { (yyval.expression) = (yyvsp[0].expression);}
-#line 2938 "parser.cpp"
+#line 2962 "parser.cpp"
     break;
 
   case 175:
 #line 554 "ecc.y"
                                                              { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_EQ); }
-#line 2944 "parser.cpp"
+#line 2968 "parser.cpp"
     break;
 
   case 176:
 #line 555 "ecc.y"
                                                               { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_NEQ); }
-#line 2950 "parser.cpp"
+#line 2974 "parser.cpp"
     break;
 
   case 177:
 #line 558 "ecc.y"
                                                    { (yyval.expression) = (yyvsp[0].expression); }
-#line 2956 "parser.cpp"
+#line 2980 "parser.cpp"
     break;
 
   case 178:
 #line 559 "ecc.y"
                                                                  { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_LT); }
-#line 2962 "parser.cpp"
+#line 2986 "parser.cpp"
     break;
 
   case 179:
 #line 560 "ecc.y"
                                                                  { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_GT); }
-#line 2968 "parser.cpp"
+#line 2992 "parser.cpp"
     break;
 
   case 180:
 #line 561 "ecc.y"
                                                                   { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_LEQ); }
-#line 2974 "parser.cpp"
+#line 2998 "parser.cpp"
     break;
 
   case 181:
 #line 562 "ecc.y"
                                                                   { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_GEQ); }
-#line 2980 "parser.cpp"
+#line 3004 "parser.cpp"
     break;
 
   case 182:
 #line 565 "ecc.y"
                                                { (yyval.expression) = (yyvsp[0].expression); }
-#line 2986 "parser.cpp"
+#line 3010 "parser.cpp"
     break;
 
   case 183:
 #line 566 "ecc.y"
                                                                { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_SL); }
-#line 2992 "parser.cpp"
+#line 3016 "parser.cpp"
     break;
 
   case 184:
 #line 567 "ecc.y"
                                                                { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_SR); }
-#line 2998 "parser.cpp"
+#line 3022 "parser.cpp"
     break;
 
   case 185:
 #line 570 "ecc.y"
                                            { (yyval.expression) = (yyvsp[0].expression); }
-#line 3004 "parser.cpp"
+#line 3028 "parser.cpp"
     break;
 
   case 186:
 #line 571 "ecc.y"
                                                         { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_ADD); }
-#line 3010 "parser.cpp"
+#line 3034 "parser.cpp"
     break;
 
   case 187:
 #line 572 "ecc.y"
                                                         { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_SUB); }
-#line 3016 "parser.cpp"
+#line 3040 "parser.cpp"
     break;
 
   case 188:
 #line 575 "ecc.y"
                                                { (yyval.expression) = (yyvsp[0].expression); }
-#line 3022 "parser.cpp"
+#line 3046 "parser.cpp"
     break;
 
   case 189:
 #line 576 "ecc.y"
                                                                  { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_MUL); }
-#line 3028 "parser.cpp"
+#line 3052 "parser.cpp"
     break;
 
   case 190:
 #line 577 "ecc.y"
                                                     { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_DIV); }
-#line 3034 "parser.cpp"
+#line 3058 "parser.cpp"
     break;
 
   case 191:
 #line 578 "ecc.y"
                                                     { (yyval.expression) = calculate((yyvsp[-2].expression), (yyvsp[0].expression), OP_MOD); }
-#line 3040 "parser.cpp"
+#line 3064 "parser.cpp"
     break;
 
   case 192:
 #line 581 "ecc.y"
                                                 { (yyval.expression) = (yyvsp[0].expression); }
-#line 3046 "parser.cpp"
+#line 3070 "parser.cpp"
     break;
 
   case 194:
 #line 585 "ecc.y"
                                                   { (yyval.expression) = (yyvsp[0].expression); }
-#line 3052 "parser.cpp"
+#line 3076 "parser.cpp"
     break;
 
   case 195:
@@ -3058,7 +3082,7 @@ yyreduce:
                                     yyerror("lvalue required as decrement operand");
                                 (yyval.expression) = new Expression((yyvsp[0].expression), OP_INC_FRONT);
                             }
-#line 3062 "parser.cpp"
+#line 3086 "parser.cpp"
     break;
 
   case 196:
@@ -3068,55 +3092,55 @@ yyreduce:
                                     yyerror("lvalue required as decrement operand");
                                 (yyval.expression) = new Expression((yyvsp[0].expression), OP_DEC_FRONT);
                             }
-#line 3072 "parser.cpp"
+#line 3096 "parser.cpp"
     break;
 
   case 197:
 #line 596 "ecc.y"
                                                       { (yyval.expression) = calculate((yyvsp[0].expression), (yyvsp[-1].op)); }
-#line 3078 "parser.cpp"
+#line 3102 "parser.cpp"
     break;
 
   case 200:
 #line 601 "ecc.y"
                                                  { (yyval.op) = OP_ADDRESSOF; }
-#line 3084 "parser.cpp"
+#line 3108 "parser.cpp"
     break;
 
   case 201:
 #line 602 "ecc.y"
                                                  { (yyval.op) = OP_DEREFERENCE; }
-#line 3090 "parser.cpp"
+#line 3114 "parser.cpp"
     break;
 
   case 202:
 #line 603 "ecc.y"
                                             { (yyval.op) = OP_POSITIVE; }
-#line 3096 "parser.cpp"
+#line 3120 "parser.cpp"
     break;
 
   case 203:
 #line 604 "ecc.y"
                                             { (yyval.op) = OP_NEGATIVE; }
-#line 3102 "parser.cpp"
+#line 3126 "parser.cpp"
     break;
 
   case 204:
 #line 605 "ecc.y"
                                             { (yyval.op) = OP_NOT; }
-#line 3108 "parser.cpp"
+#line 3132 "parser.cpp"
     break;
 
   case 205:
 #line 606 "ecc.y"
                                             { (yyval.op) = OP_NOTNOT; }
-#line 3114 "parser.cpp"
+#line 3138 "parser.cpp"
     break;
 
   case 206:
 #line 609 "ecc.y"
                                                   { (yyval.expression) = (yyvsp[0].expression); }
-#line 3120 "parser.cpp"
+#line 3144 "parser.cpp"
     break;
 
   case 207:
@@ -3126,7 +3150,7 @@ yyreduce:
                                     yyerror("subscripted value is neither array nor pointer nor vector");
                                 (yyval.expression) = new Expression((yyvsp[-3].expression), (yyvsp[-1].expression), OP_INDEX);
                             }
-#line 3130 "parser.cpp"
+#line 3154 "parser.cpp"
     break;
 
   case 208:
@@ -3136,7 +3160,7 @@ yyreduce:
                                     yyerror("called object is not a function or function pointer");
                                 (yyval.expression) = new FunctionCall((yyvsp[-3].expression), (yyvsp[-1].exprs));
                             }
-#line 3140 "parser.cpp"
+#line 3164 "parser.cpp"
     break;
 
   case 209:
@@ -3146,19 +3170,19 @@ yyreduce:
                                     yyerror("called object is not a function or function pointer");
                                 (yyval.expression) = new FunctionCall((yyvsp[-2].expression), nullptr);
                             }
-#line 3150 "parser.cpp"
+#line 3174 "parser.cpp"
     break;
 
   case 210:
 #line 625 "ecc.y"
                                                          { (yyval.expression) = new Expression((yyvsp[-2].expression), new Identifier(*(yyvsp[0].stringValue)), OP_DOT); delete (yyvsp[0].stringValue); }
-#line 3156 "parser.cpp"
+#line 3180 "parser.cpp"
     break;
 
   case 211:
 #line 626 "ecc.y"
                                                         { (yyval.expression) = new Expression((yyvsp[-2].expression), new Identifier(*(yyvsp[0].stringValue)), OP_TO); delete (yyvsp[0].stringValue); }
-#line 3162 "parser.cpp"
+#line 3186 "parser.cpp"
     break;
 
   case 212:
@@ -3168,7 +3192,7 @@ yyreduce:
                                     yyerror("lvalue required as increment operand");
                                 (yyval.expression) = new Expression((yyvsp[-1].expression), OP_INC_REAR);
                             }
-#line 3172 "parser.cpp"
+#line 3196 "parser.cpp"
     break;
 
   case 213:
@@ -3178,89 +3202,89 @@ yyreduce:
                                     yyerror("lvalue required as decrement operand");
                                 (yyval.expression) = new Expression((yyvsp[-1].expression), OP_DEC_REAR);
                             }
-#line 3182 "parser.cpp"
+#line 3206 "parser.cpp"
     break;
 
   case 214:
 #line 639 "ecc.y"
                                                     { (yyval.expression) = new Identifier(*(yyvsp[0].stringValue)); delete (yyvsp[0].stringValue); }
-#line 3188 "parser.cpp"
+#line 3212 "parser.cpp"
     break;
 
   case 215:
 #line 640 "ecc.y"
                                             { (yyval.expression) = (yyvsp[0].number); }
-#line 3194 "parser.cpp"
+#line 3218 "parser.cpp"
     break;
 
   case 216:
 #line 641 "ecc.y"
                                             { (yyval.expression) = new String(*(yyvsp[0].stringValue)); delete (yyvsp[0].stringValue); }
-#line 3200 "parser.cpp"
+#line 3224 "parser.cpp"
     break;
 
   case 217:
 #line 642 "ecc.y"
                                             { (yyval.expression) = (yyvsp[-1].expression); }
-#line 3206 "parser.cpp"
+#line 3230 "parser.cpp"
     break;
 
   case 218:
 #line 645 "ecc.y"
                                                  { (yyval.exprs) = new vector<Expression *>; (yyval.exprs)->push_back((yyvsp[0].expression)); }
-#line 3212 "parser.cpp"
+#line 3236 "parser.cpp"
     break;
 
   case 219:
 #line 646 "ecc.y"
                                                                      { (yyvsp[-2].exprs)->push_back((yyvsp[0].expression)); (yyval.exprs) = (yyvsp[-2].exprs); }
-#line 3218 "parser.cpp"
+#line 3242 "parser.cpp"
     break;
 
   case 220:
 #line 649 "ecc.y"
                                      { (yyval.number) = (yyvsp[0].number); }
-#line 3224 "parser.cpp"
+#line 3248 "parser.cpp"
     break;
 
   case 221:
 #line 652 "ecc.y"
                                         { (yyval.number) = new Number((yyvsp[0].num), new CharType(),   VAL_CHAR); }
-#line 3230 "parser.cpp"
+#line 3254 "parser.cpp"
     break;
 
   case 222:
 #line 653 "ecc.y"
                                         { (yyval.number) = new Number((yyvsp[0].num), new ShortType(),  VAL_SHORT); }
-#line 3236 "parser.cpp"
+#line 3260 "parser.cpp"
     break;
 
   case 223:
 #line 654 "ecc.y"
                                         { (yyval.number) = new Number((yyvsp[0].num), new IntType(),    VAL_INT); }
-#line 3242 "parser.cpp"
+#line 3266 "parser.cpp"
     break;
 
   case 224:
 #line 655 "ecc.y"
                                         { (yyval.number) = new Number((yyvsp[0].num), new LongType(),   VAL_LONG); }
-#line 3248 "parser.cpp"
+#line 3272 "parser.cpp"
     break;
 
   case 225:
 #line 656 "ecc.y"
                                         { (yyval.number) = new Number((yyvsp[0].num), new FloatType(),  VAL_FLOAT); }
-#line 3254 "parser.cpp"
+#line 3278 "parser.cpp"
     break;
 
   case 226:
 #line 657 "ecc.y"
                                         { (yyval.number) = new Number((yyvsp[0].num), new DoubleType(), VAL_DOUBLE); }
-#line 3260 "parser.cpp"
+#line 3284 "parser.cpp"
     break;
 
 
-#line 3264 "parser.cpp"
+#line 3288 "parser.cpp"
 
       default: break;
     }
@@ -3528,7 +3552,7 @@ static Expression *calculate(Expression *a, enum op_type op)
             yyerror("lvalue required as unary '&' operand");
         case OP_DEREFERENCE:
             yyerror("invalid type argument of unary '*' operand");
-        case POSITIVE:
+        case OP_POSITIVE:
             if(isfloatpoint)
                 num.doubleValue = +((Number *)a)->doubleView();
             else
@@ -3553,7 +3577,7 @@ static Expression *calculate(Expression *a, enum op_type op)
                 num.longValue = !((Number *)a)->longView();
             break;
         default:
-            yyerror("not supported operator");
+            yyerror("not supported unary operator");
         }
         
         if(isfloatpoint)
@@ -3623,7 +3647,7 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
                 num.longValue = v1 && v2;
                 break;
             default:
-                yyerror("not supported operator for double type");
+                yyerror("not supported binary operator for double type");
             }
             return new Number(num, new LongType(), VAL_LONG);
         }
@@ -3690,7 +3714,7 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
                 num.longValue = v1 && v2;
                 break;
             default:
-                yyerror("not supported operator for long type");
+                yyerror("not supported binary operator for long type");
             }
 
             return new Number(num, new LongType(), VAL_LONG);
@@ -3731,11 +3755,11 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
                 choice = ((Number *)a)->doubleView() != 0;
                 break;
             default:
-                yyerror("not supported type");
+                yyerror("not supported value type for condition");
             }
             break;
         default:
-            yyerror("not supported operator");
+            yyerror("not supported trinary operator");
         }
 
         if(isfloatpoint)

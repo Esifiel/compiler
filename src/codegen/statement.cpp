@@ -66,11 +66,6 @@ Value *IfElseStatement::codeGen(CodeGenerator &ctx)
     return nullptr;
 }
 
-Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
-{
-    return nullptr;
-}
-
 Value *WhileStatement::codeGen(CodeGenerator &ctx)
 {
     BasicBlock *whilecond = BasicBlock::Create(ctx.ctx, "while.cond", ctx.curFunction);
@@ -101,6 +96,30 @@ Value *WhileStatement::codeGen(CodeGenerator &ctx)
 
 Value *DoWhileStatement::codeGen(CodeGenerator &ctx)
 {
+    BasicBlock *dowhilecond = BasicBlock::Create(ctx.ctx, "dowhile.cond", ctx.curFunction);
+    BasicBlock *dowhileloop = BasicBlock::Create(ctx.ctx, "dowhile.loop", ctx.curFunction);
+    BasicBlock *dowhileout = BasicBlock::Create(ctx.ctx, "dowhile.out", ctx.curFunction);
+    ctx.loopctx.push_back(pair<BasicBlock *, BasicBlock *>(dowhilecond, dowhileout));
+
+    // do loop first
+    ctx.builder.CreateBr(dowhileloop);
+    ctx.builder.SetInsertPoint(dowhileloop);
+    stmt->codeGen(ctx);
+    ctx.builder.CreateBr(dowhilecond);
+
+    ctx.builder.SetInsertPoint(dowhilecond);
+    Value *cmpres = cond->codeGen(ctx);
+    if(cmpres->getType()->isPointerTy() || cmpres->getType()->getIntegerBitWidth() != 1)
+        // logical comparision is ommitted
+        cmpres = ctx.CreateBinaryExpr(
+            cmpres,
+            cmpres->getType()->isPointerTy() ? dyn_cast<Value>(ConstantPointerNull::get(dyn_cast<PointerType>(cmpres->getType()))) : ConstantInt::get(cmpres->getType(), 0),
+            OP_NEQ);
+    ctx.builder.CreateCondBr(cmpres, dowhileloop, dowhileout);
+
+    ctx.builder.SetInsertPoint(dowhileout);
+    ctx.loopctx.pop_back();
+
     return nullptr;
 }
 
@@ -157,10 +176,6 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
 
 Value *ReturnStatement::codeGen(CodeGenerator &ctx)
 {
-    // BasicBlock *returnblock = BasicBlock::Create(ctx.ctx, "return.block", ctx.curFunction);
-    // ctx.builder.CreateBr(returnblock);
-    // ctx.builder.SetInsertPoint(returnblock);
-
     if (res)
         // correct the ret val type and do a type cast
         ctx.builder.CreateRet(ctx.CreateCast(res->codeGen(ctx), ctx.curFunction->getReturnType()));
@@ -181,5 +196,20 @@ Value *ContinueStatement::codeGen(CodeGenerator &ctx)
 {
     ctx.builder.CreateBr(ctx.loopctx.back().first);
 
+    return nullptr;
+}
+
+
+Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
+{
+    // SwitchInst *sw = ctx.builder.CreateSwitch();
+
+    // sw->addCase();
+
+    return nullptr;
+}
+
+Value *CaseStatement::codeGen(CodeGenerator &ctx)
+{
     return nullptr;
 }

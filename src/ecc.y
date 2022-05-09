@@ -366,7 +366,7 @@ type-qualifier-list	        : type-qualifier { $$ = $1; }
                             ;
 
 param-type-list             : param-list { $$ = $1; }
-                            | param-list COMMA DOTDOTDOT // TODO: variable args
+                            | param-list COMMA DOTDOTDOT { $$ = $1; $$->isvariableargs = true; }
                             ;
 
 param-list                  : param-decl { $$ = $1; $$->tail = $$; }
@@ -449,8 +449,8 @@ stat                        : labeled-stat   { $$ = $1; }
                             ;
 
 labeled-stat		        : IDENTIFIER COLON stat // TODO: label
-                            | CASE const-exp COLON stat // TODO: case
-                            | DEFAULT COLON stat // TODO: default
+                            | CASE const-exp COLON stat { $$ = new CaseStatement($2, $4); }
+                            | DEFAULT COLON stat { $$ = $3; }
                             ;
 
 exp-stat            		: exp DELIM { $$ = new ExpressionStatement($1); }
@@ -467,9 +467,9 @@ stat-list                   : stat { $$ = $1; $$->tail = $$; }
                             | stat-list stat { $$ = $1; $$->tail->next = $2; $$->tail = $2; }
                             ;
 
-selection-stat		        : IF LP exp RP stat           { $5->next = nullptr; $$ = new IfElseStatement($3, $5); }
-                            | IF LP exp RP stat ELSE stat { $5->next = $7; $$ = new IfElseStatement($3, $5); }
-                            | SWITCH LP exp RP stat // TODO: switch
+selection-stat		        : IF LP exp RP stat             { $5->next = nullptr; $$ = new IfElseStatement($3, $5); }
+                            | IF LP exp RP stat ELSE stat   { $5->next = $7; $$ = new IfElseStatement($3, $5); }
+                            | SWITCH LP exp RP stat         { $$ = new SwitchCaseStatement($3, $5); }
                             ;
 
 iteration-stat      		: WHILE LP exp RP stat                   { $$ = new WhileStatement($3, $5); }
@@ -692,7 +692,7 @@ static Expression *calculate(Expression *a, enum op_type op)
             yyerror("lvalue required as unary '&' operand");
         case OP_DEREFERENCE:
             yyerror("invalid type argument of unary '*' operand");
-        case POSITIVE:
+        case OP_POSITIVE:
             if(isfloatpoint)
                 num.doubleValue = +((Number *)a)->doubleView();
             else
@@ -717,7 +717,7 @@ static Expression *calculate(Expression *a, enum op_type op)
                 num.longValue = !((Number *)a)->longView();
             break;
         default:
-            yyerror("not supported operator");
+            yyerror("not supported unary operator");
         }
         
         if(isfloatpoint)
@@ -787,7 +787,7 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
                 num.longValue = v1 && v2;
                 break;
             default:
-                yyerror("not supported operator for double type");
+                yyerror("not supported binary operator for double type");
             }
             return new Number(num, new LongType(), VAL_LONG);
         }
@@ -854,7 +854,7 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
                 num.longValue = v1 && v2;
                 break;
             default:
-                yyerror("not supported operator for long type");
+                yyerror("not supported binary operator for long type");
             }
 
             return new Number(num, new LongType(), VAL_LONG);
@@ -895,11 +895,11 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
                 choice = ((Number *)a)->doubleView() != 0;
                 break;
             default:
-                yyerror("not supported type");
+                yyerror("not supported value type for condition");
             }
             break;
         default:
-            yyerror("not supported operator");
+            yyerror("not supported trinary operator");
         }
 
         if(isfloatpoint)

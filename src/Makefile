@@ -47,7 +47,7 @@ $(NAME): $(OBJECTS)
 	# @cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
 
 	@./$(NAME) ../test/auto-advisor.c
-	@clang --target=$(TARGET) ./obj/auto-advisor.ll -o ./obj/auto-advisor
+	@clang -g3 -O0 --target=$(TARGET) ./obj/auto-advisor.ll -o ./obj/auto-advisor
 	# @cd tmp && opt -dot-cfg ../obj/auto-advisor.ll
 
 	# @cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done

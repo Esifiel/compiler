@@ -6,13 +6,13 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
 {
     auto pt = types->begin();
     auto pi = ids->begin();
-    
+
     for (; pt != types->end() && pi != ids->end(); pt++, pi++)
     {
         string varname = (*pi)->name;
 
         // if type is a undefined struct type, declare a opaque type first
-        if((*pt)->getRootType()->type == TYPE_STRUCT && !ctx.module->getTypeByName(((AggregateType *)(*pt)->getRootType())->name))
+        if ((*pt)->getRootType()->type == TYPE_STRUCT && !ctx.module->getTypeByName(((AggregateType *)(*pt)->getRootType())->name))
         {
             TypeDeclaration td = TypeDeclaration((*pt)->getRootType());
             td.codeGen(ctx);
@@ -43,7 +43,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 // TODO: local variable initialize not supported yet
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(array_t, 0, varname.c_str());
         }
-        else if((*pt)->type == TYPE_STRUCT)
+        else if ((*pt)->type == TYPE_STRUCT)
         {
             // struct type
             MyStructType *mst = (MyStructType *)*pt;
@@ -93,13 +93,13 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             {
                 // allocate space for new local variable
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(t, 0, varname.c_str());
-                if((*pi)->init)
+                if ((*pi)->init)
                     ctx.builder.CreateStore(ctx.CreateCast((*pi)->init->codeGen(ctx), t), ctx.blocks.front()[varname]);
             }
         }
 
         // collect struct type variable
-        if((*pt)->getRootType()->type == TYPE_STRUCT)
+        if ((*pt)->getRootType()->type == TYPE_STRUCT)
             ctx.structvars[varname] = (AggregateType *)((*pt)->getRootType());
     }
 
@@ -127,13 +127,18 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     {
         // collect args
         vector<Type *> args;
+        bool isvarargs = false;
         for (Parameter *p = params; p; p = (Parameter *)(p->next))
+        {
             args.push_back((Type *)(p->codeGen(ctx)));
-        // false: is not variable args
-        functype = FunctionType::get(rettype->getType(ctx), args, false);
+            if (p->isvariableargs)
+                isvarargs = true;
+        }
+        functype = FunctionType::get(rettype->getType(ctx), args, isvarargs);
     }
     else
         // no param
+        // false: is not variable args
         functype = FunctionType::get(rettype->getType(ctx), false);
 
     // create function
@@ -177,22 +182,22 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 
 Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
 {
-    if(type->type == TYPE_STRUCT)
+    if (type->type == TYPE_STRUCT)
     {
         MyStructType *mst = (MyStructType *)type;
         ctx.structtypes[mst->name] = vector<string>();
         // create struct type for assigned name
         StructType *stype = StructType::create(ctx.ctx, mst->name);
-        if(mst->members)
+        if (mst->members)
         {
             // set members
             vector<Type *> elements;
-            for(auto &p : *mst->members)
+            for (auto &p : *mst->members)
             {
-                for(auto &q : *p->first)
+                for (auto &q : *p->first)
                     elements.push_back(q->getType(ctx));
                 // record field name in context
-                for(auto &q : *p->second)
+                for (auto &q : *p->second)
                     ctx.structtypes[mst->name].push_back(q->name);
             }
             stype->setBody(elements);

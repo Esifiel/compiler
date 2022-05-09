@@ -822,818 +822,624 @@ digraph AST {
 	Number408 -> 0409
 	FunctionDeclaration410 [label=FunctionDeclaration]
 	Program -> FunctionDeclaration410
-	IntType411 [label=IntType]
-	FunctionDeclaration410 -> IntType411
+	VoidType411 [label=VoidType]
+	FunctionDeclaration410 -> VoidType411
 	Identifier412 [label=Identifier]
 	FunctionDeclaration410 -> Identifier412
-	main [label=main]
-	Identifier412 -> main
-	CompoundStatement414 [label=CompoundStatement]
-	FunctionDeclaration410 -> CompoundStatement414
-	VariableDeclaration415 [label=VariableDeclaration]
-	CompoundStatement414 -> VariableDeclaration415
-	DoubleType [label=DoubleType]
-	VariableDeclaration415 -> DoubleType
-	Identifier417 [label=Identifier]
-	VariableDeclaration415 -> Identifier417
-	gpa [label=gpa]
-	Identifier417 -> gpa
-	Number419 [label=Number]
-	Identifier417 -> Number419
-	0420 [label=0]
-	Number419 -> 0420
-	VariableDeclaration421 [label=VariableDeclaration]
-	CompoundStatement414 -> VariableDeclaration421
-	IntType422 [label=IntType]
-	VariableDeclaration421 -> IntType422
+	dump [label=dump]
+	Identifier412 -> dump
+	Parameter414 [label=Parameter]
+	FunctionDeclaration410 -> Parameter414
+	IntType415 [label=IntType]
+	Parameter414 -> IntType415
+	Identifier416 [label=Identifier]
+	Parameter414 -> Identifier416
+	index [label=index]
+	Identifier416 -> index
+	CompoundStatement418 [label=CompoundStatement]
+	FunctionDeclaration410 -> CompoundStatement418
+	VariableDeclaration419 [label=VariableDeclaration]
+	CompoundStatement418 -> VariableDeclaration419
+	MyPointerType420 [label=MyPointerType]
+	VariableDeclaration419 -> MyPointerType420
+	MyStructType421 [label=MyStructType]
+	MyPointerType420 -> MyStructType421
+	dep422 [label=dep]
+	MyStructType421 -> dep422
 	Identifier423 [label=Identifier]
-	VariableDeclaration421 -> Identifier423
-	total [label=total]
-	Identifier423 -> total
-	Number425 [label=Number]
-	Identifier423 -> Number425
-	0426 [label=0]
-	Number425 -> 0426
-	IntType427 [label=IntType]
-	VariableDeclaration421 -> IntType427
-	Identifier428 [label=Identifier]
-	VariableDeclaration421 -> Identifier428
-	try [label=try]
-	Identifier428 -> try
-	Number430 [label=Number]
-	Identifier428 -> Number430
-	0431 [label=0]
-	Number430 -> 0431
-	IntType432 [label=IntType]
-	VariableDeclaration421 -> IntType432
-	Identifier433 [label=Identifier]
-	VariableDeclaration421 -> Identifier433
-	taken [label=taken]
-	Identifier433 -> taken
-	Number435 [label=Number]
-	Identifier433 -> Number435
-	0436 [label=0]
-	Number435 -> 0436
-	IntType437 [label=IntType]
-	VariableDeclaration421 -> IntType437
-	Identifier438 [label=Identifier]
-	VariableDeclaration421 -> Identifier438
-	remaining [label=remaining]
-	Identifier438 -> remaining
-	Number440 [label=Number]
-	Identifier438 -> Number440
-	0441 [label=0]
-	Number440 -> 0441
-	VariableDeclaration442 [label=VariableDeclaration]
-	CompoundStatement414 -> VariableDeclaration442
-	MyArrayType443 [label=MyArrayType]
-	VariableDeclaration442 -> MyArrayType443
-	100444 [label=100]
-	MyArrayType443 -> 100444
-	MyArrayType445 [label=MyArrayType]
-	MyArrayType443 -> MyArrayType445
-	1000446 [label=1000]
-	MyArrayType445 -> 1000446
-	CharType447 [label=CharType]
-	MyArrayType445 -> CharType447
+	VariableDeclaration419 -> Identifier423
+	p424 [label=p]
+	Identifier423 -> p424
+	Qualifier425 [label=Qualifier]
+	Identifier423 -> Qualifier425
+	1426 [label=1]
+	Qualifier425 -> 1426
+	MyPointerType427 [label=MyPointerType]
+	VariableDeclaration419 -> MyPointerType427
+	MyStructType428 [label=MyStructType]
+	MyPointerType427 -> MyStructType428
+	dep429 [label=dep]
+	MyStructType428 -> dep429
+	Identifier430 [label=Identifier]
+	VariableDeclaration419 -> Identifier430
+	tmp431 [label=tmp]
+	Identifier430 -> tmp431
+	Qualifier432 [label=Qualifier]
+	Identifier430 -> Qualifier432
+	1433 [label=1]
+	Qualifier432 -> 1433
+	ExpressionStatement434 [label=ExpressionStatement]
+	CompoundStatement418 -> ExpressionStatement434
+	FunctionCall435 [label=FunctionCall]
+	ExpressionStatement434 -> FunctionCall435
+	Identifier436 [label=Identifier]
+	FunctionCall435 -> Identifier436
+	printf [label=printf]
+	Identifier436 -> printf
+	String [label=String]
+	FunctionCall435 -> String
+	"course %s \tcredit  %d\tgrade  %c\n" [label="course %s \tcredit  %d\tgrade  %c\n"]
+	String -> "course %s \tcredit  %d\tgrade  %c\n"
+	Expression440 [label=Expression]
+	FunctionCall435 -> Expression440
+	Identifier441 [label=Identifier]
+	Expression440 -> Identifier441
+	name442 [label=name]
+	Identifier441 -> name442
+	op443 [label=op]
+	Expression440 -> op443
+	"[]444" [label="[]"]
+	op443 -> "[]444"
+	Identifier445 [label=Identifier]
+	Expression440 -> Identifier445
+	index446 [label=index]
+	Identifier445 -> index446
+	Expression447 [label=Expression]
+	FunctionCall435 -> Expression447
 	Identifier448 [label=Identifier]
-	VariableDeclaration442 -> Identifier448
-	pyfa449 [label=pyfa]
-	Identifier448 -> pyfa449
-	VariableDeclaration450 [label=VariableDeclaration]
-	CompoundStatement414 -> VariableDeclaration450
-	IntType451 [label=IntType]
-	VariableDeclaration450 -> IntType451
+	Expression447 -> Identifier448
+	credit449 [label=credit]
+	Identifier448 -> credit449
+	op450 [label=op]
+	Expression447 -> op450
+	"[]451" [label="[]"]
+	op450 -> "[]451"
 	Identifier452 [label=Identifier]
-	VariableDeclaration450 -> Identifier452
-	cnt453 [label=cnt]
-	Identifier452 -> cnt453
-	VariableDeclaration454 [label=VariableDeclaration]
-	CompoundStatement414 -> VariableDeclaration454
-	IntType455 [label=IntType]
-	VariableDeclaration454 -> IntType455
+	Expression447 -> Identifier452
+	index453 [label=index]
+	Identifier452 -> index453
+	Expression454 [label=Expression]
+	FunctionCall435 -> Expression454
+	Expression455 [label=Expression]
+	Expression454 -> Expression455
 	Identifier456 [label=Identifier]
-	VariableDeclaration454 -> Identifier456
-	i457 [label=i]
-	Identifier456 -> i457
-	IntType458 [label=IntType]
-	VariableDeclaration454 -> IntType458
-	Identifier459 [label=Identifier]
-	VariableDeclaration454 -> Identifier459
-	j [label=j]
-	Identifier459 -> j
-	ForStatement461 [label=ForStatement]
-	CompoundStatement414 -> ForStatement461
-	Expression462 [label=Expression]
-	ForStatement461 -> Expression462
-	Identifier463 [label=Identifier]
-	Expression462 -> Identifier463
-	cnt464 [label=cnt]
-	Identifier463 -> cnt464
-	op465 [label=op]
-	Expression462 -> op465
-	"=466" [label="="]
-	op465 -> "=466"
-	Number467 [label=Number]
-	Expression462 -> Number467
-	0468 [label=0]
-	Number467 -> 0468
-	Expression469 [label=Expression]
-	ForStatement461 -> Expression469
-	FunctionCall470 [label=FunctionCall]
-	Expression469 -> FunctionCall470
+	Expression455 -> Identifier456
+	grade457 [label=grade]
+	Identifier456 -> grade457
+	op458 [label=op]
+	Expression455 -> op458
+	"[]459" [label="[]"]
+	op458 -> "[]459"
+	Identifier460 [label=Identifier]
+	Expression455 -> Identifier460
+	index461 [label=index]
+	Identifier460 -> index461
+	op462 [label=op]
+	Expression454 -> op462
+	"? :" [label="? :"]
+	op462 -> "? "
+	Number464 [label=Number]
+	Expression454 -> Number464
+	" " [label=" "]
+	Number464 -> " "
+	Expression466 [label=Expression]
+	Expression454 -> Expression466
+	Identifier467 [label=Identifier]
+	Expression466 -> Identifier467
+	grade468 [label=grade]
+	Identifier467 -> grade468
+	op469 [label=op]
+	Expression466 -> op469
+	"[]470" [label="[]"]
+	op469 -> "[]470"
 	Identifier471 [label=Identifier]
-	FunctionCall470 -> Identifier471
-	fgets [label=fgets]
-	Identifier471 -> fgets
-	Expression473 [label=Expression]
-	FunctionCall470 -> Expression473
-	Identifier474 [label=Identifier]
-	Expression473 -> Identifier474
-	pyfa475 [label=pyfa]
-	Identifier474 -> pyfa475
-	op476 [label=op]
-	Expression473 -> op476
-	"[]477" [label="[]"]
-	op476 -> "[]477"
-	Identifier478 [label=Identifier]
-	Expression473 -> Identifier478
-	cnt479 [label=cnt]
-	Identifier478 -> cnt479
-	Number480 [label=Number]
-	FunctionCall470 -> Number480
-	999 [label=999]
-	Number480 -> 999
-	Identifier482 [label=Identifier]
-	FunctionCall470 -> Identifier482
-	stdin [label=stdin]
-	Identifier482 -> stdin
-	op484 [label=op]
-	Expression469 -> op484
-	"," [label=","]
-	op484 -> ","
-	FunctionCall486 [label=FunctionCall]
-	Expression469 -> FunctionCall486
-	Identifier487 [label=Identifier]
-	FunctionCall486 -> Identifier487
-	strcmp [label=strcmp]
-	Identifier487 -> strcmp
+	Expression466 -> Identifier471
+	index472 [label=index]
+	Identifier471 -> index472
+	IfElseStatement473 [label=IfElseStatement]
+	CompoundStatement418 -> IfElseStatement473
+	Expression474 [label=Expression]
+	IfElseStatement473 -> Expression474
+	Identifier475 [label=Identifier]
+	Expression474 -> Identifier475
+	dependency476 [label=dependency]
+	Identifier475 -> dependency476
+	op477 [label=op]
+	Expression474 -> op477
+	"[]478" [label="[]"]
+	op477 -> "[]478"
+	Identifier479 [label=Identifier]
+	Expression474 -> Identifier479
+	index480 [label=index]
+	Identifier479 -> index480
+	CompoundStatement481 [label=CompoundStatement]
+	IfElseStatement473 -> CompoundStatement481
+	VariableDeclaration482 [label=VariableDeclaration]
+	CompoundStatement481 -> VariableDeclaration482
+	IntType483 [label=IntType]
+	VariableDeclaration482 -> IntType483
+	Identifier484 [label=Identifier]
+	VariableDeclaration482 -> Identifier484
+	cnt485 [label=cnt]
+	Identifier484 -> cnt485
+	Number486 [label=Number]
+	Identifier484 -> Number486
+	0487 [label=0]
+	Number486 -> 0487
+	ForStatement488 [label=ForStatement]
+	CompoundStatement481 -> ForStatement488
 	Expression489 [label=Expression]
-	FunctionCall486 -> Expression489
+	ForStatement488 -> Expression489
 	Identifier490 [label=Identifier]
 	Expression489 -> Identifier490
-	pyfa491 [label=pyfa]
-	Identifier490 -> pyfa491
+	p491 [label=p]
+	Identifier490 -> p491
 	op492 [label=op]
 	Expression489 -> op492
-	"[]493" [label="[]"]
-	op492 -> "[]493"
-	Identifier494 [label=Identifier]
-	Expression489 -> Identifier494
-	cnt495 [label=cnt]
-	Identifier494 -> cnt495
-	String [label=String]
-	FunctionCall486 -> String
-	"" [label=""]
-	String -> ""
-	Expression498 [label=Expression]
-	ForStatement461 -> Expression498
-	Identifier499 [label=Identifier]
-	Expression498 -> Identifier499
-	cnt500 [label=cnt]
-	Identifier499 -> cnt500
-	op501 [label=op]
-	Expression498 -> op501
-	"++502" [label="++"]
-	op501 -> "++502"
-	ExpressionStatement503 [label=ExpressionStatement]
-	ForStatement461 -> ExpressionStatement503
-	ExpressionStatement504 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement504
-	FunctionCall505 [label=FunctionCall]
-	ExpressionStatement504 -> FunctionCall505
+	"=493" [label="="]
+	op492 -> "=493"
+	Expression494 [label=Expression]
+	Expression489 -> Expression494
+	Expression495 [label=Expression]
+	Expression494 -> Expression495
+	Identifier496 [label=Identifier]
+	Expression495 -> Identifier496
+	dependency497 [label=dependency]
+	Identifier496 -> dependency497
+	op498 [label=op]
+	Expression495 -> op498
+	"[]499" [label="[]"]
+	op498 -> "[]499"
+	Identifier500 [label=Identifier]
+	Expression495 -> Identifier500
+	index501 [label=index]
+	Identifier500 -> index501
+	op502 [label=op]
+	Expression494 -> op502
+	"->" [label="->"]
+	op502 -> "->"
+	Identifier504 [label=Identifier]
+	Expression494 -> Identifier504
+	another505 [label=another]
+	Identifier504 -> another505
 	Identifier506 [label=Identifier]
-	FunctionCall505 -> Identifier506
-	extract507 [label=extract]
-	Identifier506 -> extract507
-	Identifier508 [label=Identifier]
-	FunctionCall505 -> Identifier508
-	pyfa509 [label=pyfa]
-	Identifier508 -> pyfa509
-	Identifier510 [label=Identifier]
-	FunctionCall505 -> Identifier510
-	cnt511 [label=cnt]
-	Identifier510 -> cnt511
-	ForStatement512 [label=ForStatement]
-	CompoundStatement414 -> ForStatement512
+	ForStatement488 -> Identifier506
+	p507 [label=p]
+	Identifier506 -> p507
+	Expression508 [label=Expression]
+	ForStatement488 -> Expression508
+	Identifier509 [label=Identifier]
+	Expression508 -> Identifier509
+	p510 [label=p]
+	Identifier509 -> p510
+	op511 [label=op]
+	Expression508 -> op511
+	"=512" [label="="]
+	op511 -> "=512"
 	Expression513 [label=Expression]
-	ForStatement512 -> Expression513
+	Expression508 -> Expression513
 	Identifier514 [label=Identifier]
 	Expression513 -> Identifier514
-	i515 [label=i]
-	Identifier514 -> i515
+	p515 [label=p]
+	Identifier514 -> p515
 	op516 [label=op]
 	Expression513 -> op516
-	"=517" [label="="]
-	op516 -> "=517"
-	Number518 [label=Number]
-	Expression513 -> Number518
-	0519 [label=0]
-	Number518 -> 0519
-	Expression520 [label=Expression]
-	ForStatement512 -> Expression520
-	Identifier521 [label=Identifier]
-	Expression520 -> Identifier521
-	i522 [label=i]
-	Identifier521 -> i522
-	op523 [label=op]
-	Expression520 -> op523
-	"<524" [label="<"]
-	op523 -> "<524"
-	Identifier525 [label=Identifier]
-	Expression520 -> Identifier525
-	cnt526 [label=cnt]
-	Identifier525 -> cnt526
+	"->517" [label="->"]
+	op516 -> "->517"
+	Identifier518 [label=Identifier]
+	Expression513 -> Identifier518
+	another519 [label=another]
+	Identifier518 -> another519
+	CompoundStatement520 [label=CompoundStatement]
+	ForStatement488 -> CompoundStatement520
+	ExpressionStatement521 [label=ExpressionStatement]
+	CompoundStatement520 -> ExpressionStatement521
+	FunctionCall522 [label=FunctionCall]
+	ExpressionStatement521 -> FunctionCall522
+	Identifier523 [label=Identifier]
+	FunctionCall522 -> Identifier523
+	printf524 [label=printf]
+	Identifier523 -> printf524
+	String525 [label=String]
+	FunctionCall522 -> String525
+	"choice %d  " [label="choice %d  "]
+	String525 -> "choice %d  "
 	Expression527 [label=Expression]
-	ForStatement512 -> Expression527
+	FunctionCall522 -> Expression527
 	Identifier528 [label=Identifier]
 	Expression527 -> Identifier528
-	i529 [label=i]
-	Identifier528 -> i529
+	cnt529 [label=cnt]
+	Identifier528 -> cnt529
 	op530 [label=op]
 	Expression527 -> op530
 	"++531" [label="++"]
 	op530 -> "++531"
-	CompoundStatement532 [label=CompoundStatement]
-	ForStatement512 -> CompoundStatement532
-	ExpressionStatement533 [label=ExpressionStatement]
-	CompoundStatement532 -> ExpressionStatement533
-	Expression534 [label=Expression]
-	ExpressionStatement533 -> Expression534
-	Identifier535 [label=Identifier]
-	Expression534 -> Identifier535
-	total536 [label=total]
-	Identifier535 -> total536
-	op537 [label=op]
-	Expression534 -> op537
-	"+=" [label="+="]
-	op537 -> "+="
-	Expression539 [label=Expression]
-	Expression534 -> Expression539
-	Identifier540 [label=Identifier]
-	Expression539 -> Identifier540
-	credit541 [label=credit]
-	Identifier540 -> credit541
-	op542 [label=op]
-	Expression539 -> op542
-	"[]543" [label="[]"]
-	op542 -> "[]543"
-	Identifier544 [label=Identifier]
-	Expression539 -> Identifier544
-	i545 [label=i]
-	Identifier544 -> i545
-	IfElseStatement546 [label=IfElseStatement]
-	CompoundStatement532 -> IfElseStatement546
+	ForStatement532 [label=ForStatement]
+	CompoundStatement520 -> ForStatement532
+	Expression533 [label=Expression]
+	ForStatement532 -> Expression533
+	Identifier534 [label=Identifier]
+	Expression533 -> Identifier534
+	tmp535 [label=tmp]
+	Identifier534 -> tmp535
+	op536 [label=op]
+	Expression533 -> op536
+	"=537" [label="="]
+	op536 -> "=537"
+	Expression538 [label=Expression]
+	Expression533 -> Expression538
+	Identifier539 [label=Identifier]
+	Expression538 -> Identifier539
+	p540 [label=p]
+	Identifier539 -> p540
+	op541 [label=op]
+	Expression538 -> op541
+	"->542" [label="->"]
+	op541 -> "->542"
+	Identifier543 [label=Identifier]
+	Expression538 -> Identifier543
+	next544 [label=next]
+	Identifier543 -> next544
+	Identifier545 [label=Identifier]
+	ForStatement532 -> Identifier545
+	tmp546 [label=tmp]
+	Identifier545 -> tmp546
 	Expression547 [label=Expression]
-	IfElseStatement546 -> Expression547
-	Expression548 [label=Expression]
-	Expression547 -> Expression548
-	Identifier549 [label=Identifier]
-	Expression548 -> Identifier549
-	grade550 [label=grade]
-	Identifier549 -> grade550
-	op551 [label=op]
-	Expression548 -> op551
-	"[]552" [label="[]"]
-	op551 -> "[]552"
+	ForStatement532 -> Expression547
+	Identifier548 [label=Identifier]
+	Expression547 -> Identifier548
+	tmp549 [label=tmp]
+	Identifier548 -> tmp549
+	op550 [label=op]
+	Expression547 -> op550
+	"=551" [label="="]
+	op550 -> "=551"
+	Expression552 [label=Expression]
+	Expression547 -> Expression552
 	Identifier553 [label=Identifier]
-	Expression548 -> Identifier553
-	i554 [label=i]
-	Identifier553 -> i554
+	Expression552 -> Identifier553
+	tmp554 [label=tmp]
+	Identifier553 -> tmp554
 	op555 [label=op]
-	Expression547 -> op555
-	"&&556" [label="&&"]
-	op555 -> "&&556"
-	Expression557 [label=Expression]
-	Expression547 -> Expression557
-	Expression558 [label=Expression]
-	Expression557 -> Expression558
-	Identifier559 [label=Identifier]
-	Expression558 -> Identifier559
-	grade560 [label=grade]
-	Identifier559 -> grade560
-	op561 [label=op]
-	Expression558 -> op561
-	"[]562" [label="[]"]
-	op561 -> "[]562"
-	Identifier563 [label=Identifier]
-	Expression558 -> Identifier563
-	i564 [label=i]
-	Identifier563 -> i564
-	op565 [label=op]
-	Expression557 -> op565
-	"!=566" [label="!="]
-	op565 -> "!=566"
-	Number567 [label=Number]
-	Expression557 -> Number567
-	F [label=F]
-	Number567 -> F
-	CompoundStatement569 [label=CompoundStatement]
-	IfElseStatement546 -> CompoundStatement569
-	ExpressionStatement570 [label=ExpressionStatement]
-	CompoundStatement569 -> ExpressionStatement570
-	Expression571 [label=Expression]
-	ExpressionStatement570 -> Expression571
-	Identifier572 [label=Identifier]
-	Expression571 -> Identifier572
-	taken573 [label=taken]
-	Identifier572 -> taken573
-	op574 [label=op]
-	Expression571 -> op574
-	"+=575" [label="+="]
-	op574 -> "+=575"
-	Expression576 [label=Expression]
-	Expression571 -> Expression576
-	Identifier577 [label=Identifier]
-	Expression576 -> Identifier577
-	credit578 [label=credit]
-	Identifier577 -> credit578
-	op579 [label=op]
-	Expression576 -> op579
-	"[]580" [label="[]"]
-	op579 -> "[]580"
-	Identifier581 [label=Identifier]
-	Expression576 -> Identifier581
-	i582 [label=i]
-	Identifier581 -> i582
-	IfElseStatement583 [label=IfElseStatement]
-	IfElseStatement546 -> IfElseStatement583
-	Expression584 [label=Expression]
-	IfElseStatement583 -> Expression584
-	Expression585 [label=Expression]
-	Expression584 -> Expression585
-	Identifier586 [label=Identifier]
-	Expression585 -> Identifier586
-	grade587 [label=grade]
-	Identifier586 -> grade587
-	op588 [label=op]
-	Expression585 -> op588
-	"[]589" [label="[]"]
-	op588 -> "[]589"
-	Identifier590 [label=Identifier]
-	Expression585 -> Identifier590
-	i591 [label=i]
-	Identifier590 -> i591
-	op592 [label=op]
-	Expression584 -> op592
-	"==" [label="=="]
-	op592 -> "=="
-	Number594 [label=Number]
-	Expression584 -> Number594
-	F595 [label=F]
-	Number594 -> F595
-	ExpressionStatement596 [label=ExpressionStatement]
-	IfElseStatement583 -> ExpressionStatement596
-	Expression597 [label=Expression]
-	ExpressionStatement596 -> Expression597
-	Identifier598 [label=Identifier]
-	Expression597 -> Identifier598
-	try599 [label=try]
-	Identifier598 -> try599
-	op600 [label=op]
-	Expression597 -> op600
-	"+=601" [label="+="]
-	op600 -> "+=601"
-	Expression602 [label=Expression]
-	Expression597 -> Expression602
-	Identifier603 [label=Identifier]
-	Expression602 -> Identifier603
-	credit604 [label=credit]
-	Identifier603 -> credit604
-	op605 [label=op]
-	Expression602 -> op605
-	"[]606" [label="[]"]
-	op605 -> "[]606"
-	Identifier607 [label=Identifier]
-	Expression602 -> Identifier607
-	i608 [label=i]
-	Identifier607 -> i608
-	ExpressionStatement609 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement609
-	Expression610 [label=Expression]
-	ExpressionStatement609 -> Expression610
-	Identifier611 [label=Identifier]
-	Expression610 -> Identifier611
-	try612 [label=try]
-	Identifier611 -> try612
-	op613 [label=op]
-	Expression610 -> op613
-	"+=614" [label="+="]
-	op613 -> "+=614"
-	Identifier615 [label=Identifier]
-	Expression610 -> Identifier615
-	taken616 [label=taken]
-	Identifier615 -> taken616
-	ExpressionStatement617 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement617
-	Expression618 [label=Expression]
-	ExpressionStatement617 -> Expression618
-	Identifier619 [label=Identifier]
-	Expression618 -> Identifier619
-	remaining620 [label=remaining]
-	Identifier619 -> remaining620
-	op621 [label=op]
-	Expression618 -> op621
-	"=622" [label="="]
-	op621 -> "=622"
-	Expression623 [label=Expression]
-	Expression618 -> Expression623
-	Identifier624 [label=Identifier]
-	Expression623 -> Identifier624
-	total625 [label=total]
-	Identifier624 -> total625
-	op626 [label=op]
-	Expression623 -> op626
-	"-" [label="-"]
-	op626 -> "-"
-	Identifier628 [label=Identifier]
-	Expression623 -> Identifier628
-	taken629 [label=taken]
-	Identifier628 -> taken629
-	IfElseStatement630 [label=IfElseStatement]
-	CompoundStatement414 -> IfElseStatement630
-	Expression631 [label=Expression]
-	IfElseStatement630 -> Expression631
-	Identifier632 [label=Identifier]
-	Expression631 -> Identifier632
-	try633 [label=try]
-	Identifier632 -> try633
-	op634 [label=op]
-	Expression631 -> op634
-	"!=635" [label="!="]
-	op634 -> "!=635"
-	Number636 [label=Number]
-	Expression631 -> Number636
-	0637 [label=0]
-	Number636 -> 0637
-	ExpressionStatement638 [label=ExpressionStatement]
-	IfElseStatement630 -> ExpressionStatement638
-	Expression639 [label=Expression]
-	ExpressionStatement638 -> Expression639
-	Identifier640 [label=Identifier]
-	Expression639 -> Identifier640
-	gpa641 [label=gpa]
-	Identifier640 -> gpa641
-	op642 [label=op]
-	Expression639 -> op642
-	"/=" [label="/="]
-	op642 -> "/="
-	Identifier644 [label=Identifier]
-	Expression639 -> Identifier644
-	try645 [label=try]
-	Identifier644 -> try645
-	ExpressionStatement646 [label=ExpressionStatement]
-	IfElseStatement630 -> ExpressionStatement646
-	Expression647 [label=Expression]
-	ExpressionStatement646 -> Expression647
-	Identifier648 [label=Identifier]
-	Expression647 -> Identifier648
-	gpa649 [label=gpa]
-	Identifier648 -> gpa649
-	op650 [label=op]
-	Expression647 -> op650
-	"=651" [label="="]
-	op650 -> "=651"
-	Number652 [label=Number]
-	Expression647 -> Number652
-	0653 [label=0]
-	Number652 -> 0653
-	ExpressionStatement654 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement654
-	FunctionCall655 [label=FunctionCall]
-	ExpressionStatement654 -> FunctionCall655
-	Identifier656 [label=Identifier]
-	FunctionCall655 -> Identifier656
-	printf [label=printf]
-	Identifier656 -> printf
-	String658 [label=String]
-	FunctionCall655 -> String658
-	"GPA: %.1f
-" [label="GPA: %.1f
-"]
-	String658 -> GPA:" %.1f
-"
-	Identifier660 [label=Identifier]
-	FunctionCall655 -> Identifier660
-	gpa661 [label=gpa]
-	Identifier660 -> gpa661
-	ExpressionStatement662 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement662
-	FunctionCall663 [label=FunctionCall]
-	ExpressionStatement662 -> FunctionCall663
-	Identifier664 [label=Identifier]
-	FunctionCall663 -> Identifier664
-	printf665 [label=printf]
-	Identifier664 -> printf665
-	String666 [label=String]
-	FunctionCall663 -> String666
-	"Hours Attempted: %u
-" [label="Hours Attempted: %u
-"]
-	String666 -> "Hours Attempted":" %u
-"
-	Identifier668 [label=Identifier]
-	FunctionCall663 -> Identifier668
-	try669 [label=try]
-	Identifier668 -> try669
-	ExpressionStatement670 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement670
-	FunctionCall671 [label=FunctionCall]
-	ExpressionStatement670 -> FunctionCall671
-	Identifier672 [label=Identifier]
-	FunctionCall671 -> Identifier672
-	printf673 [label=printf]
-	Identifier672 -> printf673
-	String674 [label=String]
-	FunctionCall671 -> String674
-	"Hours Completed: %u
-" [label="Hours Completed: %u
-"]
-	String674 -> "Hours Completed":" %u
-"
-	Identifier676 [label=Identifier]
-	FunctionCall671 -> Identifier676
-	taken677 [label=taken]
-	Identifier676 -> taken677
-	ExpressionStatement678 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement678
-	FunctionCall679 [label=FunctionCall]
-	ExpressionStatement678 -> FunctionCall679
-	Identifier680 [label=Identifier]
-	FunctionCall679 -> Identifier680
-	printf681 [label=printf]
-	Identifier680 -> printf681
-	String682 [label=String]
-	FunctionCall679 -> String682
-	"Credits Remaining: %u
-
-" [label="Credits Remaining: %u
-
-"]
-	String682 -> "Credits Remaining":" %u
-
-"
-	Identifier684 [label=Identifier]
-	FunctionCall679 -> Identifier684
-	remaining685 [label=remaining]
-	Identifier684 -> remaining685
-	ExpressionStatement686 [label=ExpressionStatement]
-	CompoundStatement414 -> ExpressionStatement686
-	FunctionCall687 [label=FunctionCall]
-	ExpressionStatement686 -> FunctionCall687
-	Identifier688 [label=Identifier]
-	FunctionCall687 -> Identifier688
+	Expression552 -> op555
+	"->556" [label="->"]
+	op555 -> "->556"
+	Identifier557 [label=Identifier]
+	Expression552 -> Identifier557
+	next558 [label=next]
+	Identifier557 -> next558
+	ExpressionStatement559 [label=ExpressionStatement]
+	ForStatement532 -> ExpressionStatement559
+	FunctionCall560 [label=FunctionCall]
+	ExpressionStatement559 -> FunctionCall560
+	Identifier561 [label=Identifier]
+	FunctionCall560 -> Identifier561
+	printf562 [label=printf]
+	Identifier561 -> printf562
+	String563 [label=String]
+	FunctionCall560 -> String563
+	"%s " [label="%s "]
+	String563 -> "%s "
+	Expression565 [label=Expression]
+	FunctionCall560 -> Expression565
+	Identifier566 [label=Identifier]
+	Expression565 -> Identifier566
+	tmp567 [label=tmp]
+	Identifier566 -> tmp567
+	op568 [label=op]
+	Expression565 -> op568
+	"->569" [label="->"]
+	op568 -> "->569"
+	Identifier570 [label=Identifier]
+	Expression565 -> Identifier570
+	name571 [label=name]
+	Identifier570 -> name571
+	ExpressionStatement572 [label=ExpressionStatement]
+	CompoundStatement520 -> ExpressionStatement572
+	FunctionCall573 [label=FunctionCall]
+	ExpressionStatement572 -> FunctionCall573
+	Identifier574 [label=Identifier]
+	FunctionCall573 -> Identifier574
 	puts [label=puts]
-	Identifier688 -> puts
-	String690 [label=String]
-	FunctionCall687 -> String690
-	"Possible Courses to Take Next" [label="Possible Courses to Take Next"]
-	String690 -> "Possible Courses to Take Next"
-	IfElseStatement692 [label=IfElseStatement]
-	CompoundStatement414 -> IfElseStatement692
+	Identifier574 -> puts
+	String576 [label=String]
+	FunctionCall573 -> String576
+	"" [label=""]
+	String576 -> ""
+	ExpressionStatement578 [label=ExpressionStatement]
+	IfElseStatement473 -> ExpressionStatement578
+	FunctionCall579 [label=FunctionCall]
+	ExpressionStatement578 -> FunctionCall579
+	Identifier580 [label=Identifier]
+	FunctionCall579 -> Identifier580
+	puts581 [label=puts]
+	Identifier580 -> puts581
+	String582 [label=String]
+	FunctionCall579 -> String582
+	"no courses required ahead" [label="no courses required ahead"]
+	String582 -> "no courses required ahead"
+	ExpressionStatement584 [label=ExpressionStatement]
+	CompoundStatement418 -> ExpressionStatement584
+	FunctionCall585 [label=FunctionCall]
+	ExpressionStatement584 -> FunctionCall585
+	Identifier586 [label=Identifier]
+	FunctionCall585 -> Identifier586
+	puts587 [label=puts]
+	Identifier586 -> puts587
+	String588 [label=String]
+	FunctionCall585 -> String588
+	"--------------------------------------------" [label="--------------------------------------------"]
+	String588 -> "--------------------------------------------"
+	FunctionDeclaration590 [label=FunctionDeclaration]
+	Program -> FunctionDeclaration590
+	IntType591 [label=IntType]
+	FunctionDeclaration590 -> IntType591
+	Identifier592 [label=Identifier]
+	FunctionDeclaration590 -> Identifier592
+	main [label=main]
+	Identifier592 -> main
+	CompoundStatement594 [label=CompoundStatement]
+	FunctionDeclaration590 -> CompoundStatement594
+	VariableDeclaration595 [label=VariableDeclaration]
+	CompoundStatement594 -> VariableDeclaration595
+	DoubleType [label=DoubleType]
+	VariableDeclaration595 -> DoubleType
+	Identifier597 [label=Identifier]
+	VariableDeclaration595 -> Identifier597
+	gpa [label=gpa]
+	Identifier597 -> gpa
+	Number599 [label=Number]
+	Identifier597 -> Number599
+	0600 [label=0]
+	Number599 -> 0600
+	VariableDeclaration601 [label=VariableDeclaration]
+	CompoundStatement594 -> VariableDeclaration601
+	IntType602 [label=IntType]
+	VariableDeclaration601 -> IntType602
+	Identifier603 [label=Identifier]
+	VariableDeclaration601 -> Identifier603
+	total [label=total]
+	Identifier603 -> total
+	Number605 [label=Number]
+	Identifier603 -> Number605
+	0606 [label=0]
+	Number605 -> 0606
+	IntType607 [label=IntType]
+	VariableDeclaration601 -> IntType607
+	Identifier608 [label=Identifier]
+	VariableDeclaration601 -> Identifier608
+	try [label=try]
+	Identifier608 -> try
+	Number610 [label=Number]
+	Identifier608 -> Number610
+	0611 [label=0]
+	Number610 -> 0611
+	IntType612 [label=IntType]
+	VariableDeclaration601 -> IntType612
+	Identifier613 [label=Identifier]
+	VariableDeclaration601 -> Identifier613
+	taken [label=taken]
+	Identifier613 -> taken
+	Number615 [label=Number]
+	Identifier613 -> Number615
+	0616 [label=0]
+	Number615 -> 0616
+	IntType617 [label=IntType]
+	VariableDeclaration601 -> IntType617
+	Identifier618 [label=Identifier]
+	VariableDeclaration601 -> Identifier618
+	remaining [label=remaining]
+	Identifier618 -> remaining
+	Number620 [label=Number]
+	Identifier618 -> Number620
+	0621 [label=0]
+	Number620 -> 0621
+	VariableDeclaration622 [label=VariableDeclaration]
+	CompoundStatement594 -> VariableDeclaration622
+	MyArrayType623 [label=MyArrayType]
+	VariableDeclaration622 -> MyArrayType623
+	100624 [label=100]
+	MyArrayType623 -> 100624
+	MyArrayType625 [label=MyArrayType]
+	MyArrayType623 -> MyArrayType625
+	1000626 [label=1000]
+	MyArrayType625 -> 1000626
+	CharType627 [label=CharType]
+	MyArrayType625 -> CharType627
+	Identifier628 [label=Identifier]
+	VariableDeclaration622 -> Identifier628
+	pyfa629 [label=pyfa]
+	Identifier628 -> pyfa629
+	VariableDeclaration630 [label=VariableDeclaration]
+	CompoundStatement594 -> VariableDeclaration630
+	IntType631 [label=IntType]
+	VariableDeclaration630 -> IntType631
+	Identifier632 [label=Identifier]
+	VariableDeclaration630 -> Identifier632
+	cnt633 [label=cnt]
+	Identifier632 -> cnt633
+	VariableDeclaration634 [label=VariableDeclaration]
+	CompoundStatement594 -> VariableDeclaration634
+	IntType635 [label=IntType]
+	VariableDeclaration634 -> IntType635
+	Identifier636 [label=Identifier]
+	VariableDeclaration634 -> Identifier636
+	i637 [label=i]
+	Identifier636 -> i637
+	IntType638 [label=IntType]
+	VariableDeclaration634 -> IntType638
+	Identifier639 [label=Identifier]
+	VariableDeclaration634 -> Identifier639
+	j [label=j]
+	Identifier639 -> j
+	ForStatement641 [label=ForStatement]
+	CompoundStatement594 -> ForStatement641
+	Expression642 [label=Expression]
+	ForStatement641 -> Expression642
+	Identifier643 [label=Identifier]
+	Expression642 -> Identifier643
+	cnt644 [label=cnt]
+	Identifier643 -> cnt644
+	op645 [label=op]
+	Expression642 -> op645
+	"=646" [label="="]
+	op645 -> "=646"
+	Number647 [label=Number]
+	Expression642 -> Number647
+	0648 [label=0]
+	Number647 -> 0648
+	Expression649 [label=Expression]
+	ForStatement641 -> Expression649
+	FunctionCall650 [label=FunctionCall]
+	Expression649 -> FunctionCall650
+	Identifier651 [label=Identifier]
+	FunctionCall650 -> Identifier651
+	fgets [label=fgets]
+	Identifier651 -> fgets
+	Expression653 [label=Expression]
+	FunctionCall650 -> Expression653
+	Identifier654 [label=Identifier]
+	Expression653 -> Identifier654
+	pyfa655 [label=pyfa]
+	Identifier654 -> pyfa655
+	op656 [label=op]
+	Expression653 -> op656
+	"[]657" [label="[]"]
+	op656 -> "[]657"
+	Identifier658 [label=Identifier]
+	Expression653 -> Identifier658
+	cnt659 [label=cnt]
+	Identifier658 -> cnt659
+	Number660 [label=Number]
+	FunctionCall650 -> Number660
+	999 [label=999]
+	Number660 -> 999
+	Identifier662 [label=Identifier]
+	FunctionCall650 -> Identifier662
+	stdin [label=stdin]
+	Identifier662 -> stdin
+	op664 [label=op]
+	Expression649 -> op664
+	"," [label=","]
+	op664 -> ","
+	FunctionCall666 [label=FunctionCall]
+	Expression649 -> FunctionCall666
+	Identifier667 [label=Identifier]
+	FunctionCall666 -> Identifier667
+	strcmp [label=strcmp]
+	Identifier667 -> strcmp
+	Expression669 [label=Expression]
+	FunctionCall666 -> Expression669
+	Identifier670 [label=Identifier]
+	Expression669 -> Identifier670
+	pyfa671 [label=pyfa]
+	Identifier670 -> pyfa671
+	op672 [label=op]
+	Expression669 -> op672
+	"[]673" [label="[]"]
+	op672 -> "[]673"
+	Identifier674 [label=Identifier]
+	Expression669 -> Identifier674
+	cnt675 [label=cnt]
+	Identifier674 -> cnt675
+	String676 [label=String]
+	FunctionCall666 -> String676
+	"\n" [label="\n"]
+	String676 -> "\n"
+	Expression678 [label=Expression]
+	ForStatement641 -> Expression678
+	Identifier679 [label=Identifier]
+	Expression678 -> Identifier679
+	cnt680 [label=cnt]
+	Identifier679 -> cnt680
+	op681 [label=op]
+	Expression678 -> op681
+	"++682" [label="++"]
+	op681 -> "++682"
+	ExpressionStatement683 [label=ExpressionStatement]
+	ForStatement641 -> ExpressionStatement683
+	ExpressionStatement684 [label=ExpressionStatement]
+	CompoundStatement594 -> ExpressionStatement684
+	FunctionCall685 [label=FunctionCall]
+	ExpressionStatement684 -> FunctionCall685
+	Identifier686 [label=Identifier]
+	FunctionCall685 -> Identifier686
+	extract687 [label=extract]
+	Identifier686 -> extract687
+	Identifier688 [label=Identifier]
+	FunctionCall685 -> Identifier688
+	pyfa689 [label=pyfa]
+	Identifier688 -> pyfa689
+	Identifier690 [label=Identifier]
+	FunctionCall685 -> Identifier690
+	cnt691 [label=cnt]
+	Identifier690 -> cnt691
+	ForStatement692 [label=ForStatement]
+	CompoundStatement594 -> ForStatement692
 	Expression693 [label=Expression]
-	IfElseStatement692 -> Expression693
+	ForStatement692 -> Expression693
 	Identifier694 [label=Identifier]
 	Expression693 -> Identifier694
-	remaining695 [label=remaining]
-	Identifier694 -> remaining695
+	i695 [label=i]
+	Identifier694 -> i695
 	op696 [label=op]
 	Expression693 -> op696
-	"==697" [label="=="]
-	op696 -> "==697"
+	"=697" [label="="]
+	op696 -> "=697"
 	Number698 [label=Number]
 	Expression693 -> Number698
 	0699 [label=0]
 	Number698 -> 0699
-	ExpressionStatement700 [label=ExpressionStatement]
-	IfElseStatement692 -> ExpressionStatement700
-	FunctionCall701 [label=FunctionCall]
-	ExpressionStatement700 -> FunctionCall701
-	Identifier702 [label=Identifier]
-	FunctionCall701 -> Identifier702
-	puts703 [label=puts]
-	Identifier702 -> puts703
-	String704 [label=String]
-	FunctionCall701 -> String704
-	"None - Congratulations!" [label="None - Congratulations!"]
-	String704 -> "None - Congratulations!"
-	CompoundStatement706 [label=CompoundStatement]
-	IfElseStatement692 -> CompoundStatement706
-	VariableDeclaration707 [label=VariableDeclaration]
-	CompoundStatement706 -> VariableDeclaration707
-	MyPointerType708 [label=MyPointerType]
-	VariableDeclaration707 -> MyPointerType708
-	MyStructType709 [label=MyStructType]
-	MyPointerType708 -> MyStructType709
-	dep710 [label=dep]
-	MyStructType709 -> dep710
-	Identifier711 [label=Identifier]
-	VariableDeclaration707 -> Identifier711
-	p712 [label=p]
-	Identifier711 -> p712
-	Qualifier713 [label=Qualifier]
-	Identifier711 -> Qualifier713
-	1714 [label=1]
-	Qualifier713 -> 1714
-	MyPointerType715 [label=MyPointerType]
-	VariableDeclaration707 -> MyPointerType715
-	MyStructType716 [label=MyStructType]
-	MyPointerType715 -> MyStructType716
-	dep717 [label=dep]
-	MyStructType716 -> dep717
-	Identifier718 [label=Identifier]
-	VariableDeclaration707 -> Identifier718
-	prev [label=prev]
-	Identifier718 -> prev
-	Qualifier720 [label=Qualifier]
-	Identifier718 -> Qualifier720
-	1721 [label=1]
-	Qualifier720 -> 1721
-	MyPointerType722 [label=MyPointerType]
-	VariableDeclaration707 -> MyPointerType722
-	MyStructType723 [label=MyStructType]
-	MyPointerType722 -> MyStructType723
-	dep724 [label=dep]
-	MyStructType723 -> dep724
-	Identifier725 [label=Identifier]
-	VariableDeclaration707 -> Identifier725
-	cur [label=cur]
-	Identifier725 -> cur
-	Qualifier727 [label=Qualifier]
-	Identifier725 -> Qualifier727
-	1728 [label=1]
-	Qualifier727 -> 1728
-	MyPointerType729 [label=MyPointerType]
-	VariableDeclaration707 -> MyPointerType729
-	MyStructType730 [label=MyStructType]
-	MyPointerType729 -> MyStructType730
-	dep731 [label=dep]
-	MyStructType730 -> dep731
-	Identifier732 [label=Identifier]
-	VariableDeclaration707 -> Identifier732
-	tmp733 [label=tmp]
-	Identifier732 -> tmp733
-	Qualifier734 [label=Qualifier]
-	Identifier732 -> Qualifier734
-	1735 [label=1]
-	Qualifier734 -> 1735
-	ForStatement736 [label=ForStatement]
-	CompoundStatement706 -> ForStatement736
-	Expression737 [label=Expression]
-	ForStatement736 -> Expression737
-	Identifier738 [label=Identifier]
-	Expression737 -> Identifier738
-	i739 [label=i]
-	Identifier738 -> i739
-	op740 [label=op]
-	Expression737 -> op740
-	"=741" [label="="]
-	op740 -> "=741"
-	Number742 [label=Number]
-	Expression737 -> Number742
-	0743 [label=0]
-	Number742 -> 0743
-	Expression744 [label=Expression]
-	ForStatement736 -> Expression744
-	Identifier745 [label=Identifier]
-	Expression744 -> Identifier745
-	i746 [label=i]
-	Identifier745 -> i746
-	op747 [label=op]
-	Expression744 -> op747
-	"<748" [label="<"]
-	op747 -> "<748"
-	Identifier749 [label=Identifier]
-	Expression744 -> Identifier749
-	cnt750 [label=cnt]
-	Identifier749 -> cnt750
-	Expression751 [label=Expression]
-	ForStatement736 -> Expression751
-	Identifier752 [label=Identifier]
-	Expression751 -> Identifier752
-	i753 [label=i]
-	Identifier752 -> i753
-	op754 [label=op]
-	Expression751 -> op754
-	"++755" [label="++"]
-	op754 -> "++755"
-	IfElseStatement756 [label=IfElseStatement]
-	ForStatement736 -> IfElseStatement756
-	Expression757 [label=Expression]
-	IfElseStatement756 -> Expression757
-	Expression758 [label=Expression]
-	Expression757 -> Expression758
-	Expression759 [label=Expression]
-	Expression758 -> Expression759
-	Identifier760 [label=Identifier]
-	Expression759 -> Identifier760
-	grade761 [label=grade]
-	Identifier760 -> grade761
-	op762 [label=op]
-	Expression759 -> op762
-	"[]763" [label="[]"]
-	op762 -> "[]763"
-	Identifier764 [label=Identifier]
-	Expression759 -> Identifier764
-	i765 [label=i]
-	Identifier764 -> i765
-	op766 [label=op]
-	Expression758 -> op766
-	"!" [label="!"]
-	op766 -> "!"
-	op768 [label=op]
-	Expression757 -> op768
-	"||" [label="||"]
-	op768 -> "||"
-	Expression770 [label=Expression]
-	Expression757 -> Expression770
-	Expression771 [label=Expression]
-	Expression770 -> Expression771
-	Identifier772 [label=Identifier]
-	Expression771 -> Identifier772
-	grade773 [label=grade]
-	Identifier772 -> grade773
-	op774 [label=op]
-	Expression771 -> op774
-	"[]775" [label="[]"]
-	op774 -> "[]775"
-	Identifier776 [label=Identifier]
-	Expression771 -> Identifier776
-	i777 [label=i]
-	Identifier776 -> i777
-	op778 [label=op]
-	Expression770 -> op778
-	"==779" [label="=="]
-	op778 -> "==779"
-	Number780 [label=Number]
-	Expression770 -> Number780
-	F781 [label=F]
-	Number780 -> F781
-	IfElseStatement782 [label=IfElseStatement]
-	IfElseStatement756 -> IfElseStatement782
-	Expression783 [label=Expression]
-	IfElseStatement782 -> Expression783
-	Expression784 [label=Expression]
-	Expression783 -> Expression784
-	Identifier785 [label=Identifier]
-	Expression784 -> Identifier785
-	dependency786 [label=dependency]
-	Identifier785 -> dependency786
-	op787 [label=op]
-	Expression784 -> op787
-	"[]788" [label="[]"]
-	op787 -> "[]788"
-	Identifier789 [label=Identifier]
-	Expression784 -> Identifier789
-	i790 [label=i]
-	Identifier789 -> i790
-	op791 [label=op]
-	Expression783 -> op791
-	"!792" [label="!"]
-	op791 -> "!792"
-	ExpressionStatement793 [label=ExpressionStatement]
-	IfElseStatement782 -> ExpressionStatement793
-	FunctionCall794 [label=FunctionCall]
-	ExpressionStatement793 -> FunctionCall794
-	Identifier795 [label=Identifier]
-	FunctionCall794 -> Identifier795
-	printf796 [label=printf]
-	Identifier795 -> printf796
-	String797 [label=String]
-	FunctionCall794 -> String797
-	"%s
-" [label="%s
-"]
-	String797 -> "%s
-"
-	Expression799 [label=Expression]
-	FunctionCall794 -> Expression799
-	Identifier800 [label=Identifier]
-	Expression799 -> Identifier800
-	name801 [label=name]
-	Identifier800 -> name801
-	op802 [label=op]
-	Expression799 -> op802
-	"[]803" [label="[]"]
-	op802 -> "[]803"
-	Identifier804 [label=Identifier]
-	Expression799 -> Identifier804
-	i805 [label=i]
-	Identifier804 -> i805
-	ReturnStatement806 [label=ReturnStatement]
-	CompoundStatement414 -> ReturnStatement806
-	Number807 [label=Number]
-	ReturnStatement806 -> Number807
-	0808 [label=0]
-	Number807 -> 0808
+	Expression700 [label=Expression]
+	ForStatement692 -> Expression700
+	Identifier701 [label=Identifier]
+	Expression700 -> Identifier701
+	i702 [label=i]
+	Identifier701 -> i702
+	op703 [label=op]
+	Expression700 -> op703
+	"<704" [label="<"]
+	op703 -> "<704"
+	Identifier705 [label=Identifier]
+	Expression700 -> Identifier705
+	cnt706 [label=cnt]
+	Identifier705 -> cnt706
+	Expression707 [label=Expression]
+	ForStatement692 -> Expression707
+	Identifier708 [label=Identifier]
+	Expression707 -> Identifier708
+	i709 [label=i]
+	Identifier708 -> i709
+	op710 [label=op]
+	Expression707 -> op710
+	"++711" [label="++"]
+	op710 -> "++711"
+	ExpressionStatement712 [label=ExpressionStatement]
+	ForStatement692 -> ExpressionStatement712
+	FunctionCall713 [label=FunctionCall]
+	ExpressionStatement712 -> FunctionCall713
+	Identifier714 [label=Identifier]
+	FunctionCall713 -> Identifier714
+	dump715 [label=dump]
+	Identifier714 -> dump715
+	Identifier716 [label=Identifier]
+	FunctionCall713 -> Identifier716
+	i717 [label=i]
+	Identifier716 -> i717
+	ReturnStatement718 [label=ReturnStatement]
+	CompoundStatement594 -> ReturnStatement718
+	Number719 [label=Number]
+	ReturnStatement718 -> Number719
+	0720 [label=0]
+	Number719 -> 0720
 }

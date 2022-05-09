@@ -199,10 +199,11 @@ void Visualizer::visitString(String *s)
     if (s)
     {
         string output = s->val;
-        replace(output, "\n", "\\n");
-        replace(output, "\t", "\\t");
-        replace(output, "\r", "\\r");
-        replace(output, "\"", "\\\"");
+        replace(output, "\n", "\\\\n");
+        replace(output, "\t", "\\\\t");
+        replace(output, "\r", "\\\\r");
+        replace(output, "\"", "\\\\\"");
+        replace(output, ":", " ");
         out << head << s->getName() << sub << "\"" + output + "\""<< subend << tail;
     }
 }
@@ -257,6 +258,10 @@ void Visualizer::visitStatement(Statement *s)
             visitBreakStatement((BreakStatement *)s);
         else if (s->getName() == "\"ContinueStatement\"")
             visitContinueStatement((ContinueStatement *)s);
+        else if (s->getName() == "\"SwitchCaseStatement\"")
+            visitSwitchCaseStatement((SwitchCaseStatement *)s);
+        else if (s->getName() == "\"CaseStatement\"")
+            visitCaseStatement((CaseStatement *)s);
     }
 }
 
@@ -548,12 +553,26 @@ void Visualizer::visitFunctionCall(FunctionCall *f)
 
 void Visualizer::visitDoWhileStatement(DoWhileStatement *d)
 {
-
+    if(d)
+    {
+        out << head << d->getName() << sub;
+        visitStatement(d->stmt);
+        out << sep;
+        visitExpression(d->cond);
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitSwitchCaseStatement(SwitchCaseStatement *s)
 {
-
+    if(s)
+    {
+        out << head << s->getName() << sub;
+        visitExpression(s->cond);
+        out << sep;
+        visitStatement(s->stmt);
+        out << subend << tail;
+    }
 }
 
 void Visualizer::visitBreakStatement(BreakStatement *b)
@@ -566,4 +585,16 @@ void Visualizer::visitContinueStatement(ContinueStatement *c)
 {
     if (c)
         out << head << c->getName() << sub << subend << tail;
+}
+
+void Visualizer::visitCaseStatement(CaseStatement *c)
+{
+    if(c)
+    {
+        out << head << c->getName() << sub;
+        visitExpression(c->val);
+        out << sep;
+        visitStatement(c->stmt);
+        out << subend << tail;
+    }
 }
