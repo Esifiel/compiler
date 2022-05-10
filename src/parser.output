@@ -1,4 +1,4 @@
-状态 344 冲突：1 项偏移/归约
+状态 342 冲突：1 项偏移/归约
 
 
 语法
@@ -157,8 +157,8 @@
   115     | jump-stat
 
   116 labeled-stat: IDENTIFIER COLON stat
-  117             | CASE const-exp COLON stat
-  118             | DEFAULT COLON stat
+  117             | CASE const-exp COLON
+  118             | DEFAULT COLON
 
   119 exp-stat: exp DELIM
   120         | DELIM
@@ -503,7 +503,7 @@
         on right: 99 100 102 104 106 108
     stat <statement> (128)
         on left: 110 111 112 113 114 115
-        on right: 116 117 118 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
+        on right: 116 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139
     labeled-stat <statement> (129)
         on left: 116 117 118
         on right: 110
@@ -2016,7 +2016,7 @@
 
 状态 89
 
-  117 labeled-stat: CASE . const-exp COLON stat
+  117 labeled-stat: CASE . const-exp COLON
 
     MULORDEREFERENCE  偏移，并进入状态 92
     ANDORADDRESSOF    偏移，并进入状态 93
@@ -2060,7 +2060,7 @@
 
 状态 90
 
-  118 labeled-stat: DEFAULT . COLON stat
+  118 labeled-stat: DEFAULT . COLON
 
     COLON  偏移，并进入状态 183
 
@@ -3466,81 +3466,23 @@
 
 状态 182
 
-  117 labeled-stat: CASE const-exp . COLON stat
+  117 labeled-stat: CASE const-exp . COLON
 
     COLON  偏移，并进入状态 267
 
 
 状态 183
 
-  118 labeled-stat: DEFAULT COLON . stat
+  118 labeled-stat: DEFAULT COLON .
 
-    IF                偏移，并进入状态 82
-    FOR               偏移，并进入状态 83
-    DO                偏移，并进入状态 84
-    WHILE             偏移，并进入状态 85
-    BREAK             偏移，并进入状态 86
-    CONTINUE          偏移，并进入状态 87
-    SWITCH            偏移，并进入状态 88
-    CASE              偏移，并进入状态 89
-    DEFAULT           偏移，并进入状态 90
-    GOTO              偏移，并进入状态 91
-    MULORDEREFERENCE  偏移，并进入状态 92
-    ANDORADDRESSOF    偏移，并进入状态 93
-    NOT               偏移，并进入状态 94
-    NOTNOT            偏移，并进入状态 95
-    INC               偏移，并进入状态 96
-    DEC               偏移，并进入状态 97
-    POSITIVE          偏移，并进入状态 98
-    NEGATIVE          偏移，并进入状态 99
-    SIZEOF            偏移，并进入状态 100
-    RETURN            偏移，并进入状态 101
-    DELIM             偏移，并进入状态 102
-    LP                偏移，并进入状态 103
-    LC                偏移，并进入状态 56
-    NUMCHAR           偏移，并进入状态 105
-    NUMSHORT          偏移，并进入状态 106
-    NUMINT            偏移，并进入状态 107
-    NUMLONG           偏移，并进入状态 108
-    NUMFLOAT          偏移，并进入状态 109
-    NUMDOUBLE         偏移，并进入状态 110
-    STRING            偏移，并进入状态 111
-    IDENTIFIER        偏移，并进入状态 112
-
-    stat              转到状态 268
-    labeled-stat      转到状态 115
-    exp-stat          转到状态 116
-    compound-stat     转到状态 117
-    selection-stat    转到状态 119
-    iteration-stat    转到状态 120
-    jump-stat         转到状态 121
-    exp               转到状态 122
-    assignment-exp    转到状态 123
-    conditional-exp   转到状态 124
-    logical-or-exp    转到状态 125
-    logical-and-exp   转到状态 126
-    inclusive-or-exp  转到状态 127
-    exclusive-or-exp  转到状态 128
-    and-exp           转到状态 129
-    equality-exp      转到状态 130
-    relational-exp    转到状态 131
-    shift-expression  转到状态 132
-    additive-exp      转到状态 133
-    mult-exp          转到状态 134
-    cast-exp          转到状态 135
-    unary-exp         转到状态 136
-    unary-operator    转到状态 137
-    postfix-exp       转到状态 138
-    primary-exp       转到状态 139
-    const             转到状态 140
-    number            转到状态 141
+    $default  使用规则 118 以归约 (labeled-stat)
 
 
 状态 184
 
   140 jump-stat: GOTO IDENTIFIER . DELIM
 
-    DELIM  偏移，并进入状态 269
+    DELIM  偏移，并进入状态 268
 
 
 状态 185
@@ -3647,7 +3589,7 @@
     struct-or-union       转到状态 34
     spec-qualifier-list   转到状态 192
     enum-spec             转到状态 35
-    type-name             转到状态 270
+    type-name             转到状态 269
     exp                   转到状态 194
     assignment-exp        转到状态 123
     conditional-exp       转到状态 124
@@ -3689,7 +3631,7 @@
   143 jump-stat: RETURN exp . DELIM
   146 exp: exp . COMMA assignment-exp
 
-    DELIM  偏移，并进入状态 271
+    DELIM  偏移，并进入状态 270
     COMMA  偏移，并进入状态 201
 
 
@@ -3699,13 +3641,13 @@
    97          | spec-qualifier-list .
 
     MULORDEREFERENCE  偏移，并进入状态 19
-    LP                偏移，并进入状态 272
+    LP                偏移，并进入状态 271
     LB                偏移，并进入状态 241
 
     $default  使用规则 97 以归约 (type-name)
 
-    pointer                     转到状态 273
-    abstract-declarator         转到状态 274
+    pointer                     转到状态 272
+    abstract-declarator         转到状态 273
     direct-abstract-declarator  转到状态 245
 
 
@@ -3713,7 +3655,7 @@
 
   192 cast-exp: LP type-name . RP cast-exp
 
-    RP  偏移，并进入状态 275
+    RP  偏移，并进入状态 274
 
 
 状态 194
@@ -3722,7 +3664,7 @@
   216 primary-exp: LP exp . RP
 
     COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 276
+    RP     偏移，并进入状态 275
 
 
 状态 195
@@ -3761,7 +3703,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 112
 
-    stat              转到状态 277
+    stat              转到状态 276
     labeled-stat      转到状态 115
     exp-stat          转到状态 116
     compound-stat     转到状态 117
@@ -3825,7 +3767,7 @@
     DELIM             偏移，并进入状态 102
     LP                偏移，并进入状态 103
     LC                偏移，并进入状态 56
-    RC                偏移，并进入状态 278
+    RC                偏移，并进入状态 277
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -3908,7 +3850,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    assignment-exp    转到状态 279
+    assignment-exp    转到状态 278
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
     logical-and-exp   转到状态 126
@@ -3952,7 +3894,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    logical-and-exp   转到状态 280
+    logical-and-exp   转到状态 279
     inclusive-or-exp  转到状态 127
     exclusive-or-exp  转到状态 128
     and-exp           转到状态 129
@@ -3993,7 +3935,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    exp               转到状态 281
+    exp               转到状态 280
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -4038,7 +3980,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    inclusive-or-exp  转到状态 282
+    inclusive-or-exp  转到状态 281
     exclusive-or-exp  转到状态 128
     and-exp           转到状态 129
     equality-exp      转到状态 130
@@ -4078,7 +4020,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    exclusive-or-exp  转到状态 283
+    exclusive-or-exp  转到状态 282
     and-exp           转到状态 129
     equality-exp      转到状态 130
     relational-exp    转到状态 131
@@ -4117,7 +4059,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    and-exp           转到状态 284
+    and-exp           转到状态 283
     equality-exp      转到状态 130
     relational-exp    转到状态 131
     shift-expression  转到状态 132
@@ -4155,7 +4097,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    equality-exp      转到状态 285
+    equality-exp      转到状态 284
     relational-exp    转到状态 131
     shift-expression  转到状态 132
     additive-exp      转到状态 133
@@ -4192,7 +4134,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    relational-exp    转到状态 286
+    relational-exp    转到状态 285
     shift-expression  转到状态 132
     additive-exp      转到状态 133
     mult-exp          转到状态 134
@@ -4228,7 +4170,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    relational-exp    转到状态 287
+    relational-exp    转到状态 286
     shift-expression  转到状态 132
     additive-exp      转到状态 133
     mult-exp          转到状态 134
@@ -4264,7 +4206,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    shift-expression  转到状态 288
+    shift-expression  转到状态 287
     additive-exp      转到状态 133
     mult-exp          转到状态 134
     cast-exp          转到状态 135
@@ -4299,7 +4241,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    shift-expression  转到状态 289
+    shift-expression  转到状态 288
     additive-exp      转到状态 133
     mult-exp          转到状态 134
     cast-exp          转到状态 135
@@ -4334,7 +4276,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    shift-expression  转到状态 290
+    shift-expression  转到状态 289
     additive-exp      转到状态 133
     mult-exp          转到状态 134
     cast-exp          转到状态 135
@@ -4369,7 +4311,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    shift-expression  转到状态 291
+    shift-expression  转到状态 290
     additive-exp      转到状态 133
     mult-exp          转到状态 134
     cast-exp          转到状态 135
@@ -4404,7 +4346,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    additive-exp    转到状态 292
+    additive-exp    转到状态 291
     mult-exp        转到状态 134
     cast-exp        转到状态 135
     unary-exp       转到状态 156
@@ -4438,7 +4380,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    additive-exp    转到状态 293
+    additive-exp    转到状态 292
     mult-exp        转到状态 134
     cast-exp        转到状态 135
     unary-exp       转到状态 156
@@ -4472,7 +4414,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    mult-exp        转到状态 294
+    mult-exp        转到状态 293
     cast-exp        转到状态 135
     unary-exp       转到状态 156
     unary-operator  转到状态 137
@@ -4505,7 +4447,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    mult-exp        转到状态 295
+    mult-exp        转到状态 294
     cast-exp        转到状态 135
     unary-exp       转到状态 156
     unary-operator  转到状态 137
@@ -4538,7 +4480,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    cast-exp        转到状态 296
+    cast-exp        转到状态 295
     unary-exp       转到状态 156
     unary-operator  转到状态 137
     postfix-exp     转到状态 138
@@ -4570,7 +4512,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    cast-exp        转到状态 297
+    cast-exp        转到状态 296
     unary-exp       转到状态 156
     unary-operator  转到状态 137
     postfix-exp     转到状态 138
@@ -4602,7 +4544,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    cast-exp        转到状态 298
+    cast-exp        转到状态 297
     unary-exp       转到状态 156
     unary-operator  转到状态 137
     postfix-exp     转到状态 138
@@ -4711,7 +4653,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    assignment-exp    转到状态 299
+    assignment-exp    转到状态 298
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
     logical-and-exp   转到状态 126
@@ -4757,14 +4699,14 @@
 
   209 postfix-exp: postfix-exp DOT . IDENTIFIER
 
-    IDENTIFIER  偏移，并进入状态 300
+    IDENTIFIER  偏移，并进入状态 299
 
 
 状态 237
 
   210 postfix-exp: postfix-exp TO . IDENTIFIER
 
-    IDENTIFIER  偏移，并进入状态 301
+    IDENTIFIER  偏移，并进入状态 300
 
 
 状态 238
@@ -4782,7 +4724,7 @@
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
     LP                偏移，并进入状态 103
-    RP                偏移，并进入状态 302
+    RP                偏移，并进入状态 301
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -4792,7 +4734,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    assignment-exp     转到状态 303
+    assignment-exp     转到状态 302
     conditional-exp    转到状态 124
     logical-or-exp     转到状态 125
     logical-and-exp    转到状态 126
@@ -4809,7 +4751,7 @@
     unary-operator     转到状态 137
     postfix-exp        转到状态 138
     primary-exp        转到状态 139
-    argument-exp-list  转到状态 304
+    argument-exp-list  转到状态 303
     const              转到状态 140
     number             转到状态 141
 
@@ -4837,7 +4779,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    exp               转到状态 305
+    exp               转到状态 304
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -4887,7 +4829,7 @@
     MULORDEREFERENCE  偏移，并进入状态 19
     TYPEDEF           偏移，并进入状态 20
     LP                偏移，并进入状态 240
-    RP                偏移，并进入状态 306
+    RP                偏移，并进入状态 305
     LB                偏移，并进入状态 241
     IDENTIFIER        偏移，并进入状态 22
     TYPENAME          偏移，并进入状态 23
@@ -4902,10 +4844,10 @@
     declarator                  转到状态 44
     direct-declarator           转到状态 37
     pointer                     转到状态 243
-    param-type-list             转到状态 307
+    param-type-list             转到状态 306
     param-list                  转到状态 149
     param-decl                  转到状态 150
-    abstract-declarator         转到状态 308
+    abstract-declarator         转到状态 307
     direct-abstract-declarator  转到状态 245
 
 
@@ -4924,7 +4866,7 @@
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
     LP                偏移，并进入状态 103
-    RB                偏移，并进入状态 309
+    RB                偏移，并进入状态 308
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -4935,7 +4877,7 @@
     IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
-    const-exp         转到状态 310
+    const-exp         转到状态 309
     logical-or-exp    转到状态 125
     logical-and-exp   转到状态 126
     inclusive-or-exp  转到状态 127
@@ -4975,7 +4917,7 @@
     $default  使用规则 98 以归约 (abstract-declarator)
 
     direct-declarator           转到状态 63
-    direct-abstract-declarator  转到状态 311
+    direct-abstract-declarator  转到状态 310
 
 
 状态 244
@@ -4993,8 +4935,8 @@
   106                           | direct-abstract-declarator . LP param-type-list RP
   108                           | direct-abstract-declarator . LP RP
 
-    LP  偏移，并进入状态 312
-    LB  偏移，并进入状态 313
+    LP  偏移，并进入状态 311
+    LB  偏移，并进入状态 312
 
     $default  使用规则 100 以归约 (abstract-declarator)
 
@@ -5030,7 +4972,7 @@
     VOLATILE   偏移，并进入状态 17
     STATIC     偏移，并进入状态 18
     TYPEDEF    偏移，并进入状态 20
-    DOTDOTDOT  偏移，并进入状态 314
+    DOTDOTDOT  偏移，并进入状态 313
     TYPENAME   偏移，并进入状态 23
 
     decl-specs               转到状态 147
@@ -5040,14 +4982,14 @@
     struct-or-union-spec     转到状态 33
     struct-or-union          转到状态 34
     enum-spec                转到状态 35
-    param-decl               转到状态 315
+    param-decl               转到状态 314
 
 
 状态 248
 
    90 id-list: id-list COMMA . IDENTIFIER
 
-    IDENTIFIER  偏移，并进入状态 316
+    IDENTIFIER  偏移，并进入状态 315
 
 
 状态 249
@@ -5098,8 +5040,8 @@
    93            | LC initializer-list . COMMA RC
    95 initializer-list: initializer-list . COMMA initializer
 
-    COMMA  偏移，并进入状态 317
-    RC     偏移，并进入状态 318
+    COMMA  偏移，并进入状态 316
+    RC     偏移，并进入状态 317
 
 
 状态 256
@@ -5125,7 +5067,7 @@
     LP                偏移，并进入状态 21
     IDENTIFIER        偏移，并进入状态 22
 
-    struct-declarator  转到状态 319
+    struct-declarator  转到状态 318
     declarator         转到状态 173
     direct-declarator  转到状态 37
     pointer            转到状态 38
@@ -5155,7 +5097,7 @@
     IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
-    const-exp         转到状态 320
+    const-exp         转到状态 319
     logical-or-exp    转到状态 125
     logical-and-exp   转到状态 126
     inclusive-or-exp  转到状态 127
@@ -5189,7 +5131,7 @@
   146 exp: exp . COMMA assignment-exp
 
     COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 321
+    RP     偏移，并进入状态 320
 
 
 状态 262
@@ -5208,7 +5150,7 @@
     POSITIVE          偏移，并进入状态 98
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
-    DELIM             偏移，并进入状态 322
+    DELIM             偏移，并进入状态 321
     LP                偏移，并进入状态 103
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
@@ -5219,7 +5161,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    exp               转到状态 323
+    exp               转到状态 322
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -5249,7 +5191,7 @@
   136               | FOR LP exp . DELIM DELIM RP stat
   146 exp: exp . COMMA assignment-exp
 
-    DELIM  偏移，并进入状态 324
+    DELIM  偏移，并进入状态 323
     COMMA  偏移，并进入状态 201
 
 
@@ -5257,7 +5199,7 @@
 
   131 iteration-stat: DO stat WHILE . LP exp RP DELIM
 
-    LP  偏移，并进入状态 325
+    LP  偏移，并进入状态 324
 
 
 状态 265
@@ -5266,7 +5208,7 @@
   146 exp: exp . COMMA assignment-exp
 
     COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 326
+    RP     偏移，并进入状态 325
 
 
 状态 266
@@ -5275,103 +5217,38 @@
   146 exp: exp . COMMA assignment-exp
 
     COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 327
+    RP     偏移，并进入状态 326
 
 
 状态 267
 
-  117 labeled-stat: CASE const-exp COLON . stat
+  117 labeled-stat: CASE const-exp COLON .
 
-    IF                偏移，并进入状态 82
-    FOR               偏移，并进入状态 83
-    DO                偏移，并进入状态 84
-    WHILE             偏移，并进入状态 85
-    BREAK             偏移，并进入状态 86
-    CONTINUE          偏移，并进入状态 87
-    SWITCH            偏移，并进入状态 88
-    CASE              偏移，并进入状态 89
-    DEFAULT           偏移，并进入状态 90
-    GOTO              偏移，并进入状态 91
-    MULORDEREFERENCE  偏移，并进入状态 92
-    ANDORADDRESSOF    偏移，并进入状态 93
-    NOT               偏移，并进入状态 94
-    NOTNOT            偏移，并进入状态 95
-    INC               偏移，并进入状态 96
-    DEC               偏移，并进入状态 97
-    POSITIVE          偏移，并进入状态 98
-    NEGATIVE          偏移，并进入状态 99
-    SIZEOF            偏移，并进入状态 100
-    RETURN            偏移，并进入状态 101
-    DELIM             偏移，并进入状态 102
-    LP                偏移，并进入状态 103
-    LC                偏移，并进入状态 56
-    NUMCHAR           偏移，并进入状态 105
-    NUMSHORT          偏移，并进入状态 106
-    NUMINT            偏移，并进入状态 107
-    NUMLONG           偏移，并进入状态 108
-    NUMFLOAT          偏移，并进入状态 109
-    NUMDOUBLE         偏移，并进入状态 110
-    STRING            偏移，并进入状态 111
-    IDENTIFIER        偏移，并进入状态 112
-
-    stat              转到状态 328
-    labeled-stat      转到状态 115
-    exp-stat          转到状态 116
-    compound-stat     转到状态 117
-    selection-stat    转到状态 119
-    iteration-stat    转到状态 120
-    jump-stat         转到状态 121
-    exp               转到状态 122
-    assignment-exp    转到状态 123
-    conditional-exp   转到状态 124
-    logical-or-exp    转到状态 125
-    logical-and-exp   转到状态 126
-    inclusive-or-exp  转到状态 127
-    exclusive-or-exp  转到状态 128
-    and-exp           转到状态 129
-    equality-exp      转到状态 130
-    relational-exp    转到状态 131
-    shift-expression  转到状态 132
-    additive-exp      转到状态 133
-    mult-exp          转到状态 134
-    cast-exp          转到状态 135
-    unary-exp         转到状态 136
-    unary-operator    转到状态 137
-    postfix-exp       转到状态 138
-    primary-exp       转到状态 139
-    const             转到状态 140
-    number            转到状态 141
+    $default  使用规则 117 以归约 (labeled-stat)
 
 
 状态 268
-
-  118 labeled-stat: DEFAULT COLON stat .
-
-    $default  使用规则 118 以归约 (labeled-stat)
-
-
-状态 269
 
   140 jump-stat: GOTO IDENTIFIER DELIM .
 
     $default  使用规则 140 以归约 (jump-stat)
 
 
-状态 270
+状态 269
 
   198 unary-exp: SIZEOF LP type-name . RP
 
-    RP  偏移，并进入状态 329
+    RP  偏移，并进入状态 327
 
 
-状态 271
+状态 270
 
   143 jump-stat: RETURN exp DELIM .
 
     $default  使用规则 143 以归约 (jump-stat)
 
 
-状态 272
+状态 271
 
   101 direct-abstract-declarator: LP . abstract-declarator RP
   107                           | LP . param-type-list RP
@@ -5397,8 +5274,8 @@
     STATIC            偏移，并进入状态 18
     MULORDEREFERENCE  偏移，并进入状态 19
     TYPEDEF           偏移，并进入状态 20
-    LP                偏移，并进入状态 272
-    RP                偏移，并进入状态 306
+    LP                偏移，并进入状态 271
+    RP                偏移，并进入状态 305
     LB                偏移，并进入状态 241
     TYPENAME          偏移，并进入状态 23
 
@@ -5409,35 +5286,35 @@
     struct-or-union-spec        转到状态 33
     struct-or-union             转到状态 34
     enum-spec                   转到状态 35
-    pointer                     转到状态 273
-    param-type-list             转到状态 307
+    pointer                     转到状态 272
+    param-type-list             转到状态 306
     param-list                  转到状态 149
     param-decl                  转到状态 150
-    abstract-declarator         转到状态 308
+    abstract-declarator         转到状态 307
     direct-abstract-declarator  转到状态 245
 
 
-状态 273
+状态 272
 
    98 abstract-declarator: pointer .
    99                    | pointer . direct-abstract-declarator
 
-    LP  偏移，并进入状态 272
+    LP  偏移，并进入状态 271
     LB  偏移，并进入状态 241
 
     $default  使用规则 98 以归约 (abstract-declarator)
 
-    direct-abstract-declarator  转到状态 311
+    direct-abstract-declarator  转到状态 310
 
 
-状态 274
+状态 273
 
    96 type-name: spec-qualifier-list abstract-declarator .
 
     $default  使用规则 96 以归约 (type-name)
 
 
-状态 275
+状态 274
 
   192 cast-exp: LP type-name RP . cast-exp
 
@@ -5460,7 +5337,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    cast-exp        转到状态 330
+    cast-exp        转到状态 328
     unary-exp       转到状态 156
     unary-operator  转到状态 137
     postfix-exp     转到状态 138
@@ -5469,35 +5346,35 @@
     number          转到状态 141
 
 
-状态 276
+状态 275
 
   216 primary-exp: LP exp RP .
 
     $default  使用规则 216 以归约 (primary-exp)
 
 
-状态 277
+状态 276
 
   116 labeled-stat: IDENTIFIER COLON stat .
 
     $default  使用规则 116 以归约 (labeled-stat)
 
 
-状态 278
+状态 277
 
   121 compound-stat: LC decl-list stat-list RC .
 
     $default  使用规则 121 以归约 (compound-stat)
 
 
-状态 279
+状态 278
 
   146 exp: exp COMMA assignment-exp .
 
     $default  使用规则 146 以归约 (exp)
 
 
-状态 280
+状态 279
 
   164 logical-or-exp: logical-or-exp OROR logical-and-exp .
   166 logical-and-exp: logical-and-exp . ANDAND inclusive-or-exp
@@ -5507,16 +5384,16 @@
     $default  使用规则 164 以归约 (logical-or-exp)
 
 
-状态 281
+状态 280
 
   146 exp: exp . COMMA assignment-exp
   161 conditional-exp: logical-or-exp QUESTION exp . COLON conditional-exp
 
     COMMA  偏移，并进入状态 201
-    COLON  偏移，并进入状态 331
+    COLON  偏移，并进入状态 329
 
 
-状态 282
+状态 281
 
   166 logical-and-exp: logical-and-exp ANDAND inclusive-or-exp .
   168 inclusive-or-exp: inclusive-or-exp . OR exclusive-or-exp
@@ -5526,7 +5403,7 @@
     $default  使用规则 166 以归约 (logical-and-exp)
 
 
-状态 283
+状态 282
 
   168 inclusive-or-exp: inclusive-or-exp OR exclusive-or-exp .
   170 exclusive-or-exp: exclusive-or-exp . XOR and-exp
@@ -5536,7 +5413,7 @@
     $default  使用规则 168 以归约 (inclusive-or-exp)
 
 
-状态 284
+状态 283
 
   170 exclusive-or-exp: exclusive-or-exp XOR and-exp .
   172 and-exp: and-exp . ANDORADDRESSOF equality-exp
@@ -5546,7 +5423,7 @@
     $default  使用规则 170 以归约 (exclusive-or-exp)
 
 
-状态 285
+状态 284
 
   172 and-exp: and-exp ANDORADDRESSOF equality-exp .
   174 equality-exp: equality-exp . EQ relational-exp
@@ -5558,7 +5435,7 @@
     $default  使用规则 172 以归约 (and-exp)
 
 
-状态 286
+状态 285
 
   175 equality-exp: equality-exp NEQ relational-exp .
   177 relational-exp: relational-exp . LT shift-expression
@@ -5574,7 +5451,7 @@
     $default  使用规则 175 以归约 (equality-exp)
 
 
-状态 287
+状态 286
 
   174 equality-exp: equality-exp EQ relational-exp .
   177 relational-exp: relational-exp . LT shift-expression
@@ -5590,7 +5467,7 @@
     $default  使用规则 174 以归约 (equality-exp)
 
 
-状态 288
+状态 287
 
   177 relational-exp: relational-exp LT shift-expression .
   182 shift-expression: shift-expression . SL additive-exp
@@ -5602,7 +5479,7 @@
     $default  使用规则 177 以归约 (relational-exp)
 
 
-状态 289
+状态 288
 
   178 relational-exp: relational-exp GT shift-expression .
   182 shift-expression: shift-expression . SL additive-exp
@@ -5614,7 +5491,7 @@
     $default  使用规则 178 以归约 (relational-exp)
 
 
-状态 290
+状态 289
 
   180 relational-exp: relational-exp GEQ shift-expression .
   182 shift-expression: shift-expression . SL additive-exp
@@ -5626,7 +5503,7 @@
     $default  使用规则 180 以归约 (relational-exp)
 
 
-状态 291
+状态 290
 
   179 relational-exp: relational-exp LEQ shift-expression .
   182 shift-expression: shift-expression . SL additive-exp
@@ -5638,7 +5515,7 @@
     $default  使用规则 179 以归约 (relational-exp)
 
 
-状态 292
+状态 291
 
   182 shift-expression: shift-expression SL additive-exp .
   185 additive-exp: additive-exp . ADD mult-exp
@@ -5650,7 +5527,7 @@
     $default  使用规则 182 以归约 (shift-expression)
 
 
-状态 293
+状态 292
 
   183 shift-expression: shift-expression SR additive-exp .
   185 additive-exp: additive-exp . ADD mult-exp
@@ -5662,7 +5539,7 @@
     $default  使用规则 183 以归约 (shift-expression)
 
 
-状态 294
+状态 293
 
   185 additive-exp: additive-exp ADD mult-exp .
   188 mult-exp: mult-exp . MULORDEREFERENCE cast-exp
@@ -5676,7 +5553,7 @@
     $default  使用规则 185 以归约 (additive-exp)
 
 
-状态 295
+状态 294
 
   186 additive-exp: additive-exp SUB mult-exp .
   188 mult-exp: mult-exp . MULORDEREFERENCE cast-exp
@@ -5690,116 +5567,116 @@
     $default  使用规则 186 以归约 (additive-exp)
 
 
-状态 296
+状态 295
 
   188 mult-exp: mult-exp MULORDEREFERENCE cast-exp .
 
     $default  使用规则 188 以归约 (mult-exp)
 
 
-状态 297
+状态 296
 
   189 mult-exp: mult-exp DIV cast-exp .
 
     $default  使用规则 189 以归约 (mult-exp)
 
 
-状态 298
+状态 297
 
   190 mult-exp: mult-exp MOD cast-exp .
 
     $default  使用规则 190 以归约 (mult-exp)
 
 
-状态 299
+状态 298
 
   148 assignment-exp: unary-exp assignment-operator assignment-exp .
 
     $default  使用规则 148 以归约 (assignment-exp)
 
 
-状态 300
+状态 299
 
   209 postfix-exp: postfix-exp DOT IDENTIFIER .
 
     $default  使用规则 209 以归约 (postfix-exp)
 
 
-状态 301
+状态 300
 
   210 postfix-exp: postfix-exp TO IDENTIFIER .
 
     $default  使用规则 210 以归约 (postfix-exp)
 
 
-状态 302
+状态 301
 
   208 postfix-exp: postfix-exp LP RP .
 
     $default  使用规则 208 以归约 (postfix-exp)
 
 
-状态 303
+状态 302
 
   217 argument-exp-list: assignment-exp .
 
     $default  使用规则 217 以归约 (argument-exp-list)
 
 
-状态 304
+状态 303
 
   207 postfix-exp: postfix-exp LP argument-exp-list . RP
   218 argument-exp-list: argument-exp-list . COMMA assignment-exp
 
-    COMMA  偏移，并进入状态 332
-    RP     偏移，并进入状态 333
+    COMMA  偏移，并进入状态 330
+    RP     偏移，并进入状态 331
 
 
-状态 305
+状态 304
 
   146 exp: exp . COMMA assignment-exp
   206 postfix-exp: postfix-exp LB exp . RB
 
     COMMA  偏移，并进入状态 201
-    RB     偏移，并进入状态 334
+    RB     偏移，并进入状态 332
 
 
-状态 306
+状态 305
 
   109 direct-abstract-declarator: LP RP .
 
     $default  使用规则 109 以归约 (direct-abstract-declarator)
 
 
-状态 307
+状态 306
 
   107 direct-abstract-declarator: LP param-type-list . RP
 
-    RP  偏移，并进入状态 335
+    RP  偏移，并进入状态 333
 
 
-状态 308
+状态 307
 
   101 direct-abstract-declarator: LP abstract-declarator . RP
 
-    RP  偏移，并进入状态 336
+    RP  偏移，并进入状态 334
 
 
-状态 309
+状态 308
 
   105 direct-abstract-declarator: LB RB .
 
     $default  使用规则 105 以归约 (direct-abstract-declarator)
 
 
-状态 310
+状态 309
 
   103 direct-abstract-declarator: LB const-exp . RB
 
-    RB  偏移，并进入状态 337
+    RB  偏移，并进入状态 335
 
 
-状态 311
+状态 310
 
    99 abstract-declarator: pointer direct-abstract-declarator .
   102 direct-abstract-declarator: direct-abstract-declarator . LB const-exp RB
@@ -5807,13 +5684,13 @@
   106                           | direct-abstract-declarator . LP param-type-list RP
   108                           | direct-abstract-declarator . LP RP
 
-    LP  偏移，并进入状态 312
-    LB  偏移，并进入状态 313
+    LP  偏移，并进入状态 311
+    LB  偏移，并进入状态 312
 
     $default  使用规则 99 以归约 (abstract-declarator)
 
 
-状态 312
+状态 311
 
   106 direct-abstract-declarator: direct-abstract-declarator LP . param-type-list RP
   108                           | direct-abstract-declarator LP . RP
@@ -5837,7 +5714,7 @@
     VOLATILE  偏移，并进入状态 17
     STATIC    偏移，并进入状态 18
     TYPEDEF   偏移，并进入状态 20
-    RP        偏移，并进入状态 338
+    RP        偏移，并进入状态 336
     TYPENAME  偏移，并进入状态 23
 
     decl-specs               转到状态 147
@@ -5847,12 +5724,12 @@
     struct-or-union-spec     转到状态 33
     struct-or-union          转到状态 34
     enum-spec                转到状态 35
-    param-type-list          转到状态 339
+    param-type-list          转到状态 337
     param-list               转到状态 149
     param-decl               转到状态 150
 
 
-状态 313
+状态 312
 
   102 direct-abstract-declarator: direct-abstract-declarator LB . const-exp RB
   104                           | direct-abstract-declarator LB . RB
@@ -5867,7 +5744,7 @@
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
     LP                偏移，并进入状态 103
-    RB                偏移，并进入状态 340
+    RB                偏移，并进入状态 338
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -5878,7 +5755,7 @@
     IDENTIFIER        偏移，并进入状态 153
 
     conditional-exp   转到状态 154
-    const-exp         转到状态 341
+    const-exp         转到状态 339
     logical-or-exp    转到状态 125
     logical-and-exp   转到状态 126
     inclusive-or-exp  转到状态 127
@@ -5898,28 +5775,28 @@
     number            转到状态 141
 
 
-状态 314
+状态 313
 
    83 param-type-list: param-list COMMA DOTDOTDOT .
 
     $default  使用规则 83 以归约 (param-type-list)
 
 
-状态 315
+状态 314
 
    85 param-list: param-list COMMA param-decl .
 
     $default  使用规则 85 以归约 (param-list)
 
 
-状态 316
+状态 315
 
    90 id-list: id-list COMMA IDENTIFIER .
 
     $default  使用规则 90 以归约 (id-list)
 
 
-状态 317
+状态 316
 
    93 initializer: LC initializer-list COMMA . RC
    95 initializer-list: initializer-list COMMA . initializer
@@ -5935,7 +5812,7 @@
     SIZEOF            偏移，并进入状态 100
     LP                偏移，并进入状态 103
     LC                偏移，并进入状态 162
-    RC                偏移，并进入状态 342
+    RC                偏移，并进入状态 340
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -5945,7 +5822,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    initializer       转到状态 343
+    initializer       转到状态 341
     assignment-exp    转到状态 164
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -5967,28 +5844,28 @@
     number            转到状态 141
 
 
-状态 318
+状态 317
 
    92 initializer: LC initializer-list RC .
 
     $default  使用规则 92 以归约 (initializer)
 
 
-状态 319
+状态 318
 
    56 struct-declarator-list: struct-declarator-list COMMA struct-declarator .
 
     $default  使用规则 56 以归约 (struct-declarator-list)
 
 
-状态 320
+状态 319
 
    58 struct-declarator: declarator COLON const-exp .
 
     $default  使用规则 58 以归约 (struct-declarator)
 
 
-状态 321
+状态 320
 
   127 selection-stat: IF LP exp RP . stat
   128               | IF LP exp RP . stat ELSE stat
@@ -6025,7 +5902,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 112
 
-    stat              转到状态 344
+    stat              转到状态 342
     labeled-stat      转到状态 115
     exp-stat          转到状态 116
     compound-stat     转到状态 117
@@ -6054,7 +5931,7 @@
     number            转到状态 141
 
 
-状态 322
+状态 321
 
   138 iteration-stat: FOR LP DELIM DELIM . exp RP stat
   139               | FOR LP DELIM DELIM . RP stat
@@ -6069,7 +5946,7 @@
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
     LP                偏移，并进入状态 103
-    RP                偏移，并进入状态 345
+    RP                偏移，并进入状态 343
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -6079,7 +5956,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    exp               转到状态 346
+    exp               转到状态 344
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -6101,17 +5978,17 @@
     number            转到状态 141
 
 
-状态 323
+状态 322
 
   135 iteration-stat: FOR LP DELIM exp . DELIM exp RP stat
   137               | FOR LP DELIM exp . DELIM RP stat
   146 exp: exp . COMMA assignment-exp
 
-    DELIM  偏移，并进入状态 347
+    DELIM  偏移，并进入状态 345
     COMMA  偏移，并进入状态 201
 
 
-状态 324
+状态 323
 
   132 iteration-stat: FOR LP exp DELIM . exp DELIM exp RP stat
   133               | FOR LP exp DELIM . exp DELIM RP stat
@@ -6127,7 +6004,7 @@
     POSITIVE          偏移，并进入状态 98
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
-    DELIM             偏移，并进入状态 348
+    DELIM             偏移，并进入状态 346
     LP                偏移，并进入状态 103
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
@@ -6138,7 +6015,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    exp               转到状态 349
+    exp               转到状态 347
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -6160,7 +6037,7 @@
     number            转到状态 141
 
 
-状态 325
+状态 324
 
   131 iteration-stat: DO stat WHILE LP . exp RP DELIM
 
@@ -6183,7 +6060,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    exp               转到状态 350
+    exp               转到状态 348
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -6205,7 +6082,7 @@
     number            转到状态 141
 
 
-状态 326
+状态 325
 
   130 iteration-stat: WHILE LP exp RP . stat
 
@@ -6241,7 +6118,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 112
 
-    stat              转到状态 351
+    stat              转到状态 349
     labeled-stat      转到状态 115
     exp-stat          转到状态 116
     compound-stat     转到状态 117
@@ -6270,7 +6147,7 @@
     number            转到状态 141
 
 
-状态 327
+状态 326
 
   129 selection-stat: SWITCH LP exp RP . stat
 
@@ -6306,7 +6183,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 112
 
-    stat              转到状态 352
+    stat              转到状态 350
     labeled-stat      转到状态 115
     exp-stat          转到状态 116
     compound-stat     转到状态 117
@@ -6335,28 +6212,21 @@
     number            转到状态 141
 
 
-状态 328
-
-  117 labeled-stat: CASE const-exp COLON stat .
-
-    $default  使用规则 117 以归约 (labeled-stat)
-
-
-状态 329
+状态 327
 
   198 unary-exp: SIZEOF LP type-name RP .
 
     $default  使用规则 198 以归约 (unary-exp)
 
 
-状态 330
+状态 328
 
   192 cast-exp: LP type-name RP cast-exp .
 
     $default  使用规则 192 以归约 (cast-exp)
 
 
-状态 331
+状态 329
 
   161 conditional-exp: logical-or-exp QUESTION exp COLON . conditional-exp
 
@@ -6379,7 +6249,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    conditional-exp   转到状态 353
+    conditional-exp   转到状态 351
     logical-or-exp    转到状态 125
     logical-and-exp   转到状态 126
     inclusive-or-exp  转到状态 127
@@ -6399,7 +6269,7 @@
     number            转到状态 141
 
 
-状态 332
+状态 330
 
   218 argument-exp-list: argument-exp-list COMMA . assignment-exp
 
@@ -6422,7 +6292,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 153
 
-    assignment-exp    转到状态 354
+    assignment-exp    转到状态 352
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
     logical-and-exp   转到状态 126
@@ -6443,95 +6313,95 @@
     number            转到状态 141
 
 
-状态 333
+状态 331
 
   207 postfix-exp: postfix-exp LP argument-exp-list RP .
 
     $default  使用规则 207 以归约 (postfix-exp)
 
 
-状态 334
+状态 332
 
   206 postfix-exp: postfix-exp LB exp RB .
 
     $default  使用规则 206 以归约 (postfix-exp)
 
 
-状态 335
+状态 333
 
   107 direct-abstract-declarator: LP param-type-list RP .
 
     $default  使用规则 107 以归约 (direct-abstract-declarator)
 
 
-状态 336
+状态 334
 
   101 direct-abstract-declarator: LP abstract-declarator RP .
 
     $default  使用规则 101 以归约 (direct-abstract-declarator)
 
 
-状态 337
+状态 335
 
   103 direct-abstract-declarator: LB const-exp RB .
 
     $default  使用规则 103 以归约 (direct-abstract-declarator)
 
 
-状态 338
+状态 336
 
   108 direct-abstract-declarator: direct-abstract-declarator LP RP .
 
     $default  使用规则 108 以归约 (direct-abstract-declarator)
 
 
-状态 339
+状态 337
 
   106 direct-abstract-declarator: direct-abstract-declarator LP param-type-list . RP
 
-    RP  偏移，并进入状态 355
+    RP  偏移，并进入状态 353
 
 
-状态 340
+状态 338
 
   104 direct-abstract-declarator: direct-abstract-declarator LB RB .
 
     $default  使用规则 104 以归约 (direct-abstract-declarator)
 
 
-状态 341
+状态 339
 
   102 direct-abstract-declarator: direct-abstract-declarator LB const-exp . RB
 
-    RB  偏移，并进入状态 356
+    RB  偏移，并进入状态 354
 
 
-状态 342
+状态 340
 
    93 initializer: LC initializer-list COMMA RC .
 
     $default  使用规则 93 以归约 (initializer)
 
 
-状态 343
+状态 341
 
    95 initializer-list: initializer-list COMMA initializer .
 
     $default  使用规则 95 以归约 (initializer-list)
 
 
-状态 344
+状态 342
 
   127 selection-stat: IF LP exp RP stat .
   128               | IF LP exp RP stat . ELSE stat
 
-    ELSE  偏移，并进入状态 357
+    ELSE  偏移，并进入状态 355
 
     ELSE      [使用规则 127 以归约 (selection-stat)]
     $default  使用规则 127 以归约 (selection-stat)
 
 
-状态 345
+状态 343
 
   139 iteration-stat: FOR LP DELIM DELIM RP . stat
 
@@ -6567,7 +6437,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 112
 
-    stat              转到状态 358
+    stat              转到状态 356
     labeled-stat      转到状态 115
     exp-stat          转到状态 116
     compound-stat     转到状态 117
@@ -6596,19 +6466,66 @@
     number            转到状态 141
 
 
-状态 346
+状态 344
 
   138 iteration-stat: FOR LP DELIM DELIM exp . RP stat
   146 exp: exp . COMMA assignment-exp
 
     COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 359
+    RP     偏移，并进入状态 357
 
 
-状态 347
+状态 345
 
   135 iteration-stat: FOR LP DELIM exp DELIM . exp RP stat
   137               | FOR LP DELIM exp DELIM . RP stat
+
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RP                偏移，并进入状态 358
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
+
+    exp               转到状态 359
+    assignment-exp    转到状态 123
+    conditional-exp   转到状态 124
+    logical-or-exp    转到状态 125
+    logical-and-exp   转到状态 126
+    inclusive-or-exp  转到状态 127
+    exclusive-or-exp  转到状态 128
+    and-exp           转到状态 129
+    equality-exp      转到状态 130
+    relational-exp    转到状态 131
+    shift-expression  转到状态 132
+    additive-exp      转到状态 133
+    mult-exp          转到状态 134
+    cast-exp          转到状态 135
+    unary-exp         转到状态 136
+    unary-operator    转到状态 137
+    postfix-exp       转到状态 138
+    primary-exp       转到状态 139
+    const             转到状态 140
+    number            转到状态 141
+
+
+状态 346
+
+  134 iteration-stat: FOR LP exp DELIM DELIM . exp RP stat
+  136               | FOR LP exp DELIM DELIM . RP stat
 
     MULORDEREFERENCE  偏移，并进入状态 92
     ANDORADDRESSOF    偏移，并进入状态 93
@@ -6652,11 +6569,81 @@
     number            转到状态 141
 
 
+状态 347
+
+  132 iteration-stat: FOR LP exp DELIM exp . DELIM exp RP stat
+  133               | FOR LP exp DELIM exp . DELIM RP stat
+  146 exp: exp . COMMA assignment-exp
+
+    DELIM  偏移，并进入状态 362
+    COMMA  偏移，并进入状态 201
+
+
 状态 348
 
-  134 iteration-stat: FOR LP exp DELIM DELIM . exp RP stat
-  136               | FOR LP exp DELIM DELIM . RP stat
+  131 iteration-stat: DO stat WHILE LP exp . RP DELIM
+  146 exp: exp . COMMA assignment-exp
 
+    COMMA  偏移，并进入状态 201
+    RP     偏移，并进入状态 363
+
+
+状态 349
+
+  130 iteration-stat: WHILE LP exp RP stat .
+
+    $default  使用规则 130 以归约 (iteration-stat)
+
+
+状态 350
+
+  129 selection-stat: SWITCH LP exp RP stat .
+
+    $default  使用规则 129 以归约 (selection-stat)
+
+
+状态 351
+
+  161 conditional-exp: logical-or-exp QUESTION exp COLON conditional-exp .
+
+    $default  使用规则 161 以归约 (conditional-exp)
+
+
+状态 352
+
+  218 argument-exp-list: argument-exp-list COMMA assignment-exp .
+
+    $default  使用规则 218 以归约 (argument-exp-list)
+
+
+状态 353
+
+  106 direct-abstract-declarator: direct-abstract-declarator LP param-type-list RP .
+
+    $default  使用规则 106 以归约 (direct-abstract-declarator)
+
+
+状态 354
+
+  102 direct-abstract-declarator: direct-abstract-declarator LB const-exp RB .
+
+    $default  使用规则 102 以归约 (direct-abstract-declarator)
+
+
+状态 355
+
+  128 selection-stat: IF LP exp RP stat ELSE . stat
+
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
     MULORDEREFERENCE  偏移，并进入状态 92
     ANDORADDRESSOF    偏移，并进入状态 93
     NOT               偏移，并进入状态 94
@@ -6666,8 +6653,10 @@
     POSITIVE          偏移，并进入状态 98
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
     LP                偏移，并进入状态 103
-    RP                偏移，并进入状态 362
+    LC                偏移，并进入状态 56
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -6675,9 +6664,16 @@
     NUMFLOAT          偏移，并进入状态 109
     NUMDOUBLE         偏移，并进入状态 110
     STRING            偏移，并进入状态 111
-    IDENTIFIER        偏移，并进入状态 153
+    IDENTIFIER        偏移，并进入状态 112
 
-    exp               转到状态 363
+    stat              转到状态 364
+    labeled-stat      转到状态 115
+    exp-stat          转到状态 116
+    compound-stat     转到状态 117
+    selection-stat    转到状态 119
+    iteration-stat    转到状态 120
+    jump-stat         转到状态 121
+    exp               转到状态 122
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -6699,70 +6695,81 @@
     number            转到状态 141
 
 
-状态 349
-
-  132 iteration-stat: FOR LP exp DELIM exp . DELIM exp RP stat
-  133               | FOR LP exp DELIM exp . DELIM RP stat
-  146 exp: exp . COMMA assignment-exp
-
-    DELIM  偏移，并进入状态 364
-    COMMA  偏移，并进入状态 201
-
-
-状态 350
-
-  131 iteration-stat: DO stat WHILE LP exp . RP DELIM
-  146 exp: exp . COMMA assignment-exp
-
-    COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 365
-
-
-状态 351
-
-  130 iteration-stat: WHILE LP exp RP stat .
-
-    $default  使用规则 130 以归约 (iteration-stat)
-
-
-状态 352
-
-  129 selection-stat: SWITCH LP exp RP stat .
-
-    $default  使用规则 129 以归约 (selection-stat)
-
-
-状态 353
-
-  161 conditional-exp: logical-or-exp QUESTION exp COLON conditional-exp .
-
-    $default  使用规则 161 以归约 (conditional-exp)
-
-
-状态 354
-
-  218 argument-exp-list: argument-exp-list COMMA assignment-exp .
-
-    $default  使用规则 218 以归约 (argument-exp-list)
-
-
-状态 355
-
-  106 direct-abstract-declarator: direct-abstract-declarator LP param-type-list RP .
-
-    $default  使用规则 106 以归约 (direct-abstract-declarator)
-
-
 状态 356
 
-  102 direct-abstract-declarator: direct-abstract-declarator LB const-exp RB .
+  139 iteration-stat: FOR LP DELIM DELIM RP stat .
 
-    $default  使用规则 102 以归约 (direct-abstract-declarator)
+    $default  使用规则 139 以归约 (iteration-stat)
 
 
 状态 357
 
-  128 selection-stat: IF LP exp RP stat ELSE . stat
+  138 iteration-stat: FOR LP DELIM DELIM exp RP . stat
+
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
+    LP                偏移，并进入状态 103
+    LC                偏移，并进入状态 56
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 112
+
+    stat              转到状态 365
+    labeled-stat      转到状态 115
+    exp-stat          转到状态 116
+    compound-stat     转到状态 117
+    selection-stat    转到状态 119
+    iteration-stat    转到状态 120
+    jump-stat         转到状态 121
+    exp               转到状态 122
+    assignment-exp    转到状态 123
+    conditional-exp   转到状态 124
+    logical-or-exp    转到状态 125
+    logical-and-exp   转到状态 126
+    inclusive-or-exp  转到状态 127
+    exclusive-or-exp  转到状态 128
+    and-exp           转到状态 129
+    equality-exp      转到状态 130
+    relational-exp    转到状态 131
+    shift-expression  转到状态 132
+    additive-exp      转到状态 133
+    mult-exp          转到状态 134
+    cast-exp          转到状态 135
+    unary-exp         转到状态 136
+    unary-operator    转到状态 137
+    postfix-exp       转到状态 138
+    primary-exp       转到状态 139
+    const             转到状态 140
+    number            转到状态 141
+
+
+状态 358
+
+  137 iteration-stat: FOR LP DELIM exp DELIM RP . stat
 
     IF                偏移，并进入状态 82
     FOR               偏移，并进入状态 83
@@ -6825,81 +6832,18 @@
     number            转到状态 141
 
 
-状态 358
-
-  139 iteration-stat: FOR LP DELIM DELIM RP stat .
-
-    $default  使用规则 139 以归约 (iteration-stat)
-
-
 状态 359
 
-  138 iteration-stat: FOR LP DELIM DELIM exp RP . stat
+  135 iteration-stat: FOR LP DELIM exp DELIM exp . RP stat
+  146 exp: exp . COMMA assignment-exp
 
-    IF                偏移，并进入状态 82
-    FOR               偏移，并进入状态 83
-    DO                偏移，并进入状态 84
-    WHILE             偏移，并进入状态 85
-    BREAK             偏移，并进入状态 86
-    CONTINUE          偏移，并进入状态 87
-    SWITCH            偏移，并进入状态 88
-    CASE              偏移，并进入状态 89
-    DEFAULT           偏移，并进入状态 90
-    GOTO              偏移，并进入状态 91
-    MULORDEREFERENCE  偏移，并进入状态 92
-    ANDORADDRESSOF    偏移，并进入状态 93
-    NOT               偏移，并进入状态 94
-    NOTNOT            偏移，并进入状态 95
-    INC               偏移，并进入状态 96
-    DEC               偏移，并进入状态 97
-    POSITIVE          偏移，并进入状态 98
-    NEGATIVE          偏移，并进入状态 99
-    SIZEOF            偏移，并进入状态 100
-    RETURN            偏移，并进入状态 101
-    DELIM             偏移，并进入状态 102
-    LP                偏移，并进入状态 103
-    LC                偏移，并进入状态 56
-    NUMCHAR           偏移，并进入状态 105
-    NUMSHORT          偏移，并进入状态 106
-    NUMINT            偏移，并进入状态 107
-    NUMLONG           偏移，并进入状态 108
-    NUMFLOAT          偏移，并进入状态 109
-    NUMDOUBLE         偏移，并进入状态 110
-    STRING            偏移，并进入状态 111
-    IDENTIFIER        偏移，并进入状态 112
-
-    stat              转到状态 367
-    labeled-stat      转到状态 115
-    exp-stat          转到状态 116
-    compound-stat     转到状态 117
-    selection-stat    转到状态 119
-    iteration-stat    转到状态 120
-    jump-stat         转到状态 121
-    exp               转到状态 122
-    assignment-exp    转到状态 123
-    conditional-exp   转到状态 124
-    logical-or-exp    转到状态 125
-    logical-and-exp   转到状态 126
-    inclusive-or-exp  转到状态 127
-    exclusive-or-exp  转到状态 128
-    and-exp           转到状态 129
-    equality-exp      转到状态 130
-    relational-exp    转到状态 131
-    shift-expression  转到状态 132
-    additive-exp      转到状态 133
-    mult-exp          转到状态 134
-    cast-exp          转到状态 135
-    unary-exp         转到状态 136
-    unary-operator    转到状态 137
-    postfix-exp       转到状态 138
-    primary-exp       转到状态 139
-    const             转到状态 140
-    number            转到状态 141
+    COMMA  偏移，并进入状态 201
+    RP     偏移，并进入状态 367
 
 
 状态 360
 
-  137 iteration-stat: FOR LP DELIM exp DELIM RP . stat
+  136 iteration-stat: FOR LP exp DELIM DELIM RP . stat
 
     IF                偏移，并进入状态 82
     FOR               偏移，并进入状态 83
@@ -6964,7 +6908,7 @@
 
 状态 361
 
-  135 iteration-stat: FOR LP DELIM exp DELIM exp . RP stat
+  134 iteration-stat: FOR LP exp DELIM DELIM exp . RP stat
   146 exp: exp . COMMA assignment-exp
 
     COMMA  偏移，并进入状态 201
@@ -6973,7 +6917,82 @@
 
 状态 362
 
-  136 iteration-stat: FOR LP exp DELIM DELIM RP . stat
+  132 iteration-stat: FOR LP exp DELIM exp DELIM . exp RP stat
+  133               | FOR LP exp DELIM exp DELIM . RP stat
+
+    MULORDEREFERENCE  偏移，并进入状态 92
+    ANDORADDRESSOF    偏移，并进入状态 93
+    NOT               偏移，并进入状态 94
+    NOTNOT            偏移，并进入状态 95
+    INC               偏移，并进入状态 96
+    DEC               偏移，并进入状态 97
+    POSITIVE          偏移，并进入状态 98
+    NEGATIVE          偏移，并进入状态 99
+    SIZEOF            偏移，并进入状态 100
+    LP                偏移，并进入状态 103
+    RP                偏移，并进入状态 370
+    NUMCHAR           偏移，并进入状态 105
+    NUMSHORT          偏移，并进入状态 106
+    NUMINT            偏移，并进入状态 107
+    NUMLONG           偏移，并进入状态 108
+    NUMFLOAT          偏移，并进入状态 109
+    NUMDOUBLE         偏移，并进入状态 110
+    STRING            偏移，并进入状态 111
+    IDENTIFIER        偏移，并进入状态 153
+
+    exp               转到状态 371
+    assignment-exp    转到状态 123
+    conditional-exp   转到状态 124
+    logical-or-exp    转到状态 125
+    logical-and-exp   转到状态 126
+    inclusive-or-exp  转到状态 127
+    exclusive-or-exp  转到状态 128
+    and-exp           转到状态 129
+    equality-exp      转到状态 130
+    relational-exp    转到状态 131
+    shift-expression  转到状态 132
+    additive-exp      转到状态 133
+    mult-exp          转到状态 134
+    cast-exp          转到状态 135
+    unary-exp         转到状态 136
+    unary-operator    转到状态 137
+    postfix-exp       转到状态 138
+    primary-exp       转到状态 139
+    const             转到状态 140
+    number            转到状态 141
+
+
+状态 363
+
+  131 iteration-stat: DO stat WHILE LP exp RP . DELIM
+
+    DELIM  偏移，并进入状态 372
+
+
+状态 364
+
+  128 selection-stat: IF LP exp RP stat ELSE stat .
+
+    $default  使用规则 128 以归约 (selection-stat)
+
+
+状态 365
+
+  138 iteration-stat: FOR LP DELIM DELIM exp RP stat .
+
+    $default  使用规则 138 以归约 (iteration-stat)
+
+
+状态 366
+
+  137 iteration-stat: FOR LP DELIM exp DELIM RP stat .
+
+    $default  使用规则 137 以归约 (iteration-stat)
+
+
+状态 367
+
+  135 iteration-stat: FOR LP DELIM exp DELIM exp RP . stat
 
     IF                偏移，并进入状态 82
     FOR               偏移，并进入状态 83
@@ -7007,7 +7026,7 @@
     STRING            偏移，并进入状态 111
     IDENTIFIER        偏移，并进入状态 112
 
-    stat              转到状态 370
+    stat              转到状态 373
     labeled-stat      转到状态 115
     exp-stat          转到状态 116
     compound-stat     转到状态 117
@@ -7036,20 +7055,27 @@
     number            转到状态 141
 
 
-状态 363
+状态 368
 
-  134 iteration-stat: FOR LP exp DELIM DELIM exp . RP stat
-  146 exp: exp . COMMA assignment-exp
+  136 iteration-stat: FOR LP exp DELIM DELIM RP stat .
 
-    COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 371
+    $default  使用规则 136 以归约 (iteration-stat)
 
 
-状态 364
+状态 369
 
-  132 iteration-stat: FOR LP exp DELIM exp DELIM . exp RP stat
-  133               | FOR LP exp DELIM exp DELIM . RP stat
+  134 iteration-stat: FOR LP exp DELIM DELIM exp RP . stat
 
+    IF                偏移，并进入状态 82
+    FOR               偏移，并进入状态 83
+    DO                偏移，并进入状态 84
+    WHILE             偏移，并进入状态 85
+    BREAK             偏移，并进入状态 86
+    CONTINUE          偏移，并进入状态 87
+    SWITCH            偏移，并进入状态 88
+    CASE              偏移，并进入状态 89
+    DEFAULT           偏移，并进入状态 90
+    GOTO              偏移，并进入状态 91
     MULORDEREFERENCE  偏移，并进入状态 92
     ANDORADDRESSOF    偏移，并进入状态 93
     NOT               偏移，并进入状态 94
@@ -7059,8 +7085,10 @@
     POSITIVE          偏移，并进入状态 98
     NEGATIVE          偏移，并进入状态 99
     SIZEOF            偏移，并进入状态 100
+    RETURN            偏移，并进入状态 101
+    DELIM             偏移，并进入状态 102
     LP                偏移，并进入状态 103
-    RP                偏移，并进入状态 372
+    LC                偏移，并进入状态 56
     NUMCHAR           偏移，并进入状态 105
     NUMSHORT          偏移，并进入状态 106
     NUMINT            偏移，并进入状态 107
@@ -7068,9 +7096,16 @@
     NUMFLOAT          偏移，并进入状态 109
     NUMDOUBLE         偏移，并进入状态 110
     STRING            偏移，并进入状态 111
-    IDENTIFIER        偏移，并进入状态 153
+    IDENTIFIER        偏移，并进入状态 112
 
-    exp               转到状态 373
+    stat              转到状态 374
+    labeled-stat      转到状态 115
+    exp-stat          转到状态 116
+    compound-stat     转到状态 117
+    selection-stat    转到状态 119
+    iteration-stat    转到状态 120
+    jump-stat         转到状态 121
+    exp               转到状态 122
     assignment-exp    转到状态 123
     conditional-exp   转到状态 124
     logical-or-exp    转到状态 125
@@ -7092,37 +7127,9 @@
     number            转到状态 141
 
 
-状态 365
+状态 370
 
-  131 iteration-stat: DO stat WHILE LP exp RP . DELIM
-
-    DELIM  偏移，并进入状态 374
-
-
-状态 366
-
-  128 selection-stat: IF LP exp RP stat ELSE stat .
-
-    $default  使用规则 128 以归约 (selection-stat)
-
-
-状态 367
-
-  138 iteration-stat: FOR LP DELIM DELIM exp RP stat .
-
-    $default  使用规则 138 以归约 (iteration-stat)
-
-
-状态 368
-
-  137 iteration-stat: FOR LP DELIM exp DELIM RP stat .
-
-    $default  使用规则 137 以归约 (iteration-stat)
-
-
-状态 369
-
-  135 iteration-stat: FOR LP DELIM exp DELIM exp RP . stat
+  133 iteration-stat: FOR LP exp DELIM exp DELIM RP . stat
 
     IF                偏移，并进入状态 82
     FOR               偏移，并进入状态 83
@@ -7185,81 +7192,46 @@
     number            转到状态 141
 
 
-状态 370
-
-  136 iteration-stat: FOR LP exp DELIM DELIM RP stat .
-
-    $default  使用规则 136 以归约 (iteration-stat)
-
-
 状态 371
 
-  134 iteration-stat: FOR LP exp DELIM DELIM exp RP . stat
+  132 iteration-stat: FOR LP exp DELIM exp DELIM exp . RP stat
+  146 exp: exp . COMMA assignment-exp
 
-    IF                偏移，并进入状态 82
-    FOR               偏移，并进入状态 83
-    DO                偏移，并进入状态 84
-    WHILE             偏移，并进入状态 85
-    BREAK             偏移，并进入状态 86
-    CONTINUE          偏移，并进入状态 87
-    SWITCH            偏移，并进入状态 88
-    CASE              偏移，并进入状态 89
-    DEFAULT           偏移，并进入状态 90
-    GOTO              偏移，并进入状态 91
-    MULORDEREFERENCE  偏移，并进入状态 92
-    ANDORADDRESSOF    偏移，并进入状态 93
-    NOT               偏移，并进入状态 94
-    NOTNOT            偏移，并进入状态 95
-    INC               偏移，并进入状态 96
-    DEC               偏移，并进入状态 97
-    POSITIVE          偏移，并进入状态 98
-    NEGATIVE          偏移，并进入状态 99
-    SIZEOF            偏移，并进入状态 100
-    RETURN            偏移，并进入状态 101
-    DELIM             偏移，并进入状态 102
-    LP                偏移，并进入状态 103
-    LC                偏移，并进入状态 56
-    NUMCHAR           偏移，并进入状态 105
-    NUMSHORT          偏移，并进入状态 106
-    NUMINT            偏移，并进入状态 107
-    NUMLONG           偏移，并进入状态 108
-    NUMFLOAT          偏移，并进入状态 109
-    NUMDOUBLE         偏移，并进入状态 110
-    STRING            偏移，并进入状态 111
-    IDENTIFIER        偏移，并进入状态 112
-
-    stat              转到状态 376
-    labeled-stat      转到状态 115
-    exp-stat          转到状态 116
-    compound-stat     转到状态 117
-    selection-stat    转到状态 119
-    iteration-stat    转到状态 120
-    jump-stat         转到状态 121
-    exp               转到状态 122
-    assignment-exp    转到状态 123
-    conditional-exp   转到状态 124
-    logical-or-exp    转到状态 125
-    logical-and-exp   转到状态 126
-    inclusive-or-exp  转到状态 127
-    exclusive-or-exp  转到状态 128
-    and-exp           转到状态 129
-    equality-exp      转到状态 130
-    relational-exp    转到状态 131
-    shift-expression  转到状态 132
-    additive-exp      转到状态 133
-    mult-exp          转到状态 134
-    cast-exp          转到状态 135
-    unary-exp         转到状态 136
-    unary-operator    转到状态 137
-    postfix-exp       转到状态 138
-    primary-exp       转到状态 139
-    const             转到状态 140
-    number            转到状态 141
+    COMMA  偏移，并进入状态 201
+    RP     偏移，并进入状态 376
 
 
 状态 372
 
-  133 iteration-stat: FOR LP exp DELIM exp DELIM RP . stat
+  131 iteration-stat: DO stat WHILE LP exp RP DELIM .
+
+    $default  使用规则 131 以归约 (iteration-stat)
+
+
+状态 373
+
+  135 iteration-stat: FOR LP DELIM exp DELIM exp RP stat .
+
+    $default  使用规则 135 以归约 (iteration-stat)
+
+
+状态 374
+
+  134 iteration-stat: FOR LP exp DELIM DELIM exp RP stat .
+
+    $default  使用规则 134 以归约 (iteration-stat)
+
+
+状态 375
+
+  133 iteration-stat: FOR LP exp DELIM exp DELIM RP stat .
+
+    $default  使用规则 133 以归约 (iteration-stat)
+
+
+状态 376
+
+  132 iteration-stat: FOR LP exp DELIM exp DELIM exp RP . stat
 
     IF                偏移，并进入状态 82
     FOR               偏移，并进入状态 83
@@ -7322,109 +7294,7 @@
     number            转到状态 141
 
 
-状态 373
-
-  132 iteration-stat: FOR LP exp DELIM exp DELIM exp . RP stat
-  146 exp: exp . COMMA assignment-exp
-
-    COMMA  偏移，并进入状态 201
-    RP     偏移，并进入状态 378
-
-
-状态 374
-
-  131 iteration-stat: DO stat WHILE LP exp RP DELIM .
-
-    $default  使用规则 131 以归约 (iteration-stat)
-
-
-状态 375
-
-  135 iteration-stat: FOR LP DELIM exp DELIM exp RP stat .
-
-    $default  使用规则 135 以归约 (iteration-stat)
-
-
-状态 376
-
-  134 iteration-stat: FOR LP exp DELIM DELIM exp RP stat .
-
-    $default  使用规则 134 以归约 (iteration-stat)
-
-
 状态 377
-
-  133 iteration-stat: FOR LP exp DELIM exp DELIM RP stat .
-
-    $default  使用规则 133 以归约 (iteration-stat)
-
-
-状态 378
-
-  132 iteration-stat: FOR LP exp DELIM exp DELIM exp RP . stat
-
-    IF                偏移，并进入状态 82
-    FOR               偏移，并进入状态 83
-    DO                偏移，并进入状态 84
-    WHILE             偏移，并进入状态 85
-    BREAK             偏移，并进入状态 86
-    CONTINUE          偏移，并进入状态 87
-    SWITCH            偏移，并进入状态 88
-    CASE              偏移，并进入状态 89
-    DEFAULT           偏移，并进入状态 90
-    GOTO              偏移，并进入状态 91
-    MULORDEREFERENCE  偏移，并进入状态 92
-    ANDORADDRESSOF    偏移，并进入状态 93
-    NOT               偏移，并进入状态 94
-    NOTNOT            偏移，并进入状态 95
-    INC               偏移，并进入状态 96
-    DEC               偏移，并进入状态 97
-    POSITIVE          偏移，并进入状态 98
-    NEGATIVE          偏移，并进入状态 99
-    SIZEOF            偏移，并进入状态 100
-    RETURN            偏移，并进入状态 101
-    DELIM             偏移，并进入状态 102
-    LP                偏移，并进入状态 103
-    LC                偏移，并进入状态 56
-    NUMCHAR           偏移，并进入状态 105
-    NUMSHORT          偏移，并进入状态 106
-    NUMINT            偏移，并进入状态 107
-    NUMLONG           偏移，并进入状态 108
-    NUMFLOAT          偏移，并进入状态 109
-    NUMDOUBLE         偏移，并进入状态 110
-    STRING            偏移，并进入状态 111
-    IDENTIFIER        偏移，并进入状态 112
-
-    stat              转到状态 379
-    labeled-stat      转到状态 115
-    exp-stat          转到状态 116
-    compound-stat     转到状态 117
-    selection-stat    转到状态 119
-    iteration-stat    转到状态 120
-    jump-stat         转到状态 121
-    exp               转到状态 122
-    assignment-exp    转到状态 123
-    conditional-exp   转到状态 124
-    logical-or-exp    转到状态 125
-    logical-and-exp   转到状态 126
-    inclusive-or-exp  转到状态 127
-    exclusive-or-exp  转到状态 128
-    and-exp           转到状态 129
-    equality-exp      转到状态 130
-    relational-exp    转到状态 131
-    shift-expression  转到状态 132
-    additive-exp      转到状态 133
-    mult-exp          转到状态 134
-    cast-exp          转到状态 135
-    unary-exp         转到状态 136
-    unary-operator    转到状态 137
-    postfix-exp       转到状态 138
-    primary-exp       转到状态 139
-    const             转到状态 140
-    number            转到状态 141
-
-
-状态 379
 
   132 iteration-stat: FOR LP exp DELIM exp DELIM exp RP stat .
 

@@ -471,8 +471,10 @@ stat                        : labeled-stat   { $$ = $1; }
                             ;
 
 labeled-stat		        : IDENTIFIER COLON stat { $$ = new LabelStatement(*$1); delete $1; }
-                            | CASE const-exp COLON stat { $$ = new CaseStatement($2, $4); }
-                            | DEFAULT COLON stat { $$ = $3; }
+                            /* | CASE const-exp COLON stat { $$ = new CaseStatement($2, $4); } */
+                            /* | DEFAULT COLON stat { $$ = new CaseStatement(nullptr, $3); } */
+                            | CASE const-exp COLON { $$ = new CaseStatement($2); }
+                            | DEFAULT COLON { $$ = new CaseStatement(nullptr); }
                             ;
 
 exp-stat            		: exp DELIM { $$ = new ExpressionStatement($1); }
@@ -491,7 +493,11 @@ stat-list                   : stat { $$ = $1; $$->tail = $$; }
 
 selection-stat		        : IF LP exp RP stat             { $5->next = nullptr; $$ = new IfElseStatement($3, $5); }
                             | IF LP exp RP stat ELSE stat   { $5->next = $7; $$ = new IfElseStatement($3, $5); }
-                            | SWITCH LP exp RP stat         { $$ = new SwitchCaseStatement($3, $5); }
+                            | SWITCH LP exp RP stat         {
+                                if($5->getName() != "\"CompoundStatement\"")
+                                    yyerror("case label not within a switch statement");
+                                $$ = new SwitchCaseStatement($3, $5);
+                            }
                             ;
 
 iteration-stat      		: WHILE LP exp RP stat                   { $$ = new WhileStatement($3, $5); }

@@ -11,7 +11,7 @@ Value *CompoundStatement::codeGen(CodeGenerator &ctx)
         for (auto &p : *vardecs)
             p->codeGen(ctx);
 
-    for(Statement *s = stmt; s; s = s->next)
+    for (Statement *s = stmt; s; s = s->next)
         s->codeGen(ctx);
 
     // leave the current block
@@ -22,7 +22,7 @@ Value *CompoundStatement::codeGen(CodeGenerator &ctx)
 
 Value *ExpressionStatement::codeGen(CodeGenerator &ctx)
 {
-    if(expr)
+    if (expr)
         expr->codeGen(ctx);
     return nullptr;
 }
@@ -38,7 +38,7 @@ Value *IfElseStatement::codeGen(CodeGenerator &ctx)
     // branch condition
     ctx.builder.SetInsertPoint(ifcond);
     Value *cmpres = cond->codeGen(ctx);
-    if(cmpres->getType()->isPointerTy() || cmpres->getType()->getIntegerBitWidth() != 1)
+    if (cmpres->getType()->isPointerTy() || cmpres->getType()->getIntegerBitWidth() != 1)
         // logical comparision is ommitted
         cmpres = ctx.CreateBinaryExpr(
             cmpres,
@@ -50,16 +50,16 @@ Value *IfElseStatement::codeGen(CodeGenerator &ctx)
     ctx.builder.SetInsertPoint(ifthen);
     stmt->codeGen(ctx);
     // if current block has not terminated, go if.out
-    if(!ctx.builder.GetInsertBlock()->getTerminator())
+    if (!ctx.builder.GetInsertBlock()->getTerminator())
         ctx.builder.CreateBr(ifout);
 
     // else-part
     ctx.builder.SetInsertPoint(ifelse);
     if (stmt->next)
         stmt->next->codeGen(ctx);
-    if(!ctx.builder.GetInsertBlock()->getTerminator())
+    if (!ctx.builder.GetInsertBlock()->getTerminator())
         ctx.builder.CreateBr(ifout);
-    
+
     // go out
     ctx.builder.SetInsertPoint(ifout);
 
@@ -76,7 +76,7 @@ Value *WhileStatement::codeGen(CodeGenerator &ctx)
 
     ctx.builder.SetInsertPoint(whilecond);
     Value *cmpres = cond->codeGen(ctx);
-    if(cmpres->getType()->isPointerTy() || cmpres->getType()->getIntegerBitWidth() != 1)
+    if (cmpres->getType()->isPointerTy() || cmpres->getType()->getIntegerBitWidth() != 1)
         // logical comparision is ommitted
         cmpres = ctx.CreateBinaryExpr(
             cmpres,
@@ -109,7 +109,7 @@ Value *DoWhileStatement::codeGen(CodeGenerator &ctx)
 
     ctx.builder.SetInsertPoint(dowhilecond);
     Value *cmpres = cond->codeGen(ctx);
-    if(cmpres->getType()->isPointerTy() || cmpres->getType()->getIntegerBitWidth() != 1)
+    if (cmpres->getType()->isPointerTy() || cmpres->getType()->getIntegerBitWidth() != 1)
         // logical comparision is ommitted
         cmpres = ctx.CreateBinaryExpr(
             cmpres,
@@ -145,7 +145,7 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
     if (cond)
     {
         Value *condVal = cond->codeGen(ctx);
-        if(condVal->getType()->isPointerTy() || condVal->getType()->getIntegerBitWidth() != 1)
+        if (condVal->getType()->isPointerTy() || condVal->getType()->getIntegerBitWidth() != 1)
             // logical comparision is ommitted
             condVal = ctx.CreateBinaryExpr(
                 condVal,
@@ -199,26 +199,54 @@ Value *ContinueStatement::codeGen(CodeGenerator &ctx)
     return nullptr;
 }
 
-
 Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
 {
-    // SwitchInst *sw = ctx.builder.CreateSwitch();
+    BasicBlock *switchcond = BasicBlock::Create(ctx.ctx, "switch.cond", ctx.curFunction);
+    BasicBlock *switchout = BasicBlock::Create(ctx.ctx, "switch.out", ctx.curFunction);
+    ctx.builder.CreateBr(switchcond);
+    ctx.loopctx.push_back(pair<BasicBlock *, BasicBlock *>(switchcond, switchout));
 
-    // sw->addCase();
+    ctx.builder.SetInsertPoint(switchcond);
+    SwitchInst *swinst = ctx.builder.CreateSwitch(cond->codeGen(ctx), nullptr);
+
+    if (((CompoundStatement *)stmt)->vardecs)
+        ctx.warning("variable declaration inside switch statement will never be executed");
+
+    for (Statement *p = ((CompoundStatement *)stmt)->stmt; p; p = p->next)
+    {
+        if (p->getName() == "\"CaseStatement\"")
+        {
+            if (((CaseStatement *)p)->val)
+            {
+                BasicBlock *switchcase = BasicBlock::Create(ctx.ctx, "switch.case", ctx.curFunction);
+                swinst->addCase(dyn_cast<ConstantInt>(ctx.Num2Constant(((CaseStatement *)p)->val)), switchcase);
+                ctx.builder.SetInsertPoint(switchcase);
+            }
+            else
+            {
+                BasicBlock *switchdefault = BasicBlock::Create(ctx.ctx, "switch.default", ctx.curFunction);
+                swinst->setDefaultDest(switchdefault);
+                ctx.builder.SetInsertPoint(switchdefault);
+            }
+        }
+        else
+            p->codeGen(ctx);
+    }
+
+    ctx.builder.SetInsertPoint(switchout);
+    ctx.loopctx.pop_back();
 
     return nullptr;
 }
 
 Value *CaseStatement::codeGen(CodeGenerator &ctx)
 {
-    
-
     return nullptr;
 }
 
 Value *GotoStatement::codeGen(CodeGenerator &ctx)
 {
-    if(ctx.labels.find(label) != ctx.labels.end())
+    if (ctx.labels.find(label) != ctx.labels.end())
         ctx.builder.CreateBr(ctx.labels[label]);
     else
         ctx.error(string("label '") + label + string("' is not defined"));
@@ -228,7 +256,7 @@ Value *GotoStatement::codeGen(CodeGenerator &ctx)
 
 Value *LabelStatement::codeGen(CodeGenerator &ctx)
 {
-    if(ctx.labels.find(label) != ctx.labels.end())
+    if (ctx.labels.find(label) != ctx.labels.end())
         ctx.error(string("redefinition of label '") + label + string("'"));
 
     BasicBlock *labelblock = BasicBlock::Create(ctx.ctx, label, ctx.curFunction);

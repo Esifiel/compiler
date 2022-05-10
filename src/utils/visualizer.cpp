@@ -50,7 +50,7 @@ void Visualizer::visitDeclaration(Declaration *d)
 
 void Visualizer::visitTypeDeclaration(TypeDeclaration *t)
 {
-    if(t)
+    if (t)
     {
         out << head << t->getName() << sub;
         visitType(t->type);
@@ -67,7 +67,7 @@ void Visualizer::visitVariableDeclaration(VariableDeclaration *d)
         auto pi = d->ids->begin();
         for (; pt != d->types->end() && pi != d->ids->end(); pt++, pi++)
         {
-            if(pt != d->types->begin() && pi != d->ids->begin())
+            if (pt != d->types->begin() && pi != d->ids->begin())
                 out << sep;
             visitType(*pt);
             out << sep;
@@ -119,11 +119,11 @@ void Visualizer::visitFunctionDeclaration(FunctionDeclaration *d)
 
 void Visualizer::visitAggregateType(AggregateType *t)
 {
-    if(t)
+    if (t)
     {
         out << "\"" << t->name << "\"";
-        if(t->members && t->members->size() > 0)
-            for(auto &p : *t->members)
+        if (t->members && t->members->size() > 0)
+            for (auto &p : *t->members)
             {
                 out << sep;
                 auto pt = p->first->begin();
@@ -143,13 +143,13 @@ void Visualizer::visitType(TypeSpecifier *t)
     if (t)
     {
         out << head << t->getName() << sub;
-        if(t->qual)
+        if (t->qual)
             visitQualifier(t->qual);
-        if(t->type == TYPE_ARRAY)
+        if (t->type == TYPE_ARRAY)
             out << ((MyArrayType *)t)->size << sep;
-        if(t->type == TYPE_ARRAY || t->type == TYPE_POINTER)
+        if (t->type == TYPE_ARRAY || t->type == TYPE_POINTER)
             visitType(((IterableType *)t)->basictype);
-        if(t->type == TYPE_STRUCT)
+        if (t->type == TYPE_STRUCT)
             visitAggregateType((AggregateType *)t);
         out << subend << tail;
     }
@@ -157,18 +157,18 @@ void Visualizer::visitType(TypeSpecifier *t)
 
 void Visualizer::visitQualifier(Qualifier *q)
 {
-    if(q)
+    if (q)
     {
         out << head << q->getName() << sub;
-        if(q->isconst)
+        if (q->isconst)
             out << "\"const\"";
-        if(q->isconst && q->isvolatile)
+        if (q->isconst && q->isvolatile)
             out << sep;
-        if(q->isvolatile)
+        if (q->isvolatile)
             out << "\"volatile\"";
-        if((q->isconst || q->isvolatile) && q->pcnt)
+        if ((q->isconst || q->isvolatile) && q->pcnt)
             out << sep;
-        if(q->pcnt)
+        if (q->pcnt)
             out << q->pcnt;
         out << subend << tail;
     }
@@ -179,12 +179,12 @@ void Visualizer::visitIdentifier(Identifier *i)
     if (i)
     {
         out << head << i->getName() << sub << "\"" + i->name + "\"";
-        if(i->qual)
+        if (i->qual)
         {
             out << sep;
             visitQualifier(i->qual);
         }
-        if(i->init)
+        if (i->init)
         {
             out << sep;
             visitExpression(i->init);
@@ -204,7 +204,7 @@ void Visualizer::visitString(String *s)
         replace(output, "\r", "\\\\r");
         replace(output, "\"", "\\\\\"");
         replace(output, ":", " ");
-        out << head << s->getName() << sub << "\"" + output + "\""<< subend << tail;
+        out << head << s->getName() << sub << "\"" + output + "\"" << subend << tail;
     }
 }
 
@@ -213,19 +213,19 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
     if (c)
     {
         out << head << c->getName() << sub;
-        if(c->vardecs)
+        if (c->vardecs)
             for (auto &p : *c->vardecs)
             {
                 if (p != (*c->vardecs)[0])
                     out << sep;
                 visitDeclaration(p);
             }
-        if(c->vardecs && c->vardecs->size() > 0 && c->stmt)
+        if (c->vardecs && c->vardecs->size() > 0 && c->stmt)
             out << sep;
         Statement *p = c->stmt;
         while (p)
         {
-            if(p != c->stmt)
+            if (p != c->stmt)
                 out << sep;
             visitStatement(p);
             p = p->next;
@@ -317,7 +317,7 @@ void Visualizer::visitExpression(Expression *e)
         else
         {
             out << head << e->getName() << sub;
-            if(e->op == OP_CAST)
+            if (e->op == OP_CAST)
                 visitType(e->left->type);
             else
                 visitExpression(e->left);
@@ -557,7 +557,7 @@ void Visualizer::visitFunctionCall(FunctionCall *f)
 
 void Visualizer::visitDoWhileStatement(DoWhileStatement *d)
 {
-    if(d)
+    if (d)
     {
         out << head << d->getName() << sub;
         visitStatement(d->stmt);
@@ -569,7 +569,7 @@ void Visualizer::visitDoWhileStatement(DoWhileStatement *d)
 
 void Visualizer::visitSwitchCaseStatement(SwitchCaseStatement *s)
 {
-    if(s)
+    if (s)
     {
         out << head << s->getName() << sub;
         visitExpression(s->cond);
@@ -593,19 +593,17 @@ void Visualizer::visitContinueStatement(ContinueStatement *c)
 
 void Visualizer::visitCaseStatement(CaseStatement *c)
 {
-    if(c)
+    if (c)
     {
         out << head << c->getName() << sub;
-        visitExpression(c->val);
-        out << sep;
-        visitStatement(c->stmt);
+        visitNumber(c->val);
         out << subend << tail;
     }
 }
 
 void Visualizer::visitGotoStatement(GotoStatement *s)
 {
-    if(s)
+    if (s)
     {
         out << head << s->getName() << sub;
         out << "\"" + s->label << "\"";
@@ -615,7 +613,7 @@ void Visualizer::visitGotoStatement(GotoStatement *s)
 
 void Visualizer::visitLabelStatement(LabelStatement *s)
 {
-    if(s)
+    if (s)
     {
         out << head << s->getName() << sub;
         out << "\"" + s->label << "\"";

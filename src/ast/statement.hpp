@@ -150,10 +150,11 @@ public:
 class CaseStatement : public Statement
 {
 public:
-    Expression *val;
-    Statement *stmt;
+    Number *val;
+    // Statement *stmt;
 
-    CaseStatement(Expression *e, Statement *s) : val(e), stmt(s) {}
+    // CaseStatement(Number *e, Statement *s) : val(e), stmt(s) {}
+    CaseStatement(Number *e) : val(e) {}
 
     virtual string getName() { return "\"CaseStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
