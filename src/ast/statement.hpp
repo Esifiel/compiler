@@ -159,4 +159,26 @@ public:
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 };
 
+class GotoStatement : public Statement
+{
+public:
+    string label;
+
+    GotoStatement(string s) : label(s) {}
+
+    virtual string getName() { return "\"GotoStatement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
+class LabelStatement : public Statement
+{
+public:
+    string label;
+
+    LabelStatement(string s) : label(s) {}
+
+    virtual string getName() { return "\"LabelStatement\""; }
+    virtual llvm::Value *codeGen(CodeGenerator &ctx);
+};
+
 #endif

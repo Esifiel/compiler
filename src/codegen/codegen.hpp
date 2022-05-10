@@ -57,6 +57,7 @@ public:
     map<string, string> typealias;
     map<string, vector<string>> structtypes;
     map<string, AggregateType *> structvars;
+    map<string, BasicBlock *> labels;
 
     CodeGenerator();
     ~CodeGenerator();

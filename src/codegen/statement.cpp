@@ -211,5 +211,28 @@ Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
 
 Value *CaseStatement::codeGen(CodeGenerator &ctx)
 {
+    
+
+    return nullptr;
+}
+
+Value *GotoStatement::codeGen(CodeGenerator &ctx)
+{
+    if(ctx.labels.find(label) != ctx.labels.end())
+        ctx.builder.CreateBr(ctx.labels[label]);
+    else
+        ctx.error(string("label '") + label + string("' is not defined"));
+
+    return nullptr;
+}
+
+Value *LabelStatement::codeGen(CodeGenerator &ctx)
+{
+    if(ctx.labels.find(label) != ctx.labels.end())
+        ctx.error(string("redefinition of label '") + label + string("'"));
+
+    BasicBlock *labelblock = BasicBlock::Create(ctx.ctx, label, ctx.curFunction);
+    ctx.labels[label] = labelblock;
+
     return nullptr;
 }

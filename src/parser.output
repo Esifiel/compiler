@@ -495,7 +495,7 @@
     type-name <type> (125)
         on left: 96 97
         on right: 192 198
-    abstract-declarator (126)
+    abstract-declarator <node> (126)
         on left: 98 99 100
         on right: 87 96 101
     direct-abstract-declarator (127)

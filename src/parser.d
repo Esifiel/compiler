@@ -23,8 +23,7 @@ parser.o: parser.cpp ast/program.hpp ast/basic.hpp \
  /usr/lib/llvm-10/include/llvm/Support/MathExtras.h \
  /usr/lib/llvm-10/include/llvm/Support/SwapByteOrder.h \
  /usr/lib/llvm-10/include/llvm/IR/Value.def ast/declaration.hpp \
- ast/expression.hpp ast/statement.hpp ast/type.hpp \
- /usr/lib/llvm-10/include/llvm/IR/Type.h \
+ ast/expression.hpp ast/type.hpp /usr/lib/llvm-10/include/llvm/IR/Type.h \
  /usr/lib/llvm-10/include/llvm/ADT/APFloat.h \
  /usr/lib/llvm-10/include/llvm/ADT/APInt.h \
  /usr/lib/llvm-10/include/llvm/ADT/ArrayRef.h \
@@ -35,5 +34,6 @@ parser.o: parser.cpp ast/program.hpp ast/basic.hpp \
  /usr/lib/llvm-10/include/llvm/ADT/SmallPtrSet.h \
  /usr/lib/llvm-10/include/llvm/ADT/EpochTracker.h \
  /usr/lib/llvm-10/include/llvm/Support/ReverseIteration.h \
- /usr/lib/llvm-10/include/llvm/Support/TypeSize.h ast/basic.hpp \
- ast/expression.hpp ast/statement.hpp ast/declaration.hpp ast/type.hpp
+ /usr/lib/llvm-10/include/llvm/Support/TypeSize.h ast/statement.hpp \
+ ast/basic.hpp ast/expression.hpp ast/statement.hpp ast/declaration.hpp \
+ ast/type.hpp

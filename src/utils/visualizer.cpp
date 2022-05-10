@@ -317,7 +317,10 @@ void Visualizer::visitExpression(Expression *e)
         else
         {
             out << head << e->getName() << sub;
-            visitExpression(e->left);
+            if(e->op == OP_CAST)
+                visitType(e->left->type);
+            else
+                visitExpression(e->left);
             out << sep;
             visitOp(e->op);
             if (e->right)
@@ -446,7 +449,8 @@ void Visualizer::visitOp(enum op_type op)
         out << "|=";
         break;
     case OP_IFELSE:
-        out << "? :";
+        // out << "? :";
+        out << "?";
         break;
     case OP_CAST:
         out << "()";
@@ -511,7 +515,7 @@ void Visualizer::visitNumber(Number *n)
             out << "\"NaN\"";
             break;
         case VAL_CHAR:
-            out << "\"" << n->charView() << "\"";
+            out << (uint32_t)(n->charView());
             break;
         case VAL_SHORT:
             out << n->shortView();
@@ -595,6 +599,26 @@ void Visualizer::visitCaseStatement(CaseStatement *c)
         visitExpression(c->val);
         out << sep;
         visitStatement(c->stmt);
+        out << subend << tail;
+    }
+}
+
+void Visualizer::visitGotoStatement(GotoStatement *s)
+{
+    if(s)
+    {
+        out << head << s->getName() << sub;
+        out << "\"" + s->label << "\"";
+        out << subend << tail;
+    }
+}
+
+void Visualizer::visitLabelStatement(LabelStatement *s)
+{
+    if(s)
+    {
+        out << head << s->getName() << sub;
+        out << "\"" + s->label << "\"";
         out << subend << tail;
     }
 }

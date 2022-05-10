@@ -2,7 +2,6 @@
 #define _TYPE_HPP_
 
 #include "basic.hpp"
-#include "expression.hpp"
 #include <llvm/IR/Type.h>
 #include <vector>
 #include <iostream>
@@ -38,6 +37,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx) = 0;
     virtual TypeSpecifier *getRootType() = 0;
     virtual uint64_t getSize() = 0;
+    virtual bool isAggregateType() = 0;
+    virtual bool isIterableType() = 0;
 };
 
 class CharType : public TypeSpecifier
@@ -49,6 +50,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(char); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class ShortType : public TypeSpecifier
@@ -60,6 +63,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(short); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class IntType : public TypeSpecifier
@@ -72,6 +77,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(int); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class LongType : public TypeSpecifier
@@ -83,6 +90,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(long); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class FloatType : public TypeSpecifier
@@ -94,6 +103,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(float); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class DoubleType : public TypeSpecifier
@@ -105,6 +116,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(double); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class VoidType : public TypeSpecifier
@@ -116,6 +129,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(char); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class IterableType : public TypeSpecifier
@@ -127,6 +142,8 @@ public:
 
     virtual TypeSpecifier *getRootType() { return basictype->getRootType(); }
     virtual uint64_t getSize() = 0;
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return true; }
 };
 
 class MyArrayType : public IterableType
@@ -141,6 +158,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return basictype->getRootType(); }
     virtual uint64_t getSize() { return size * basictype->getSize(); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return true; }
 };
 
 class MyPointerType : public IterableType
@@ -152,7 +171,11 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return basictype->getRootType(); }
     virtual uint64_t getSize() { return sizeof(void *); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return true; }
 };
+
+class Identifier;
 
 class AggregateType : public TypeSpecifier
 {
@@ -165,6 +188,9 @@ public:
     virtual string getName() { return "\"AggregateType\""; }
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() = 0;
+    virtual bool isAggregateType() { return true; }
+    virtual bool isIterableType() { return false; }
+    pair<TypeSpecifier *, Identifier *> getMemberDef(Identifier *id);
 };
 
 class MyStructType : public AggregateType
@@ -175,17 +201,9 @@ public:
     virtual string getName() { return "\"MyStructType\""; }
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
-    virtual uint64_t getSize()
-    {
-        uint64_t sum = 0;
-        for (auto &p : *members)
-            for (auto &q : *p->first)
-            {
-                cout << q->getName() << endl;
-                sum += q->getSize();
-            }
-        return sum;
-    }
+    virtual uint64_t getSize();
+    virtual bool isAggregateType() { return true; }
+    virtual bool isIterableType() { return false; }
 };
 
 class UnionType : public AggregateType
@@ -205,6 +223,8 @@ public:
                     max = q->getSize();
         return max;
     }
+    virtual bool isAggregateType() { return true; }
+    virtual bool isIterableType() { return false; }
 };
 
 class EnumType : public TypeSpecifier
@@ -218,6 +238,8 @@ public:
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
     virtual uint64_t getSize() { return sizeof(int); }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 #endif

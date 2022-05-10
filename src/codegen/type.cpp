@@ -1,4 +1,5 @@
 #include "../ast/type.hpp"
+#include "../ast/expression.hpp"
 #include "codegen.hpp"
 
 Type *CharType::getType(CodeGenerator &ctx)
@@ -59,4 +60,29 @@ Type *UnionType::getType(CodeGenerator &ctx)
 Type *EnumType::getType(CodeGenerator &ctx)
 {
     return nullptr;
+}
+
+uint64_t MyStructType::getSize()
+{
+    uint64_t sum = 0;
+    cout << members << endl;
+    for (auto &p : *members)
+        for (auto &q : *p->first)
+            sum += q->getSize();
+    return sum;
+}
+
+pair<TypeSpecifier *, Identifier *> AggregateType::getMemberDef(Identifier *id)
+{
+    string name = id->name;
+    if (members)
+        for (auto &p : *members)
+        {
+            auto pt = (*p->first).begin();
+            auto pi = (*p->second).begin();
+            for (; pt != (*p->first).end() && pi != (*p->second).end(); pt++, pi++)
+                if ((*pi)->name == name)
+                    return pair<TypeSpecifier *, Identifier *>(*pt, *pi);
+        }
+    return pair<TypeSpecifier *, Identifier *>(nullptr, nullptr);
 }

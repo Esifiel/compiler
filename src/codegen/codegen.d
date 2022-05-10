@@ -23,7 +23,7 @@ codegen/codegen.o: codegen/codegen.cpp codegen/../ast/expression.hpp \
  /usr/lib/llvm-10/include/llvm/Support/MathExtras.h \
  /usr/lib/llvm-10/include/llvm/Support/SwapByteOrder.h \
  /usr/lib/llvm-10/include/llvm/IR/Value.def codegen/../ast/type.hpp \
- codegen/../ast/expression.hpp /usr/lib/llvm-10/include/llvm/IR/Type.h \
+ /usr/lib/llvm-10/include/llvm/IR/Type.h \
  /usr/lib/llvm-10/include/llvm/ADT/APFloat.h \
  /usr/lib/llvm-10/include/llvm/ADT/APInt.h \
  /usr/lib/llvm-10/include/llvm/ADT/ArrayRef.h \
@@ -34,8 +34,8 @@ codegen/codegen.o: codegen/codegen.cpp codegen/../ast/expression.hpp \
  /usr/lib/llvm-10/include/llvm/ADT/SmallPtrSet.h \
  /usr/lib/llvm-10/include/llvm/ADT/EpochTracker.h \
  /usr/lib/llvm-10/include/llvm/Support/ReverseIteration.h \
- /usr/lib/llvm-10/include/llvm/Support/TypeSize.h codegen/codegen.hpp \
- /usr/lib/llvm-10/include/llvm/IR/BasicBlock.h \
+ /usr/lib/llvm-10/include/llvm/Support/TypeSize.h codegen/../ast/type.hpp \
+ codegen/codegen.hpp /usr/lib/llvm-10/include/llvm/IR/BasicBlock.h \
  /usr/lib/llvm-10/include/llvm/ADT/Twine.h \
  /usr/lib/llvm-10/include/llvm/ADT/StringRef.h \
  /usr/lib/llvm-10/include/llvm/ADT/ilist.h \

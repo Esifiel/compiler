@@ -2,8 +2,8 @@
 #include "ast/program.hpp"
 #include <map>
 Program *program;
-static map<string, Number *> constvar;
-static map<string, AggregateType *> aggrdef;
+map<string, Number *> constvar;
+map<string, AggregateType *> aggrdef;
 %}
 
 %expect 1 // shift-reduce conflict: optional else-part for if-else statement
@@ -112,7 +112,8 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 %type<identifier> init-declarator struct-declarator
 %type<ids> id-list init-declarator-list struct-declarator-list
 %type<number> number const const-exp
-%type<node> direct-declarator declarator
+
+%type<node> direct-declarator declarator abstract-declarator
 
 %right ASSIGN ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN SLASSIGN SRASSIGN
 %left OROR
@@ -262,17 +263,7 @@ struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC 
                                 $$->members = $4;
                             }
                             | struct-or-union LC struct-decl-list RC { $$ = $1; $$->members = $3; } // annoymous struct
-                            | struct-or-union IDENTIFIER {
-                                if(aggrdef.find(*$2) != aggrdef.end())
-                                    $$ = aggrdef[*$2];
-                                else
-                                {
-                                    $$ = $1;
-                                    $$->name = *$2;
-                                    aggrdef[*$2] = $$;
-                                    delete $2;
-                                }
-                            }
+                            | struct-or-union IDENTIFIER { $$ = $1; $$->name = *$2; delete $2; }
                             ;
 
 struct-or-union             : STRUCT    { $$ = new MyStructType(); }
@@ -444,11 +435,18 @@ initializer-list            : initializer { $$ = $1; }
                             }
                             ;
 
-type-name                   : spec-qualifier-list abstract-declarator
+type-name                   : spec-qualifier-list abstract-declarator {
+                                $$ = $1;
+                                if($2->getName() == "\"Qualifier\"")
+                                    for(int i = 0; i < ((Qualifier *)$2)->pcnt; i++)
+                                        $$ = new MyPointerType($$);
+                                else
+                                    yyerror(string("abstract-declarator of type '") + $2->getName() + "' is not supported yet");
+                            }
                             | spec-qualifier-list { $$ = $1; }
                             ;
 
-abstract-declarator         : pointer
+abstract-declarator         : pointer { $$ = $1; }
                             | pointer direct-abstract-declarator
                             |         direct-abstract-declarator
                             ;
@@ -472,7 +470,7 @@ stat                        : labeled-stat   { $$ = $1; }
                             | jump-stat      { $$ = $1; }
                             ;
 
-labeled-stat		        : IDENTIFIER COLON stat // TODO: label
+labeled-stat		        : IDENTIFIER COLON stat { $$ = new LabelStatement(*$1); delete $1; }
                             | CASE const-exp COLON stat { $$ = new CaseStatement($2, $4); }
                             | DEFAULT COLON stat { $$ = $3; }
                             ;
@@ -508,7 +506,7 @@ iteration-stat      		: WHILE LP exp RP stat                   { $$ = new WhileS
                             | FOR LP     DELIM     DELIM     RP stat { $$ = new ForStatement(nullptr, nullptr, nullptr, $6); }
                             ;
 
-jump-stat                   : GOTO IDENTIFIER DELIM // TODO: goto
+jump-stat                   : GOTO IDENTIFIER DELIM { $$ = new GotoStatement(*$2); delete $2; }
                             | CONTINUE DELIM        { $$ = new ContinueStatement(); }
                             | BREAK DELIM           { $$ = new BreakStatement(); }
                             | RETURN exp DELIM      { $$ = new ReturnStatement($2); }
@@ -603,7 +601,10 @@ mult-exp		            : cast-exp { $$ = $1; }
                             ;
 
 cast-exp		            : unary-exp { $$ = $1; }
-                            | LP type-name RP cast-exp // TODO: type casting
+                            | LP type-name RP cast-exp {
+                                // coercion type casting
+                                $$ = new Expression(new Expression($2), $4, OP_CAST);
+                            }
                             ;
 
 unary-exp		            : postfix-exp { $$ = $1; }
@@ -618,8 +619,14 @@ unary-exp		            : postfix-exp { $$ = $1; }
                                 $$ = new Expression($2, OP_DEC_FRONT);
                             }
                             | unary-operator cast-exp { $$ = calculate($2, $1); }
-                            | SIZEOF unary-exp // TODO: sizeof
-                            | SIZEOF LP type-name RP { yylval.num.longValue = $3->getSize(); $$ = new Number(yylval.num, new LongType(), VAL_LONG); }
+                            | SIZEOF unary-exp // TODO: size of a expr { yylval.num.longValue = $2->type->getSize(); $$ = new Number(yylval.num, new LongType(), VAL_LONG); }
+                            | SIZEOF LP type-name RP {
+                                if($3->isAggregateType())
+                                    yylval.num.longValue = aggrdef[((AggregateType *)$3)->name]->getSize();
+                                else
+                                    yylval.num.longValue = $3->getSize();
+                                $$ = new Number(yylval.num, new LongType(), VAL_LONG);
+                            }
                             ;
 
 unary-operator              : ANDORADDRESSOF     { $$ = OP_ADDRESSOF; }

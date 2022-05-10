@@ -23,7 +23,8 @@ codegen/expression.o: codegen/expression.cpp \
  /usr/lib/llvm-10/include/llvm/Support/Alignment.h \
  /usr/lib/llvm-10/include/llvm/Support/MathExtras.h \
  /usr/lib/llvm-10/include/llvm/Support/SwapByteOrder.h \
- /usr/lib/llvm-10/include/llvm/IR/Value.def codegen/codegen.hpp \
+ /usr/lib/llvm-10/include/llvm/IR/Value.def codegen/../ast/type.hpp \
+ /usr/lib/llvm-10/include/llvm/IR/Type.h \
  /usr/lib/llvm-10/include/llvm/ADT/APFloat.h \
  /usr/lib/llvm-10/include/llvm/ADT/APInt.h \
  /usr/lib/llvm-10/include/llvm/ADT/ArrayRef.h \
@@ -31,6 +32,10 @@ codegen/expression.o: codegen/expression.cpp \
  /usr/lib/llvm-10/include/llvm/ADT/SmallVector.h \
  /usr/lib/llvm-10/include/llvm/Support/AlignOf.h \
  /usr/lib/llvm-10/include/llvm/Support/MemAlloc.h \
+ /usr/lib/llvm-10/include/llvm/ADT/SmallPtrSet.h \
+ /usr/lib/llvm-10/include/llvm/ADT/EpochTracker.h \
+ /usr/lib/llvm-10/include/llvm/Support/ReverseIteration.h \
+ /usr/lib/llvm-10/include/llvm/Support/TypeSize.h codegen/codegen.hpp \
  /usr/lib/llvm-10/include/llvm/IR/BasicBlock.h \
  /usr/lib/llvm-10/include/llvm/ADT/Twine.h \
  /usr/lib/llvm-10/include/llvm/ADT/StringRef.h \
@@ -47,9 +52,6 @@ codegen/expression.o: codegen/expression.cpp \
  /usr/lib/llvm-10/include/llvm/IR/Metadata.h \
  /usr/lib/llvm-10/include/llvm/ADT/DenseMap.h \
  /usr/lib/llvm-10/include/llvm/ADT/DenseMapInfo.h \
- /usr/lib/llvm-10/include/llvm/Support/TypeSize.h \
- /usr/lib/llvm-10/include/llvm/ADT/EpochTracker.h \
- /usr/lib/llvm-10/include/llvm/Support/ReverseIteration.h \
  /usr/lib/llvm-10/include/llvm/ADT/PointerUnion.h \
  /usr/lib/llvm-10/include/llvm/ADT/StringMap.h \
  /usr/lib/llvm-10/include/llvm/Support/Allocator.h \
@@ -63,8 +65,6 @@ codegen/expression.o: codegen/expression.cpp \
  /usr/lib/llvm-10/include/llvm/IR/Instruction.def \
  /usr/lib/llvm-10/include/llvm/IR/Constants.h \
  /usr/lib/llvm-10/include/llvm/IR/DerivedTypes.h \
- /usr/lib/llvm-10/include/llvm/IR/Type.h \
- /usr/lib/llvm-10/include/llvm/ADT/SmallPtrSet.h \
  /usr/lib/llvm-10/include/llvm/IR/OperandTraits.h \
  /usr/lib/llvm-10/include/llvm/IR/Function.h \
  /usr/lib/llvm-10/include/llvm/ADT/DenseSet.h \
@@ -162,4 +162,4 @@ codegen/expression.o: codegen/expression.cpp \
  /usr/lib/llvm-10/include/llvm/Support/StringSaver.h \
  /usr/lib/llvm-10/include/llvm/MC/StringTableBuilder.h \
  /usr/lib/llvm-10/include/llvm/ADT/CachedHashString.h \
- codegen/../ast/type.hpp codegen/../ast/expression.hpp
+ codegen/../ast/type.hpp

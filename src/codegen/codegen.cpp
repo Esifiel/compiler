@@ -171,16 +171,23 @@ void CodeGenerator::warning(string msg)
 // simplified type casting
 Value *CodeGenerator::CreateCast(Value *V, Type *DestTy)
 {
-    if (V->getType() == DestTy)
+    Type *src = V->getType(), *dst = DestTy;
+    if (src == dst)
         return V;
-    else if (V->getType()->isIntegerTy() && DestTy->isIntegerTy())
-        return builder.CreateIntCast(V, DestTy, false, "");
-    else if (V->getType()->isFloatingPointTy() && DestTy->isFloatingPointTy())
+    else if (src->isIntegerTy() && dst->isIntegerTy())
+        return builder.CreateIntCast(V, dst, false, "");
+    else if (src->isFloatingPointTy() && dst->isFloatingPointTy())
         return builder.CreateFPCast(V, DestTy, "");
-    else if (V->getType()->isFloatingPointTy())
+    else if (src->isFloatingPointTy())
         return builder.CreateFPToSI(V, DestTy);
-    else if (DestTy->isFloatingPointTy())
+    else if (dst->isFloatingPointTy())
         return builder.CreateSIToFP(V, DestTy);
+    else if(src->isPointerTy() && dst->isPointerTy())
+        return builder.CreatePointerCast(V, DestTy);
+    else if(src->isIntegerTy() && dst->isPointerTy())
+        return builder.CreateIntToPtr(V, DestTy);
+    else if(src->isPointerTy() && dst->isIntegerTy())
+        return builder.CreatePtrToInt(V, DestTy);
     else
         // error("type casting failed.");
         return builder.CreateIntCast(V, DestTy, false, "");

@@ -77,6 +77,8 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
     return ctx.builder.CreateCall(func, args);
 }
 
+extern map<string, AggregateType *> aggrdef;
+
 Value *Expression::codeGen(CodeGenerator &ctx)
 {
     string varname;
@@ -100,33 +102,43 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_XOR:
     case OP_SL:
     case OP_SR:
-    case OP_SUB:
     case OP_MUL:
     case OP_DIV:
     case OP_MOD:
         return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
+    case OP_SUB:
     case OP_ADD:
         // if a variable loaded as right value and is pointer type, it means a pointer addition
         lv = left->codeGen(ctx);
-        if (lv->getType()->isPointerTy())
-            return ctx.builder.CreateGEP(lv, right->codeGen(ctx));
-        if (lv->getType()->isArrayTy())
-        {
-            // TODO: getting array's GEP may need to be refactored as a static function
-            idxlist[1] = right->codeGen(ctx);
-            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
-            return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
-        }
         rv = right->codeGen(ctx);
-        if (rv->getType()->isPointerTy())
-            return ctx.builder.CreateGEP(rv, lv);
-        if (rv->getType()->isArrayTy())
+        if( !lv->getType()->isPointerTy() && \
+            !lv->getType()->isArrayTy() && \
+            !rv->getType()->isPointerTy() && \
+            !rv->getType()->isArrayTy())
+            return ctx.CreateBinaryExpr(lv, rv, op);
+        else
         {
-            idxlist[1] = lv;
-            idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
-            return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
+            if(op == OP_SUB)
+                rv = ctx.builder.CreateFNeg(rv);
+
+            if (lv->getType()->isPointerTy())
+                return ctx.builder.CreateGEP(lv, rv);
+            if (lv->getType()->isArrayTy())
+            {
+                // TODO: getting array's GEP may need to be refactored as a static function
+                idxlist[1] = rv;
+                idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+                return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
+            }
+            if (rv->getType()->isPointerTy())
+                return ctx.builder.CreateGEP(rv, lv);
+            if (rv->getType()->isArrayTy())
+            {
+                idxlist[1] = lv;
+                idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
+                return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
+            }
         }
-        return ctx.CreateBinaryExpr(lv, rv, op);
     case OP_ANDAND:
         lv = left->codeGen(ctx);
         rv = right->codeGen(ctx);
@@ -231,12 +243,8 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         newval = ctx.CreateCast(right->codeGen(ctx), var->getType()->getPointerElementType());
         ctx.builder.CreateStore(newval, var);
         return newval;
-    // case OP_IFELSE:
-    //     out << "? :";
-    //     break;
-    // case OP_CAST:
-    //     out << "()";
-    //     break;
+    case OP_CAST:
+        return ctx.CreateCast(right->codeGen(ctx), ((AggregateType *)(left->type))->getType(ctx));
     case OP_COMMA:
         left->codeGen(ctx);
         return right->codeGen(ctx);

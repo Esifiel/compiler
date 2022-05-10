@@ -47,6 +47,8 @@ private:
     void visitTypeDeclaration(TypeDeclaration *t);
     void visitAggregateType(AggregateType *t);
     void visitCaseStatement(CaseStatement *c);
+    void visitGotoStatement(GotoStatement *s);
+    void visitLabelStatement(LabelStatement *s);
 };
 
 #endif
