@@ -131,6 +131,14 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     func = Function::Create(functype, Function::ExternalLinkage, "free", module);
     func->setCallingConv(CallingConv::C);
     functions["free"] = func;
+
+    // exit
+    args.clear();
+    args.push_back(Type::getInt32Ty(ctx));
+    functype = FunctionType::get(Type::getInt32Ty(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "exit", module);
+    func->setCallingConv(CallingConv::C);
+    functions["exit"] = func;
 }
 
 // destructor

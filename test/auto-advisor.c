@@ -154,7 +154,7 @@ int main()
     printf("Credits Remaining: %u\n\n", remaining);
     puts("Possible Courses to Take Next");
     if (remaining == 0)
-        puts("None - Congratulations!");
+        puts("  None - Congratulations!");
     else
     {
         // find recommend
@@ -186,12 +186,12 @@ int main()
         for (i = 0; i < cnt; i++)
             if (!grade[i] || grade[i] == 'F')
                 if (!dependency[i])
-                    printf("%s\n", name[i]);
+                    printf("  %s\n", name[i]);
                 else
                     for (p = dependency[i]->another; p; p = p->another)
                         if (!p->next)
                         {
-                            printf("%s\n", name[i]);
+                            printf("  %s\n", name[i]);
                             break;
                         }
     }

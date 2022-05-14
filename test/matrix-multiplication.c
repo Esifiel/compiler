@@ -18,7 +18,10 @@ int main()
             scanf("%d", &b[i][j]);
 
     if (na != mb)
+    {
         puts("Incompatible Dimensions");
+        exit(0);
+    }
     else
         for (i = 0; i < ma; i++)
             for (j = 0; j < nb; j++)
