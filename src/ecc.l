@@ -164,21 +164,20 @@ void replace(string &src, string sub, string tar)
                                     }
                                     return NUMCHAR;
                                 }
-\".*\"                          {
+(\"([^"]|\\\")*\")+             {
+                                    // string const
                                     debug();
-                                    // strip " and translate escape char
+                                    // strip "
                                     yylval.stringValue = new string(string(yytext).substr(1, strlen(yytext) - 2));
+                                    // multiple strings will be combined
+                                    replace(*yylval.stringValue, "\"\"", "");
+                                    // translate escape char
                                     replace(*yylval.stringValue, "\\n", "\n");
                                     replace(*yylval.stringValue, "\\t", "\t");
                                     replace(*yylval.stringValue, "\\r", "\r");
                                     replace(*yylval.stringValue, "\\\"", "\"");
                                     return STRING;
                                 }
-                            
-"#if"                           {}
-"#else"                         {}
-"#endif"                        {}
-"#define"                       {}
 
 [ \t\n]                         {}
 "//".*                          {}

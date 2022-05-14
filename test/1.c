@@ -1,55 +1,20 @@
-
-int fusc(int n)
-{
-    if (n == 0 || n == 1)
-        return n;
-    else if (n % 2 == 0)
-        return fusc(n / 2);
-    else
-        return fusc((n - 1) / 2) + fusc((n + 1) / 2);
-}
-
-int numLen(int n)
-{
-    int sum = 1;
-
-    while (n > 9)
-    {
-        n = n / 10;
-        sum++;
-    }
-
-    return sum;
-}
-
-void printLargeFuscs(int limit)
-{
-    int i, f, len, maxLen = 1;
-
-    printf("\n\nPrinting all largest Fusc numbers upto %d \nIndex-------Value", limit);
-
-    for (i = 0; i <= limit; i++)
-    {
-        f = fusc(i);
-        len = numLen(f);
-
-        if (len > maxLen)
-        {
-            maxLen = len;
-            printf("\n%5d%12d", i, f);
-        }
-    }
-}
-
-const int INT_MAX = 10000000;
+#include <stdio.h>
+#include "demo/header.h"
 
 int main()
 {
-    int i;
+    printf("%d\n", a);
+    // char is_open[100] = {0};
+    // int pass, door;
 
-    printf("Index-------Value");
-    for (i = 0; i < 61; i++)
-        printf("\n%5d%12d", i, fusc(i));
-    printLargeFuscs(INT_MAX);
+    // /* do the 100 passes */
+    // for (pass = 0; pass < 100; ++pass)
+    //     for (door = pass; door < 100; door += pass + 1)
+    //         is_open[door] = !is_open[door];
+
+    // /* output the result */
+    // for (door = 0; door < 100; ++door)
+    //     printf("door #%d is %s.\n", door + 1, (is_open[door] ? "open" : "closed"));
+
     return 0;
 }
