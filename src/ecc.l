@@ -5,6 +5,9 @@
 #include <string>
 #include "parser.hpp"
 
+extern bool inyyparse;
+extern vector<tuple<string, vector<string>, string>> macrodef;
+
 // print out token scanned
 uint64_t cnt = 0;
 static inline void debug() {
@@ -30,160 +33,240 @@ void replace(string &src, string sub, string tar)
 
 %%
 
-":"                             { debug(); return COLON; }
-";"                             { debug(); return DELIM; }
-"?"                             { debug(); return QUESTION; }
-","                             { debug(); return COMMA; }
-"."                             { debug(); return DOT; }
-"->"                            { debug(); return TO; }
-"..."                           { debug(); return DOTDOTDOT; }
-"!"                             { debug(); return NOTNOT; }
+":"                             { if(inyyparse) debug(); return COLON; }
+";"                             { if(inyyparse) debug(); return DELIM; }
+"?"                             { if(inyyparse) debug(); return QUESTION; }
+","                             { if(inyyparse) debug(); return COMMA; }
+"."                             { if(inyyparse) debug(); return DOT; }
+"->"                            { if(inyyparse) debug(); return TO; }
+"..."                           { if(inyyparse) debug(); return DOTDOTDOT; }
+"!"                             { if(inyyparse) debug(); return NOTNOT; }
 
-"auto"                          { debug(); return AUTO; }
-"double"                        { debug(); return DOUBLE; }
-"int"                           { debug(); return INT; }
-"struct"                        { debug(); return STRUCT; }
-"break"                         { debug(); return BREAK; }
-"else"                          { debug(); return ELSE; }    
-"long"                          { debug(); return LONG; }
-"switch"                        { debug(); return SWITCH; }
-"case"                          { debug(); return CASE; }
-"enum"                          { debug(); return ENUM; }
-"register"                      { debug(); return REGISTER; }
-"typedef"                       { debug(); return TYPEDEF; }
-"char"                          { debug(); return CHAR; }
-"extern"                        { debug(); return EXTERN; }
-"return"                        { debug(); return RETURN; }
-"union"                         { debug(); return UNION; }
-"const"                         { debug(); return CONST; }
-"float"                         { debug(); return FLOAT; }
-"short"                         { debug(); return SHORT; }
-"unsigned"                      { debug(); return UNSIGNED; }
-"continue"                      { debug(); return CONTINUE; }
-"for"                           { debug(); return FOR; }
-"signed"                        { debug(); return SIGNED; }
-"void"                          { debug(); return VOID; }
-"default"                       { debug(); return DEFAULT; }
-"goto"                          { debug(); return GOTO; }
-"sizeof"                        { debug(); return SIZEOF; }
-"volatile"                      { debug(); return VOLATILE; }
-"do"                            { debug(); return DO; }
-"if"                            { debug(); return IF; }
-"static"                        { debug(); return STATIC; }
-"while"                         { debug(); return WHILE; }
+"auto"                          { if(inyyparse) debug(); return AUTO; }
+"double"                        { if(inyyparse) debug(); return DOUBLE; }
+"int"                           { if(inyyparse) debug(); return INT; }
+"struct"                        { if(inyyparse) debug(); return STRUCT; }
+"break"                         { if(inyyparse) debug(); return BREAK; }
+"else"                          { if(inyyparse) debug(); return ELSE; }    
+"long"                          { if(inyyparse) debug(); return LONG; }
+"switch"                        { if(inyyparse) debug(); return SWITCH; }
+"case"                          { if(inyyparse) debug(); return CASE; }
+"enum"                          { if(inyyparse) debug(); return ENUM; }
+"register"                      { if(inyyparse) debug(); return REGISTER; }
+"typedef"                       { if(inyyparse) debug(); return TYPEDEF; }
+"char"                          { if(inyyparse) debug(); return CHAR; }
+"extern"                        { if(inyyparse) debug(); return EXTERN; }
+"return"                        { if(inyyparse) debug(); return RETURN; }
+"union"                         { if(inyyparse) debug(); return UNION; }
+"const"                         { if(inyyparse) debug(); return CONST; }
+"float"                         { if(inyyparse) debug(); return FLOAT; }
+"short"                         { if(inyyparse) debug(); return SHORT; }
+"unsigned"                      { if(inyyparse) debug(); return UNSIGNED; }
+"continue"                      { if(inyyparse) debug(); return CONTINUE; }
+"for"                           { if(inyyparse) debug(); return FOR; }
+"signed"                        { if(inyyparse) debug(); return SIGNED; }
+"void"                          { if(inyyparse) debug(); return VOID; }
+"default"                       { if(inyyparse) debug(); return DEFAULT; }
+"goto"                          { if(inyyparse) debug(); return GOTO; }
+"sizeof"                        { if(inyyparse) debug(); return SIZEOF; }
+"volatile"                      { if(inyyparse) debug(); return VOLATILE; }
+"do"                            { if(inyyparse) debug(); return DO; }
+"if"                            { if(inyyparse) debug(); return IF; }
+"static"                        { if(inyyparse) debug(); return STATIC; }
+"while"                         { if(inyyparse) debug(); return WHILE; }
 
-"+"                             { debug(); return ADD; }
-"-"                             { debug(); return SUB; }
-"*"                             { debug(); return MULORDEREFERENCE; }
-"/"                             { debug(); return DIV; }
-"%"                             { debug(); return MOD; }
-"&"                             { debug(); return ANDORADDRESSOF; }
-"|"                             { debug(); return OR; }
-"~"                             { debug(); return NOT; }
-"^"                             { debug(); return XOR; }
-"&&"                            { debug(); return ANDAND; }
-"||"                            { debug(); return OROR; }
-"+="                            { debug(); return ADDASSIGN; }
-"-="                            { debug(); return SUBASSIGN; }
-"*="                            { debug(); return MULASSIGN; }
-"/="                            { debug(); return DIVASSIGN; }
-"%="                            { debug(); return MODASSIGN; }
-"&="                            { debug(); return ANDASSIGN; }
-"|="                            { debug(); return ORASSIGN; }
-"^="                            { debug(); return XORASSIGN; }
-"="                             { debug(); return ASSIGN; }
-"<"                             { debug(); return LT; }
-">"                             { debug(); return GT; }
-"<="                            { debug(); return LEQ; }
-">="                            { debug(); return GEQ; }
-"!="                            { debug(); return NEQ; }
-"=="                            { debug(); return EQ; }
-"<<"                            { debug(); return SL; }
-">>"                            { debug(); return SR; }
-"<<="                           { debug(); return SLASSIGN; }
-">>="                           { debug(); return SRASSIGN; }
-"++"                            { debug(); return INC; }
-"--"                            { debug(); return DEC; }
+"+"                             { if(inyyparse) debug(); return ADDORPOSITIVE; }
+"-"                             { if(inyyparse) debug(); return SUBORNEGATIVE; }
+"*"                             { if(inyyparse) debug(); return MULORDEREFERENCE; }
+"/"                             { if(inyyparse) debug(); return DIV; }
+"%"                             { if(inyyparse) debug(); return MOD; }
+"&"                             { if(inyyparse) debug(); return ANDORADDRESSOF; }
+"|"                             { if(inyyparse) debug(); return OR; }
+"~"                             { if(inyyparse) debug(); return NOT; }
+"^"                             { if(inyyparse) debug(); return XOR; }
+"&&"                            { if(inyyparse) debug(); return ANDAND; }
+"||"                            { if(inyyparse) debug(); return OROR; }
+"+="                            { if(inyyparse) debug(); return ADDASSIGN; }
+"-="                            { if(inyyparse) debug(); return SUBASSIGN; }
+"*="                            { if(inyyparse) debug(); return MULASSIGN; }
+"/="                            { if(inyyparse) debug(); return DIVASSIGN; }
+"%="                            { if(inyyparse) debug(); return MODASSIGN; }
+"&="                            { if(inyyparse) debug(); return ANDASSIGN; }
+"|="                            { if(inyyparse) debug(); return ORASSIGN; }
+"^="                            { if(inyyparse) debug(); return XORASSIGN; }
+"~="                            { if(inyyparse) debug(); return NOTASSIGN; }
+"="                             { if(inyyparse) debug(); return ASSIGN; }
+"<"                             { if(inyyparse) debug(); return LT; }
+">"                             { if(inyyparse) debug(); return GT; }
+"<="                            { if(inyyparse) debug(); return LEQ; }
+">="                            { if(inyyparse) debug(); return GEQ; }
+"!="                            { if(inyyparse) debug(); return NEQ; }
+"=="                            { if(inyyparse) debug(); return EQ; }
+"<<"                            { if(inyyparse) debug(); return SL; }
+">>"                            { if(inyyparse) debug(); return SR; }
+"<<="                           { if(inyyparse) debug(); return SLASSIGN; }
+">>="                           { if(inyyparse) debug(); return SRASSIGN; }
+"++"                            { if(inyyparse) debug(); return INC; }
+"--"                            { if(inyyparse) debug(); return DEC; }
 
-"("                             { debug(); return LP; }
-")"                             { debug(); return RP; }
-"["                             { debug(); return LB; }
-"]"                             { debug(); return RB; }
-"{"                             { debug(); return LC; }
-"}"                             { debug(); return RC; }
+"("                             { if(inyyparse) debug(); return LP; }
+")"                             { if(inyyparse) debug(); return RP; }
+"["                             { if(inyyparse) debug(); return LB; }
+"]"                             { if(inyyparse) debug(); return RB; }
+"{"                             { if(inyyparse) debug(); return LC; }
+"}"                             { if(inyyparse) debug(); return RC; }
 
--?(0|([1-9][0-9]*))             {
-                                    debug();
-                                    yylval.num.longValue = atoll(yytext);
+0|([1-9][0-9]*)                 {
+                                    if(inyyparse)
+                                    {
+                                        debug();
+                                        yylval.num.longValue = atoll(yytext);
+                                    }
                                     return NUMLONG;
                                 }
--?0[0-7]*                       {
-                                    debug();
-                                    yylval.num.longValue = strtol(yytext, NULL, 8);
+0[0-7]*                         {
+                                    if(inyyparse)
+                                    {
+                                        debug();
+                                        yylval.num.longValue = strtol(yytext, NULL, 8);
+                                    }
                                     return NUMLONG;
                                 }
--?0[xX][0-9a-fA-F]+             {
-                                    debug();
-                                    yylval.num.longValue = strtol(yytext, NULL, 16);
+0[xX][0-9a-fA-F]+               {
+                                    if(inyyparse)
+                                    {
+                                        debug();
+                                        yylval.num.longValue = strtol(yytext, NULL, 16);
+                                    }
                                     return NUMLONG;
                                 }
--?(0|([1-9][0-9]*))(\.[0-9]+)?  {
-                                    debug();
-                                    yylval.num.doubleValue = atof(yytext);
+(0|([1-9][0-9]*))(\.[0-9]+)?    {
+                                    if(inyyparse)
+                                    {
+                                        debug();
+                                        yylval.num.doubleValue = atof(yytext);
+                                    }
                                     return NUMDOUBLE;
                                 }
 [A-Za-z_][A-Za-z0-9_]*          {
-                                    debug();
-                                    yylval.stringValue = new string(yytext);
+                                    if(!inyyparse)
+                                    {
+                                        for(auto &p : macrodef)
+                                            if(get<0>(p) == string(yytext))
+                                            {
+                                                yytext = (char *)malloc(get<2>(p).length() + 1);
+                                                strcpy(yytext, get<2>(p).c_str());
+                                                break;
+                                            }
+                                    }
+                                    else
+                                    {
+                                        debug();
+                                        yylval.stringValue = new string(yytext);
+                                    }
                                     return IDENTIFIER;
                                 }
 \'.\'                           {
+                                    // normal single char
                                     debug();
                                     yylval.num.charValue = yytext[1];
                                     return NUMCHAR;
                                 }
-\'\\[nta\\\']\'                 {
-                                    debug();
-                                    switch(yytext[2])
+\'\\[abfnrtv\'\"\\]\'           {
+                                    if(inyyparse)
                                     {
-                                    case 'n':
-                                        yylval.num.charValue = '\n';
-                                        break;
-                                    case 't':
-                                        yylval.num.charValue = '\t';
-                                        break;
-                                    case '\\':
-                                        yylval.num.charValue = '\\';
-                                        break;
-                                    case '\'':
-                                        yylval.num.charValue = '\'';
-                                        break;
-                                    default:
-                                        yylval.num.charValue = '\0';
-                                        break;
+                                        // escape char
+                                        debug();
+                                        switch(yytext[2])
+                                        {
+                                        case 'a':
+                                            yylval.num.charValue = '\a';
+                                            break;
+                                        case 'b':
+                                            yylval.num.charValue = '\b';
+                                            break;
+                                        case 'f':
+                                            yylval.num.charValue = '\f';
+                                            break;
+                                        case 'n':
+                                            yylval.num.charValue = '\n';
+                                            break;
+                                        case 'r':
+                                            yylval.num.charValue = '\r';
+                                            break;
+                                        case 't':
+                                            yylval.num.charValue = '\t';
+                                            break;
+                                        case 'v':
+                                            yylval.num.charValue = '\v';
+                                            break;
+                                        case '\'':
+                                            yylval.num.charValue = '\'';
+                                            break;
+                                        case '\"':
+                                            yylval.num.charValue = '\"';
+                                            break;
+                                        case '\\':
+                                            yylval.num.charValue = '\\';
+                                            break;
+                                        default:
+                                            yylval.num.charValue = '\0';
+                                            break;
+                                        }
+                                    }
+                                    return NUMCHAR;
+                                }
+\'\\0[0-7]{1,3}\'               {
+                                    if(inyyparse)
+                                    {
+                                        // octal char
+                                        debug();
+                                        yytext[strlen(yytext) - 1] = '\0';
+                                        yylval.num.charValue = strtol(yytext + 2, NULL, 8);
+                                    }
+                                    return NUMCHAR;
+                                }
+\'\\x[0-9a-fA-F]{1,2}\'         {
+                                    if(inyyparse)
+                                    {
+                                        // hexidecimal char
+                                        debug();
+                                        yytext[strlen(yytext) - 1] = '\0';
+                                        yylval.num.charValue = strtol(yytext + 3, NULL, 16);
                                     }
                                     return NUMCHAR;
                                 }
 (\"([^"]|\\\")*\")+             {
-                                    // string const
-                                    debug();
-                                    // strip "
-                                    yylval.stringValue = new string(string(yytext).substr(1, strlen(yytext) - 2));
-                                    // multiple strings will be combined
-                                    replace(*yylval.stringValue, "\"\"", "");
-                                    // translate escape char
-                                    replace(*yylval.stringValue, "\\n", "\n");
-                                    replace(*yylval.stringValue, "\\t", "\t");
-                                    replace(*yylval.stringValue, "\\r", "\r");
-                                    replace(*yylval.stringValue, "\\\"", "\"");
+                                    if(inyyparse)
+                                    {
+                                        // string const
+                                        debug();
+                                        // strip "
+                                        yylval.stringValue = new string(string(yytext).substr(1, strlen(yytext) - 2));
+                                        // multiple strings will be combined
+                                        replace(*yylval.stringValue, "\"\"", "");
+                                        // translate escape char
+                                        replace(*yylval.stringValue, "\\a", "\a");
+                                        replace(*yylval.stringValue, "\\b", "\b");
+                                        replace(*yylval.stringValue, "\\f", "\f");
+                                        replace(*yylval.stringValue, "\\n", "\n");
+                                        replace(*yylval.stringValue, "\\r", "\r");
+                                        replace(*yylval.stringValue, "\\t", "\t");
+                                        replace(*yylval.stringValue, "\\v", "\v");
+                                        replace(*yylval.stringValue, "\\\"", "\"");
+                                        replace(*yylval.stringValue, "\\'", "'");
+                                        replace(*yylval.stringValue, "\\\\", "\\");
+                                    }
                                     return STRING;
                                 }
 
-[ \t\n]                         {}
-"//".*                          {}
-"/*"([^*]|"*"+[^/*])*"*"+"/"    {}
-\\$                             {}
+[ \t\n]                         { if(!inyyparse) return 1; }
+"//".*                          { if(!inyyparse) return 1; }
+"/*"([^*]|"*"+[^/*])*"*"+"/"    { if(!inyyparse) return 1; }
+\\$                             { if(!inyyparse) return 1; }
 
-.                               {}
+.                               { if(!inyyparse) return 1; }
+
+<<EOF>>                         { yyterminate(); }
 
 %%

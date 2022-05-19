@@ -5,3 +5,4 @@ all:
 	
 clean:
 	@rm -f quicksort auto-advisor matrix-multiplication
+	@rm -f *.ll *.bc

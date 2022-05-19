@@ -12,7 +12,8 @@ OBJECTS =	./main.o \
 			./codegen/type.o \
 			./codegen/expression.o \
 			./codegen/statement.o \
-			./codegen/codegen.o
+			./codegen/codegen.o \
+			./macro/macro.o
 TARGET = `llvm-config --host-target`
 
 .PHONY: all $(NAME)
@@ -28,7 +29,7 @@ parser.hpp: parser.cpp
 
 scanner.cpp: $(NAME).l parser.hpp
 	$(LEX) -o $@ $<
-	
+
 -include *.d
 %.o: %.cpp
 	$(CC) -g3 -c $(LLVMFLAGS) -MMD -o $@ $<
@@ -39,30 +40,26 @@ $(NAME): $(OBJECTS)
 
 	$(CC) -g3 -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 	
-	# @./$(NAME) ../test/quicksort.c
-	# @clang --target=$(TARGET) ./obj/quicksort.ll -o ./obj/quicksort
+	@./$(NAME) -o obj/quicksort ../test/quicksort.c
+	@./$(NAME) -o obj/matrix-multiplication ../test/matrix-multiplication.c
+	@./$(NAME) -o obj/auto-advisor ../test/auto-advisor.c
+	
 	# @cd tmp && opt -dot-cfg ../obj/quicksort.ll
-
-	# @./$(NAME) ../test/matrix-multiplication.c
-	# @clang --target=$(TARGET) ./obj/matrix-multiplication.ll -o ./obj/matrix-multiplication
 	# @cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
-
-	# @./$(NAME) ../test/auto-advisor.c
-	# @clang -g3 -O0 --target=$(TARGET) ./obj/auto-advisor.ll -o ./obj/auto-advisor
 	# @cd tmp && opt -dot-cfg ../obj/auto-advisor.ll
 
-	@./$(NAME) ../test/1.c
-	@clang -g3 -O0 --target=$(TARGET) ./obj/1.ll -o ./obj/1
+	@./$(NAME) -o obj/1 ../test/1.c
 	@./obj/1
 
 	# @cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
 
-	# @./obj/auto-advisor
-
 clean:
 	@rm -f $(NAME)
-	@rm -f *.o utils/*.o codegen/*.o
+	@rm -f *.o utils/*.o codegen/*.o macro/*.o
+	@rm -f *.d utils/*.d codegen/*.d macro/*.d
 	@rm -f parser.* scanner.*
 	@rm -rf tmp
 	@rm -rf obj
 	@rm -f .gdb_history ../test/.gdb_history
+	@cd ../test && make clean && cd ../src
+	@rm -f *.ll *.bc *.i *.out

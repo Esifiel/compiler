@@ -73,14 +73,13 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 %token  CHAR SHORT INT LONG FLOAT DOUBLE STRUCT ENUM UNION VOID
 %token  AUTO REGISTER EXTERN CONST UNSIGNED SIGNED VOLATILE STATIC
 %token  IF ELSE FOR DO WHILE BREAK CONTINUE SWITCH CASE DEFAULT GOTO
-%token  ADD SUB MULORDEREFERENCE DIV MOD
+%token  ADDORPOSITIVE SUBORNEGATIVE MULORDEREFERENCE DIV MOD
         ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN
         ANDORADDRESSOF OR XOR NOT SL SR
-        ANDASSIGN ORASSIGN XORASSIGN SLASSIGN SRASSIGN
+        ANDASSIGN ORASSIGN XORASSIGN SLASSIGN SRASSIGN NOTASSIGN
         ANDAND OROR NOTNOT LT GT GEQ LEQ NEQ EQ
         ASSIGN
         INC DEC
-        POSITIVE NEGATIVE
 %token  TYPEDEF SIZEOF RETURN DOTDOTDOT
 %token  DELIM COMMA COLON QUESTION DOT TO LP RP LB RB LC RC
 %token<num> NUMCHAR NUMSHORT NUMINT NUMLONG NUMFLOAT NUMDOUBLE
@@ -124,7 +123,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 %left EQ NEQ
 %left GT GEQ LT LEQ
 %left SL SR
-%left ADD SUB
+%left ADDORPOSITIVE SUBORNEGATIVE
 %left MULORDEREFERENCE DIV MOD
 %right INC DEC NOTNOT NOT SIZEOF
 
@@ -542,6 +541,7 @@ assignment-operator	        : ASSIGN    { $$ = OP_ASSIGN; }
                             | ANDASSIGN { $$ = OP_ANDASSIGN; }
                             | XORASSIGN { $$ = OP_XORASSIGN; }
                             | ORASSIGN  { $$ = OP_ORASSIGN; }
+                            | NOTASSIGN { $$ = OP_NOTASSIGN; }
                             ;
 
 conditional-exp             : logical-or-exp { $$ = $1; }
@@ -596,8 +596,8 @@ shift-expression	        : additive-exp { $$ = $1; }
                             ;
 
 additive-exp		        : mult-exp { $$ = $1; }
-                            | additive-exp ADD mult-exp { $$ = calculate($1, $3, OP_ADD); }
-                            | additive-exp SUB mult-exp { $$ = calculate($1, $3, OP_SUB); }
+                            | additive-exp ADDORPOSITIVE mult-exp { $$ = calculate($1, $3, OP_ADD); }
+                            | additive-exp SUBORNEGATIVE mult-exp { $$ = calculate($1, $3, OP_SUB); }
                             ;
 
 mult-exp		            : cast-exp { $$ = $1; }
@@ -635,12 +635,12 @@ unary-exp		            : postfix-exp { $$ = $1; }
                             }
                             ;
 
-unary-operator              : ANDORADDRESSOF     { $$ = OP_ADDRESSOF; }
-                            | MULORDEREFERENCE   { $$ = OP_DEREFERENCE; }
-                            | POSITIVE      { $$ = OP_POSITIVE; }
-                            | NEGATIVE      { $$ = OP_NEGATIVE; }
-                            | NOT           { $$ = OP_NOT; }
-                            | NOTNOT        { $$ = OP_NOTNOT; }
+unary-operator              : ANDORADDRESSOF    { $$ = OP_ADDRESSOF; }
+                            | MULORDEREFERENCE  { $$ = OP_DEREFERENCE; }
+                            | ADDORPOSITIVE     { $$ = OP_POSITIVE; }
+                            | SUBORNEGATIVE     { $$ = OP_NEGATIVE; }
+                            | NOT               { $$ = OP_NOT; }
+                            | NOTNOT            { $$ = OP_NOTNOT; }
                             ;
 
 postfix-exp		            : primary-exp { $$ = $1; }
@@ -674,7 +674,8 @@ postfix-exp		            : primary-exp { $$ = $1; }
                             ;
 
 primary-exp		            : IDENTIFIER    { $$ = new Identifier(*$1); delete $1; }
-                            | const         { $$ = $1; } // orignal rule: CONSTANT
+                            /* | CONSTANT */
+                            | const         { $$ = $1; }
                             | STRING        { $$ = new String(*$1); delete $1; }
                             | LP exp RP     { $$ = $2; }
                             ;

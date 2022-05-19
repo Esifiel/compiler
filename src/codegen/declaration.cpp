@@ -170,8 +170,14 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     // recursively generate
     stmts->codeGen(ctx);
 
-    if (rettype->type == TYPE_VOID)
-        ctx.builder.CreateRetVoid();
+    // default return statement
+    if(stmts->stmt->tail && stmts->stmt->tail->getName() != "\"ReturnStatement\"")
+    {
+        if(rettype->type == TYPE_VOID)
+            ctx.builder.CreateRetVoid();
+        else
+            ctx.builder.CreateRet(ctx.CreateCast(ctx.builder.getInt64(0), rettype->getType(ctx)));
+    }
 
     // leave the current block
     ctx.curFunction = nullptr;

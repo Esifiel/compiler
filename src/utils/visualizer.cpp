@@ -448,6 +448,9 @@ void Visualizer::visitOp(enum op_type op)
     case OP_ORASSIGN:
         out << "|=";
         break;
+    case OP_NOTASSIGN:
+        out << "~=";
+        break;
     case OP_IFELSE:
         // out << "? :";
         out << "?";

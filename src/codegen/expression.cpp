@@ -20,7 +20,8 @@ Value *String::codeGen(CodeGenerator &ctx)
         var = new GlobalVariable(*ctx.module, str->getType(), true, GlobalValue::PrivateLinkage, str, val);
         ctx.blocks.front()[val] = var;
     }
-    return var;
+    // return a string variable as char * but not char array
+    return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
 }
 
 Value *Identifier::codeGen(CodeGenerator &ctx)
@@ -82,7 +83,7 @@ extern map<string, AggregateType *> aggrdef;
 Value *Expression::codeGen(CodeGenerator &ctx)
 {
     string varname;
-    Value *var, *oldval, *newval, *lv, *rv;
+    Value *var, *oldval, *newval, *lv, *rv, *cond;
     Value *idxlist[2];
     bool tmpleft;
     Type *t;
@@ -105,40 +106,9 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_MUL:
     case OP_DIV:
     case OP_MOD:
-        return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
     case OP_SUB:
     case OP_ADD:
-        // if a variable loaded as right value and is pointer type, it means a pointer addition
-        lv = left->codeGen(ctx);
-        rv = right->codeGen(ctx);
-        if( !lv->getType()->isPointerTy() && \
-            !lv->getType()->isArrayTy() && \
-            !rv->getType()->isPointerTy() && \
-            !rv->getType()->isArrayTy())
-            return ctx.CreateBinaryExpr(lv, rv, op);
-        else
-        {
-            if(op == OP_SUB)
-                rv = ctx.builder.CreateFNeg(rv);
-
-            if (lv->getType()->isPointerTy())
-                return ctx.builder.CreateGEP(lv, rv);
-            if (lv->getType()->isArrayTy())
-            {
-                // TODO: getting array's GEP may need to be refactored as a static function
-                idxlist[1] = rv;
-                idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
-                return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
-            }
-            if (rv->getType()->isPointerTy())
-                return ctx.builder.CreateGEP(rv, lv);
-            if (rv->getType()->isArrayTy())
-            {
-                idxlist[1] = lv;
-                idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
-                return ctx.builder.CreateGEP(lv, ArrayRef<Value *>(idxlist, 2));
-            }
-        }
+        return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
     case OP_ANDAND:
         lv = left->codeGen(ctx);
         rv = right->codeGen(ctx);
@@ -161,12 +131,17 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             OP_EQ);
     case OP_NOT:
         return ctx.CreateUnaryExpr(left->codeGen(ctx), OP_NOT);
-    // case OP_POSITIVE:
-    //     out << "+";
-    //
-    // case OP_NEGATIVE:
-    //     out << "-";
-    //     break;
+    case OP_POSITIVE:
+    case OP_NEGATIVE:
+        var = left->codeGen(ctx);
+        cond = ctx.CreateBinaryExpr(
+            var,
+            var->getType()->isIntegerTy() ? dyn_cast<Constant>(ctx.builder.getInt64(0)) : dyn_cast<Constant>(ConstantFP::get(ctx.ctx, APFloat(0.0))),
+            op == OP_POSITIVE ? OP_GEQ : OP_LEQ);
+        return ctx.builder.CreateSelect(
+            cond,
+            var,
+            var->getType()->isIntegerTy() ? ctx.builder.CreateNeg(var) : ctx.builder.CreateFNeg(var));
     case OP_INC_REAR:
     case OP_DEC_REAR:
         ctx.isleft = true;
@@ -188,6 +163,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_ANDASSIGN:
     case OP_XORASSIGN:
     case OP_ORASSIGN:
+    case OP_NOTASSIGN:
         ctx.isleft = true;
         var = left->codeGen(ctx);
         ctx.isleft = false;
@@ -230,10 +206,14 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         case OP_ORASSIGN:
             newval = ctx.CreateBinaryExpr(oldval, right->codeGen(ctx), OP_OR);
             break;
+        case OP_NOTASSIGN:
+            newval = ctx.CreateUnaryExpr(oldval, OP_NOT);
+            break;
         default:
             newval = nullptr;
             break;
         }
+        newval = ctx.CreateCast(newval, var->getType()->getPointerElementType());
         ctx.builder.CreateStore(newval, var);
         return newval;
     case OP_ASSIGN:
@@ -294,7 +274,13 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         else
             ctx.error("not supported operand of [] operator");
     case OP_DEREFERENCE:
-        break;
+        var = left->codeGen(ctx);
+        if(var->getType()->isPointerTy())
+            return ctx.builder.CreateLoad(var);
+        else if(var->getType()->isArrayTy())
+            return ctx.builder.CreateExtractValue(var, 0);
+        else
+            ctx.error("'" + ((Identifier *)left)->name + "' is not iterable");
     case OP_ADDRESSOF:
         ctx.isleft = true;
         var = left->codeGen(ctx);
@@ -338,6 +324,8 @@ Value *Expression::codeGen(CodeGenerator &ctx)
                 OP_NEQ);
         return ctx.builder.CreateSelect(var, left->codeGen(ctx), right->codeGen(ctx));
     default:
-        return nullptr;
+        ctx.error("not supported operand");
+        break;
     }
+    return nullptr;
 }

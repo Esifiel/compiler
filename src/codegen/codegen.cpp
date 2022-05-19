@@ -226,6 +226,7 @@ Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
             return builder.CreateGEP(a, builder.getInt64(-1));
         default:
             error("operator type not supoorted for pointer type");
+            return nullptr;
         }
     else
         switch (op)
@@ -237,10 +238,11 @@ Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
         case OP_DEC_REAR:
             return builder.CreateBinOp(Instruction::BinaryOps::Sub, a, ConstantInt::get(a->getType(), 1));
         case OP_NOT:
-            return builder.CreateFNeg(a);
+            return a->getType()->isIntegerTy() ? builder.CreateNeg(a) : builder.CreateFNeg(a);
         default:
             cout << op << endl;
             error("operator type not supoorted for general operands");
+            return nullptr;
         }
 }
 
@@ -248,9 +250,30 @@ Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
 Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
 {
     if (a->getType()->isPointerTy() || b->getType()->isPointerTy())
+    {
+        // a->getType()->print(outs());
+        // b->getType()->print(outs());
+        
         // if is pointer operation
         switch (op)
         {
+        case OP_ADD:
+            if (a->getType()->isIntegerTy() && b->getType()->isPointerTy())
+                return builder.CreateGEP(b, a);
+            else if (a->getType()->isPointerTy() && b->getType()->isIntegerTy())
+                return builder.CreateGEP(a, b);
+            else
+                error("+ not supported for the types");
+        case OP_SUB:
+            if (a->getType()->isIntegerTy() && b->getType()->isPointerTy())
+                return builder.CreateGEP(b, builder.CreateNeg(a));
+            else if (a->getType()->isPointerTy() && b->getType()->isIntegerTy())
+                return builder.CreateGEP(a, builder.CreateNeg(b));
+            else if(a->getType()->isPointerTy() && b->getType()->isPointerTy())
+                // two pointer diff
+                return builder.CreatePtrDiff(a, b);
+            else
+                error("- not supported for the types");
         case OP_EQ:
             return builder.CreateICmp(
                 CmpInst::ICMP_EQ,
@@ -261,23 +284,32 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
                 CmpInst::ICMP_NE,
                 builder.CreatePtrDiff(a, b),
                 builder.getInt64(0));
-        case OP_ADD:
-            if (a->getType()->isIntegerTy())
-                return builder.CreateGEP(b, a);
-            else if (b->getType()->isIntegerTy())
-                return builder.CreateGEP(a, b);
-            else
-                error("+ not supported for two pointer types");
-        case OP_SUB:
-            if (a->getType()->isIntegerTy())
-                return builder.CreateGEP(b, builder.CreateFNeg(a));
-            else if (b->getType()->isIntegerTy())
-                return builder.CreateGEP(a, builder.CreateFNeg(b));
-            else
-                error("+ not supported for two pointer types");
+        case OP_LT:
+            return builder.CreateICmp(
+                CmpInst::ICMP_ULT,
+                builder.CreatePtrToInt(a, Type::getInt64Ty(ctx)),
+                builder.CreatePtrToInt(b, Type::getInt64Ty(ctx)));
+        case OP_GT:
+            return builder.CreateICmp(
+                CmpInst::ICMP_UGT,
+                builder.CreatePtrToInt(a, Type::getInt64Ty(ctx)),
+                builder.CreatePtrToInt(b, Type::getInt64Ty(ctx)));
+        case OP_LEQ:
+            return builder.CreateICmp(
+                CmpInst::ICMP_ULE,
+                builder.CreatePtrToInt(a, Type::getInt64Ty(ctx)),
+                builder.CreatePtrToInt(b, Type::getInt64Ty(ctx)));
+        case OP_GEQ:   
+            return builder.CreateICmp(
+                CmpInst::ICMP_UGE,
+                builder.CreatePtrToInt(a, Type::getInt64Ty(ctx)),
+                builder.CreatePtrToInt(b, Type::getInt64Ty(ctx)));     
         default:
+            cout << op << endl;
             error("operator type not supported for pointer type");
+            return nullptr;
         }
+    }
     else
     {
         // type casting if at least one of operands is float point
@@ -333,6 +365,7 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
         default:
             cout << op << endl;
             error("operator type not supoorted for general operands");
+            return nullptr;
         }
     }
 }
@@ -343,7 +376,10 @@ Function *CodeGenerator::GetFunction(string name)
     if (functions.find(name) != functions.end())
         return functions[name];
     else
+    {
         error(string("function '") + name + string("' not found"));
+        return nullptr;
+    }
 }
 
 Constant *CodeGenerator::Num2Constant(Number *num)

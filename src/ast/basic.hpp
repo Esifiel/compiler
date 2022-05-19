@@ -29,7 +29,7 @@ enum op_type
     OP_ADDRESSOF, OP_DEREFERENCE,
     OP_POSITIVE, OP_NEGATIVE,
     OP_ASSIGN, OP_MULASSIGN, OP_DIVASSIGN, OP_MODASSIGN, OP_ADDASSIGN, OP_SUBASSIGN,
-    OP_SLASSIGN, OP_SRASSIGN, OP_ANDASSIGN, OP_XORASSIGN, OP_ORASSIGN,
+    OP_SLASSIGN, OP_SRASSIGN, OP_ANDASSIGN, OP_XORASSIGN, OP_ORASSIGN, OP_NOTASSIGN,
     OP_IFELSE,
     OP_CAST,
     OP_COMMA,
@@ -70,7 +70,6 @@ class Node
 {
 public:
     Node() {}
-    virtual ~Node() {}
     virtual string getName() = 0;
     virtual llvm::Value *codeGen(CodeGenerator &context) { return nullptr; };
 };

@@ -65,7 +65,6 @@ Type *EnumType::getType(CodeGenerator &ctx)
 uint64_t MyStructType::getSize()
 {
     uint64_t sum = 0;
-    cout << members << endl;
     for (auto &p : *members)
         for (auto &q : *p->first)
             sum += q->getSize();

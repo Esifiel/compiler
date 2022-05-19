@@ -79,26 +79,26 @@ void extract(char pyfa[][MAXLEN], int n)
     }
 }
 
-void dump(int index)
-{
-    struct dep *p, *tmp;
+// void dump(int index)
+// {
+//     struct dep *p, *tmp;
 
-    printf("course %s:\tcredit: %d\tgrade: %c\n", name[index], credit[index], grade[index] ? grade[index] : ' ');
-    if (dependency[index])
-    {
-        int cnt = 0;
-        for (p = dependency[index]->another; p; p = p->another)
-        {
-            printf("choice %d: ", cnt++);
-            for (tmp = p->next; tmp; tmp = tmp->next)
-                printf("%s ", tmp->name);
-            puts("");
-        }
-    }
-    else
-        puts("no courses required ahead");
-    puts("--------------------------------------------");
-}
+//     printf("course %s:\tcredit: %d\tgrade: %c\n", name[index], credit[index], grade[index] ? grade[index] : ' ');
+//     if (dependency[index])
+//     {
+//         int cnt = 0;
+//         for (p = dependency[index]->another; p; p = p->another)
+//         {
+//             printf("choice %d: ", cnt++);
+//             for (tmp = p->next; tmp; tmp = tmp->next)
+//                 printf("%s ", tmp->name);
+//             puts("");
+//         }
+//     }
+//     else
+//         puts("no courses required ahead");
+//     puts("--------------------------------------------");
+// }
 
 int main()
 {
