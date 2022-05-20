@@ -3,10 +3,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string>
+#include <vector>
+#include <map>
+#include "ast/type.hpp"
 #include "parser.hpp"
 
 extern bool inyyparse;
 extern vector<tuple<string, vector<string>, string>> macrodef;
+extern map<string, TypeSpecifier *> typealias;
 
 // print out token scanned
 uint64_t cnt = 0;
@@ -158,13 +162,17 @@ void replace(string &src, string sub, string tar)
                                                 strcpy(yytext, get<2>(p).c_str());
                                                 break;
                                             }
+                                        return IDENTIFIER;
                                     }
                                     else
                                     {
                                         debug();
                                         yylval.stringValue = new string(yytext);
+                                        if(typealias.find(*yylval.stringValue) != typealias.end())
+                                            return TYPENAME;
+                                        else
+                                            return IDENTIFIER;
                                     }
-                                    return IDENTIFIER;
                                 }
 \'.\'                           {
                                     // normal single char

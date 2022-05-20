@@ -61,8 +61,6 @@ public:
 class IfElseStatement : public SelectionStatement
 {
 public:
-    
-
     IfElseStatement(Expression *c, Statement *s) : SelectionStatement(c, s) {}
 
     virtual string getName() { return "\"IfElseStatement\""; }

@@ -29,16 +29,19 @@ public:
     enum type_type type;
     bool isunsigned;
     Qualifier *qual;
+    enum linkage_type linkage;
 
-    TypeSpecifier(enum type_type t) : type(t), isunsigned(false), qual(nullptr) {}
-    TypeSpecifier(enum type_type t, Qualifier *q) : type(t), isunsigned(false), qual(q) {}
+    TypeSpecifier(enum type_type t) : type(t), isunsigned(false), qual(nullptr), linkage(LINKAGE_NONE) {}
+    TypeSpecifier(enum type_type t, Qualifier *q) : type(t), isunsigned(false), qual(q), linkage(LINKAGE_NONE) {}
+    TypeSpecifier(bool flag) : type(TYPE_NONE), isunsigned(flag), qual(nullptr), linkage(LINKAGE_NONE) {}
+    TypeSpecifier(enum linkage_type link) : type(TYPE_NONE), isunsigned(false), qual(nullptr), linkage(link) {}
 
     virtual string getName() { return "\"TypeSpecifier\""; }
-    virtual Type *getType(CodeGenerator &ctx) = 0;
-    virtual TypeSpecifier *getRootType() = 0;
-    virtual uint64_t getSize() = 0;
-    virtual bool isAggregateType() = 0;
-    virtual bool isIterableType() = 0;
+    virtual Type *getType(CodeGenerator &ctx) { return nullptr; }
+    virtual TypeSpecifier *getRootType() { return nullptr; }
+    virtual uint64_t getSize() { return 0; }
+    virtual bool isAggregateType() { return false; }
+    virtual bool isIterableType() { return false; }
 };
 
 class CharType : public TypeSpecifier
@@ -184,6 +187,7 @@ public:
     vector<pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *> *members;
 
     AggregateType(enum type_type t) : name(""), members(nullptr), TypeSpecifier(t) {}
+    AggregateType(AggregateType *a) : name(a->name), members(nullptr), TypeSpecifier(a->type) {}
 
     virtual string getName() { return "\"AggregateType\""; }
     virtual TypeSpecifier *getRootType() { return this; }
@@ -197,6 +201,7 @@ class MyStructType : public AggregateType
 {
 public:
     MyStructType() : AggregateType(TYPE_STRUCT) {}
+    MyStructType(MyStructType *a) : AggregateType(a) {}
 
     virtual string getName() { return "\"MyStructType\""; }
     virtual Type *getType(CodeGenerator &ctx);
@@ -210,19 +215,12 @@ class UnionType : public AggregateType
 {
 public:
     UnionType() : AggregateType(TYPE_UNION) {}
+    UnionType(UnionType *a) : AggregateType(a) {}
 
     virtual string getName() { return "\"UnionType\""; }
     virtual Type *getType(CodeGenerator &ctx);
     virtual TypeSpecifier *getRootType() { return this; }
-    virtual uint64_t getSize()
-    {
-        uint64_t max = 0;
-        for (auto &p : *members)
-            for (auto &q : *p->first)
-                if (q->getSize() > max)
-                    max = q->getSize();
-        return max;
-    }
+    virtual uint64_t getSize();
     virtual bool isAggregateType() { return true; }
     virtual bool isIterableType() { return false; }
 };

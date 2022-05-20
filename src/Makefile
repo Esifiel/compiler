@@ -39,14 +39,6 @@ $(NAME): $(OBJECTS)
 	@if [ ! -d obj ]; then mkdir obj; fi
 
 	$(CC) -g3 -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
-	
-	@./$(NAME) -o obj/quicksort ../test/quicksort.c
-	@./$(NAME) -o obj/matrix-multiplication ../test/matrix-multiplication.c
-	@./$(NAME) -o obj/auto-advisor ../test/auto-advisor.c
-	
-	# @cd tmp && opt -dot-cfg ../obj/quicksort.ll
-	# @cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
-	# @cd tmp && opt -dot-cfg ../obj/auto-advisor.ll
 
 	@./$(NAME) -o obj/1 ../test/1.c
 	@./obj/1
@@ -63,3 +55,21 @@ clean:
 	@rm -f .gdb_history ../test/.gdb_history
 	@cd ../test && make clean && cd ../src
 	@rm -f *.ll *.bc *.i *.out
+
+test:
+	@if [ ! -d tmp ]; then mkdir tmp; fi
+	@if [ ! -d obj ]; then mkdir obj; fi
+
+	$(CC) -g3 -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
+
+	@./$(NAME) -o obj/quicksort ../test/quicksort.c
+	@./$(NAME) -o obj/matrix-multiplication ../test/matrix-multiplication.c
+	@./$(NAME) -o obj/auto-advisor ../test/auto-advisor.c
+
+	# @cd tmp && opt -dot-cfg ../obj/quicksort.ll
+	# @cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
+	# @cd tmp && opt -dot-cfg ../obj/auto-advisor.ll
+
+	@../test/tester/quicksort/linux-amd64 obj/quicksort
+	@../test/tester/matrix-multiplication/linux-amd64 obj/matrix-multiplication
+	@../test/tester/auto-advisor/linux-amd64 obj/auto-advisor

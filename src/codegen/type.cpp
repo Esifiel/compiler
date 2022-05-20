@@ -71,6 +71,16 @@ uint64_t MyStructType::getSize()
     return sum;
 }
 
+uint64_t UnionType::getSize()
+{
+    uint64_t max = 0;
+    for (auto &p : *members)
+        for (auto &q : *p->first)
+            if (q->getSize() > max)
+                max = q->getSize();
+    return max;
+}
+
 pair<TypeSpecifier *, Identifier *> AggregateType::getMemberDef(Identifier *id)
 {
     string name = id->name;

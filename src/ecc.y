@@ -4,6 +4,7 @@
 Program *program;
 map<string, Number *> constvar;
 map<string, AggregateType *> aggrdef;
+map<string, TypeSpecifier *> typealias;
 %}
 
 %expect 1 // shift-reduce conflict: optional else-part for if-else statement
@@ -29,7 +30,7 @@ extern char *yytext;
 extern int yylex();
 
 void yyerror(string s);
-void yywarning(string s, string addition);
+void yywarning(string s);
 
 static void debug(string s);
 static Expression *calculate(Expression *a, enum op_type op);
@@ -89,7 +90,7 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 
 %type<program> program
 
-%type<type> type-spec decl-specs spec-qualifier-list type-name
+%type<type> type-spec decl-specs spec-qualifier-list type-name storage-class-specifier
 %type<qual> pointer type-qualifier type-qualifier-list 
 %type<aggrtype> struct-or-union-spec struct-or-union
 %type<members> struct-decl-list
@@ -199,19 +200,61 @@ decl                        : decl-specs init-declarator-list DELIM {
 
                                 $$ = new VariableDeclaration(ts, $2);
                             }
-                            | decl-specs DELIM { $$ = new TypeDeclaration($1); } // type definition
+                            | decl-specs DELIM {
+                                // type definition
+                                if($1->isAggregateType())
+                                    $$ = new TypeDeclaration($1);
+                                else
+                                {
+                                    yywarning("useless type name in empty declaration");
+                                    $$ = new TypeDeclaration();
+                                }
+                            }
+                            | TYPEDEF decl-specs IDENTIFIER DELIM {
+                                // type alias
+                                if(typealias.find(*$3) == typealias.end())
+                                {
+                                    if($2->getName() == "\"MyStructType\"")
+                                        typealias[*$3] = new MyStructType((MyStructType *)$2);
+                                    else if($2->getName() == "\"UnionType\"")
+                                        typealias[*$3] = new UnionType((UnionType *)$2);
+                                    else
+                                        typealias[*$3] = $2;
+                                }
+                                else
+                                    yyerror("redefinition of type alias '" + *$3 + "'");
+
+                                if($2->isAggregateType())
+                                    $$ = new TypeDeclaration($2);
+                                else
+                                    $$ = new TypeDeclaration();
+                                
+                                delete $3;
+                            }
                             ;
 
 decl-list                   : decl { $$ = new vector<VariableDeclaration *>; $$->push_back((VariableDeclaration *)$1); }
                             | decl-list decl { $1->push_back((VariableDeclaration *)$2); $$ = $1; }
                             ;
 
-decl-specs                  : storage-class-specifier // TODO: storage
-                            | storage-class-specifier decl-specs // TODO: storage
+decl-specs                  : storage-class-specifier {
+                                $$ = new IntType();
+                                $$->linkage = $1->linkage;
+                                delete $1;
+                            }
+                            | storage-class-specifier decl-specs {
+                                $$ = $2;
+                                $$->linkage = $1->linkage;
+                                delete $1;
+                            }
                             | type-spec { $$ = $1; }
-                            | type-spec decl-specs // TODO: unsigned & signed
+                            | type-spec decl-specs {
+                                $$ = $2;
+                                $$->isunsigned = $1->isunsigned;
+                                delete $1;
+                            }
                             | type-qualifier { $$ = new IntType($1); } // no type decl, default is "int"
-                            | type-qualifier decl-specs { $$ = $2 ; $$->qual = $1; }
+                            | type-qualifier decl-specs { $$ = $2; $$->qual = $1; }
                             ;
 
 init-declarator-list        : init-declarator { $$ = new vector<Identifier *>; $$->push_back($1); }
@@ -222,11 +265,11 @@ init-declarator             : declarator { $$ = (Identifier *)$1; }
                             | declarator ASSIGN initializer { $$ = (Identifier *)$1; $$->init = $3; }
                             ;
 
-storage-class-specifier     : TYPEDEF
-                            | EXTERN
-                            | STATIC
-                            | AUTO
-                            | REGISTER
+storage-class-specifier     : EXTERN    { $$ = new TypeSpecifier(LINKAGE_EXTERNAL); }
+                            | STATIC    { $$ = new TypeSpecifier(LINKAGE_INTERNAL); }
+                            | AUTO      { $$ = new TypeSpecifier(LINKAGE_NONE); }
+                            | REGISTER  // TODO: register
+                            /* | TYPEDEF */
                             ;
 
 type-spec                   : CHAR      { $$ = new CharType();      }
@@ -236,11 +279,11 @@ type-spec                   : CHAR      { $$ = new CharType();      }
                             | FLOAT     { $$ = new FloatType();     }
                             | DOUBLE    { $$ = new DoubleType();    }
                             | VOID      { $$ = new VoidType();      }
-                            | SIGNED
-                            | UNSIGNED
+                            | SIGNED    { $$ = new TypeSpecifier(false); }
+                            | UNSIGNED  { $$ = new TypeSpecifier(true); }
                             | struct-or-union-spec { $$ = $1; }
-                            | enum-spec
-                            | TYPENAME
+                            | enum-spec // TODO: enum type
+                            | TYPENAME  { $$ = typealias[*$1]; }
                             ;
 
 type-qualifier              : CONST     { $$ = new Qualifier(); $$->isconst    = true; }
@@ -249,17 +292,21 @@ type-qualifier              : CONST     { $$ = new Qualifier(); $$->isconst    =
 
 struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC {
                                 if(aggrdef.find(*$2) != aggrdef.end())
+                                { 
+                                    if(!aggrdef[*$2]->members)
+                                        aggrdef[*$2]->members = $4;
                                     // if the struct has been defined, fetch it directly
                                     $$ = aggrdef[*$2];
+                                }
                                 else
                                 {
                                     $$ = $1;
                                     $$->name = *$2;
+                                    $$->members = $4;
                                     // add struct definition into map
                                     aggrdef[*$2] = $$;
                                 }
                                 delete $2;
-                                $$->members = $4;
                             }
                             | struct-or-union LC struct-decl-list RC { $$ = $1; $$->members = $3; } // annoymous struct
                             | struct-or-union IDENTIFIER { $$ = $1; $$->name = *$2; delete $2; }
@@ -440,7 +487,7 @@ type-name                   : spec-qualifier-list abstract-declarator {
                                     for(int i = 0; i < ((Qualifier *)$2)->pcnt; i++)
                                         $$ = new MyPointerType($$);
                                 else
-                                    yyerror(string("abstract-declarator of type '") + $2->getName() + "' is not supported yet");
+                                    yyerror("abstract-declarator of type '" + $2->getName() + "' is not supported yet");
                             }
                             | spec-qualifier-list { $$ = $1; }
                             ;
@@ -704,10 +751,9 @@ void yyerror(string s)
     exit(1);
 }
 
-void yywarning(string s, string addition)
+void yywarning(string s)
 {
     cerr << "\033[1;35m" << "warning: " << "\033[0m" << s << endl;
-    cerr << "Line " << yylineno << ": " << "\033[1;35m" << yytext << "\033[0m" << ". " << addition << endl;
 }
 
 static void debug(string s) {

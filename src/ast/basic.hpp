@@ -66,6 +66,13 @@ enum type_type
     TYPE_QUALIFIER
 };
 
+enum linkage_type
+{
+    LINKAGE_NONE,
+    LINKAGE_EXTERNAL,
+    LINKAGE_INTERNAL,
+};
+
 class Node
 {
 public:

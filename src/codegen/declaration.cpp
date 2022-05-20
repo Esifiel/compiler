@@ -171,9 +171,9 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     stmts->codeGen(ctx);
 
     // default return statement
-    if(stmts->stmt->tail && stmts->stmt->tail->getName() != "\"ReturnStatement\"")
+    if (stmts->stmt->tail && stmts->stmt->tail->getName() != "\"ReturnStatement\"")
     {
-        if(rettype->type == TYPE_VOID)
+        if (rettype->type == TYPE_VOID)
             ctx.builder.CreateRetVoid();
         else
             ctx.builder.CreateRet(ctx.CreateCast(ctx.builder.getInt64(0), rettype->getType(ctx)));
@@ -188,12 +188,15 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 
 Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
 {
-    if (type->type == TYPE_STRUCT)
+    if (type && type->type == TYPE_STRUCT)
     {
         MyStructType *mst = (MyStructType *)type;
+        // create struct type for assigned name or implement the member declaration
+        StructType *stype = ctx.module->getTypeByName(mst->name);
+        if (!stype)
+            stype = StructType::create(ctx.ctx, mst->name);
         ctx.structtypes[mst->name] = vector<string>();
-        // create struct type for assigned name
-        StructType *stype = StructType::create(ctx.ctx, mst->name);
+
         if (mst->members)
         {
             // set members

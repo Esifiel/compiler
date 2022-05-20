@@ -72,6 +72,7 @@ class TypeDeclaration : public Declaration
 public:
     TypeSpecifier *type;
 
+    TypeDeclaration() : type(nullptr) {}
     TypeDeclaration(TypeSpecifier *t) : type(t) {}
 
     virtual string getName() { return "\"TypeDeclaration\""; }

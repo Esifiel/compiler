@@ -122,7 +122,7 @@ int main(int argc, char *argv[], char **envp)
     cout << "[+] target code generated." << endl;
 
     // compile the IR
-    system(("clang -g3 -O0 --target=`llvm-config --host-target` " + filenameo + ".ll -o " + filenameo).c_str());
+    system(("clang -O3 --target=`llvm-config --host-target` " + filenameo + ".ll -o " + filenameo).c_str());
     cout << "[+] compilation done." << endl;
 
     return 0;
