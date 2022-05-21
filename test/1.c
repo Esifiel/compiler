@@ -1,13 +1,9 @@
-typedef struct node HH;
-
-struct node {
-    int a;
-};
-
-HH bb, cc;
+const char *s = "hello";
 
 int main()
 {
- 
-  return 0;
+    int a[10] = {0};
+    
+
+    return 0;
 }

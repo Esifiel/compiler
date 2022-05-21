@@ -54,7 +54,7 @@ Type *MyStructType::getType(CodeGenerator &ctx)
 
 Type *UnionType::getType(CodeGenerator &ctx)
 {
-    return nullptr;
+    return ctx.module->getTypeByName(name);
 }
 
 Type *EnumType::getType(CodeGenerator &ctx)

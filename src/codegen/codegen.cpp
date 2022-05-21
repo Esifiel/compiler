@@ -9,7 +9,6 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     module = new Module("main", ctx);
     functions.clear();
     blocks.clear();
-    typealias.clear();
     structtypes.clear();
     structvars.clear();
     // top level (global) blocks
@@ -146,7 +145,6 @@ CodeGenerator::~CodeGenerator()
 {
     blocks.clear();
     functions.clear();
-    typealias.clear();
     structtypes.clear();
     structvars.clear();
     delete module;
@@ -208,9 +206,8 @@ Value *CodeGenerator::GetVar(string name)
         for (auto &p : blocks)
             if (p.find(name) != p.end())
                 return p[name];
-    // warning(string("null variable '") + name + "'");
-    return nullptr;
-    // error(string("variable '") + name + string("' not found"));
+    // if not local, find in global
+    return module->getGlobalVariable(name);
 }
 
 Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
@@ -253,7 +250,7 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
     {
         // a->getType()->print(outs());
         // b->getType()->print(outs());
-        
+
         // if is pointer operation
         switch (op)
         {

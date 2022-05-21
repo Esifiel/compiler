@@ -213,14 +213,14 @@ void Visualizer::visitCompoundStatement(CompoundStatement *c)
     if (c)
     {
         out << head << c->getName() << sub;
-        if (c->vardecs)
-            for (auto &p : *c->vardecs)
+        if (c->decl)
+            for (Declaration *d = c->decl; d; d = d->next)
             {
-                if (p != (*c->vardecs)[0])
+                if (d != c->decl)
                     out << sep;
-                visitDeclaration(p);
+                visitDeclaration(d);
             }
-        if (c->vardecs && c->vardecs->size() > 0 && c->stmt)
+        if (c->decl && c->stmt)
             out << sep;
         Statement *p = c->stmt;
         while (p)

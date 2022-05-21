@@ -13,12 +13,11 @@ Value *Number::codeGen(CodeGenerator &ctx)
 
 Value *String::codeGen(CodeGenerator &ctx)
 {
-    Value *var = ctx.GetVar(val);
+    Value *var = ctx.module->getGlobalVariable(val);
     if (!var)
     {
         Constant *str = ConstantDataArray::getString(ctx.ctx, val);
         var = new GlobalVariable(*ctx.module, str->getType(), true, GlobalValue::PrivateLinkage, str, val);
-        ctx.blocks.front()[val] = var;
     }
     // return a string variable as char * but not char array
     return ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
@@ -63,8 +62,7 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
                 bool tmpleft = ctx.isleft;
                 ctx.isleft = true;
                 tmp = (*p)->codeGen(ctx);
-                Value *idxlist[] = {ctx.builder.getInt64(0), ctx.builder.getInt64(0)};
-                tmp = ctx.builder.CreateGEP(tmp, ArrayRef<Value *>(idxlist, 2));
+                tmp = ctx.builder.CreateGEP(tmp, {ctx.builder.getInt64(0), ctx.builder.getInt64(0)});
                 ctx.isleft = tmpleft;
             }
             else
@@ -272,7 +270,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             }
         }
         else
-            ctx.error("not supported operand of [] operator");
+            ctx.error("variable '" + ((Identifier *)left)->name + "' is not subscriptable");
     case OP_DEREFERENCE:
         var = left->codeGen(ctx);
         if(var->getType()->isPointerTy())

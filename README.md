@@ -8,7 +8,8 @@ Dependence of compilation:
 # flex 2.6.4
 # bison 3.5.1
 # llvm 10.0.0
-sudo apt install flex bison llvm
+# clang 10.0.0
+sudo apt install flex bison clang llvm
 ```
 For visualization of AST, [Graphviz](https://graphviz.org/) is used:
 ```bash

@@ -96,10 +96,9 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
 %type<members> struct-decl-list
 %type<member> struct-decl
 
-%type<declaration> external-decl translation-unit decl
+%type<declaration> external-decl translation-unit decl decl-list
 %type<functionDeclaration> function-definition
 %type<param> param-list param-type-list param-decl
-%type<vars> decl-list
 
 %type<statement> stat jump-stat labeled-stat stat-list
 %type<compoundStatement> compound-stat
@@ -190,11 +189,10 @@ decl                        : decl-specs init-declarator-list DELIM {
                                     }
 
                                     // constant variable
-                                    if($1->qual && $1->qual->isconst)
+                                    if($1->qual && $1->qual->isconst && !ts->back()->isIterableType() && !ts->back()->isAggregateType())
                                     {
-                                        if(p->init->getName() != "\"Number\"")
-                                            yyerror("not constant initializer for const variable");
-                                        constvar[p->name] = (Number *)(p->init);
+                                        if(p->init->getName() == "\"Number\"")
+                                            constvar[p->name] = (Number *)(p->init);
                                     }
                                 }
 
@@ -233,8 +231,8 @@ decl                        : decl-specs init-declarator-list DELIM {
                             }
                             ;
 
-decl-list                   : decl { $$ = new vector<VariableDeclaration *>; $$->push_back((VariableDeclaration *)$1); }
-                            | decl-list decl { $1->push_back((VariableDeclaration *)$2); $$ = $1; }
+decl-list                   : decl { $$ = $1; $$->tail = $$; }
+                            | decl-list decl { $$ = $1; $$->tail->next = $2; $$->tail = $2; }
                             ;
 
 decl-specs                  : storage-class-specifier {
@@ -283,7 +281,13 @@ type-spec                   : CHAR      { $$ = new CharType();      }
                             | UNSIGNED  { $$ = new TypeSpecifier(true); }
                             | struct-or-union-spec { $$ = $1; }
                             | enum-spec // TODO: enum type
-                            | TYPENAME  { $$ = typealias[*$1]; }
+                            | TYPENAME  {
+                                if(typealias.find(*$1) != typealias.end())
+                                    $$ = typealias[*$1];
+                                else
+                                    yyerror("type name '" + *$1 + "' not found");
+                                delete $1;
+                            }
                             ;
 
 type-qualifier              : CONST     { $$ = new Qualifier(); $$->isconst    = true; }
@@ -571,7 +575,11 @@ exp			                : assignment-exp { $$ = $1; }
 
 assignment-exp      		: conditional-exp { $$ = $1; }
                             | unary-exp assignment-operator assignment-exp {
-                                if($1->getName() == "\"Number\"")
+                                if( $1->getName() != "\"Identifier\"" && \
+                                    $1->op != OP_DEREFERENCE && \
+                                    $1->op != OP_INDEX && \
+                                    $1->op != OP_DOT && \
+                                    $1->op != OP_TO)
                                     yyerror("lvalue required as left operand of assignment");
                                 $$ = new Expression($1, $3, $2);
                             }
@@ -599,7 +607,7 @@ const-exp           		: conditional-exp {
                                 if($1->getName() == "\"Number\"")
                                     $$ = (Number *)$1;
                                 else if($1->getName() == "\"Identifier\"" && constvar[((Identifier *)$1)->name])
-                                    $$ = (Number *)constvar[((Identifier *)$1)->name];
+                                    $$ = constvar[((Identifier *)$1)->name];
                                 else
                                     yyerror("const-exp is not a Number constant");
                             }
@@ -662,12 +670,20 @@ cast-exp		            : unary-exp { $$ = $1; }
 
 unary-exp		            : postfix-exp { $$ = $1; }
                             | INC unary-exp {
-                                if($2->getName() == "\"Number\"")
-                                    yyerror("lvalue required as decrement operand");
+                                if( $2->getName() != "\"Identifier\"" && \
+                                    $2->op != OP_DEREFERENCE && \
+                                    $2->op != OP_INDEX && \
+                                    $2->op != OP_DOT && \
+                                    $2->op != OP_TO)
+                                    yyerror("lvalue required as increment operand");
                                 $$ = new Expression($2, OP_INC_FRONT);
                             }
                             | DEC unary-exp {
-                                if($2->getName() == "\"Number\"")
+                                if( $2->getName() != "\"Identifier\"" && \
+                                    $2->op != OP_DEREFERENCE && \
+                                    $2->op != OP_INDEX && \
+                                    $2->op != OP_DOT && \
+                                    $2->op != OP_TO)
                                     yyerror("lvalue required as decrement operand");
                                 $$ = new Expression($2, OP_DEC_FRONT);
                             }
@@ -693,28 +709,36 @@ unary-operator              : ANDORADDRESSOF    { $$ = OP_ADDRESSOF; }
 postfix-exp		            : primary-exp { $$ = $1; }
                             | postfix-exp LB exp RB {
                                 if($1->getName() == "\"Number\"")
-                                    yyerror("subscripted value is neither array nor pointer nor vector");
+                                    yyerror("number is not subscriptable");
                                 $$ = new Expression($1, $3, OP_INDEX);
                             }
                             | postfix-exp LP argument-exp-list RP {
                                 if($1->getName() == "\"Number\"")
-                                    yyerror("called object is not a function or function pointer");
+                                    yyerror("number is not callable");
                                 $$ = new FunctionCall($1, $3);
                             }
                             | postfix-exp LP RP {
                                 if($1->getName() == "\"Number\"")
-                                    yyerror("called object is not a function or function pointer");
+                                    yyerror("number is not callable");
                                 $$ = new FunctionCall($1, nullptr);
                             }
                             | postfix-exp DOT IDENTIFIER { $$ = new Expression($1, new Identifier(*$3), OP_DOT); delete $3; }
                             | postfix-exp TO IDENTIFIER { $$ = new Expression($1, new Identifier(*$3), OP_TO); delete $3; }
                             | postfix-exp INC {
-                                if($1->getName() == "\"Number\"")
+                                if( $1->getName() != "\"Identifier\"" && \
+                                    $1->op != OP_DEREFERENCE && \
+                                    $1->op != OP_INDEX && \
+                                    $1->op != OP_DOT && \
+                                    $1->op != OP_TO)
                                     yyerror("lvalue required as increment operand");
                                 $$ = new Expression($1, OP_INC_REAR);
                             }
                             | postfix-exp DEC {
-                                if($1->getName() == "\"Number\"")
+                                if( $1->getName() != "\"Identifier\"" && \
+                                    $1->op != OP_DEREFERENCE && \
+                                    $1->op != OP_INDEX && \
+                                    $1->op != OP_DOT && \
+                                    $1->op != OP_TO)
                                     yyerror("lvalue required as decrement operand");
                                 $$ = new Expression($1, OP_DEC_REAR);
                             }
@@ -997,9 +1021,9 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
         else
         {
             if(choice)
-                num.doubleValue = ((Number *)b)->longView();
+                num.longValue = ((Number *)b)->longView();
             else
-                num.doubleValue = ((Number *)c)->longView();
+                num.longValue = ((Number *)c)->longView();
             return new Number(num, new LongType(), VAL_LONG);
         }
     }

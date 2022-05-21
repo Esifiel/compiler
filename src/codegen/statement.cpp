@@ -7,9 +7,8 @@ Value *CompoundStatement::codeGen(CodeGenerator &ctx)
     // new level block
     ctx.blocks.push_front(map<string, Value *>());
 
-    if (vardecs)
-        for (auto &p : *vardecs)
-            p->codeGen(ctx);
+    for (Declaration *p = decl; p; p = p->next)
+        p->codeGen(ctx);
 
     for (Statement *s = stmt; s; s = s->next)
         s->codeGen(ctx);
@@ -187,6 +186,8 @@ Value *ReturnStatement::codeGen(CodeGenerator &ctx)
 
 Value *BreakStatement::codeGen(CodeGenerator &ctx)
 {
+    if (ctx.loopctx.size() == 0)
+        ctx.error("keyword break used outside of iteration or switch");
     ctx.builder.CreateBr(ctx.loopctx.back().second);
 
     return nullptr;
@@ -194,6 +195,8 @@ Value *BreakStatement::codeGen(CodeGenerator &ctx)
 
 Value *ContinueStatement::codeGen(CodeGenerator &ctx)
 {
+    if (ctx.loopctx.size() == 0)
+        ctx.error("keyword continue used outside of iteration or switch");
     ctx.builder.CreateBr(ctx.loopctx.back().first);
 
     return nullptr;
@@ -207,10 +210,11 @@ Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
     ctx.loopctx.push_back(pair<BasicBlock *, BasicBlock *>(switchcond, switchout));
 
     ctx.builder.SetInsertPoint(switchcond);
-    SwitchInst *swinst = ctx.builder.CreateSwitch(cond->codeGen(ctx), nullptr);
+    Value *condexp = cond->codeGen(ctx);
+    SwitchInst *swinst = ctx.builder.CreateSwitch(condexp, nullptr);
 
-    if (((CompoundStatement *)stmt)->vardecs)
-        ctx.warning("variable declaration inside switch statement will never be executed");
+    if (((CompoundStatement *)stmt)->decl)
+        ctx.warning("variable or type declaration inside switch statement will never be executed");
 
     for (Statement *p = ((CompoundStatement *)stmt)->stmt; p; p = p->next)
     {
@@ -219,19 +223,31 @@ Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
             if (((CaseStatement *)p)->val)
             {
                 BasicBlock *switchcase = BasicBlock::Create(ctx.ctx, "switch.case", ctx.curFunction);
-                swinst->addCase(dyn_cast<ConstantInt>(ctx.Num2Constant(((CaseStatement *)p)->val)), switchcase);
+                swinst->addCase(
+                    dyn_cast<ConstantInt>(
+                        ctx.CreateCast(
+                            ctx.Num2Constant(((CaseStatement *)p)->val), condexp->getType())),
+                    switchcase);
+                if (!ctx.builder.GetInsertBlock()->getTerminator())
+                    ctx.builder.CreateBr(switchcase);
                 ctx.builder.SetInsertPoint(switchcase);
             }
             else
             {
                 BasicBlock *switchdefault = BasicBlock::Create(ctx.ctx, "switch.default", ctx.curFunction);
                 swinst->setDefaultDest(switchdefault);
+                if (!ctx.builder.GetInsertBlock()->getTerminator())
+                    ctx.builder.CreateBr(switchdefault);
                 ctx.builder.SetInsertPoint(switchdefault);
             }
         }
+        else if (p->getName() == "\"ContinueStatement\"")
+            ctx.error("keyword continue used in switch statement");
         else
             p->codeGen(ctx);
     }
+    if (!ctx.builder.GetInsertBlock()->getTerminator())
+        ctx.builder.CreateBr(switchout);
 
     ctx.builder.SetInsertPoint(switchout);
     ctx.loopctx.pop_back();

@@ -21,15 +21,15 @@ public:
     virtual llvm::Value *codeGen(CodeGenerator &ctx) { return nullptr; }
 };
 
-class VariableDeclaration;
+class Declaration;
 
 class CompoundStatement : public Statement
 {
 public:
-    vector<VariableDeclaration *> *vardecs;
+    Declaration *decl;
     Statement *stmt;
 
-    CompoundStatement(vector<VariableDeclaration *> *d, Statement *s) : vardecs(d), stmt(s) {}
+    CompoundStatement(Declaration *d, Statement *s) : decl(d), stmt(s) {}
 
     virtual string getName() { return "\"CompoundStatement\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);

@@ -54,7 +54,6 @@ public:
     list<pair<BasicBlock *, BasicBlock *>> loopctx; // for jump statement
     bool isglobal;  // global definition
     bool isleft;    // left value
-    map<string, string> typealias;
     map<string, vector<string>> structtypes;
     map<string, AggregateType *> structvars;
     map<string, BasicBlock *> labels;
@@ -73,8 +72,6 @@ public:
     Function *GetFunction(string name);
     Value *CreateUnaryExpr(Value *a, enum op_type op);
     Value *CreateBinaryExpr(Value *a, Value *b, enum op_type op);
-    Constant *CalculateExpr(Expression *expr);
-    Constant *Expr2Constant(Expression *expr);
     Constant *Num2Constant(Number *num);
 };
 
