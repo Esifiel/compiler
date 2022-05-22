@@ -814,7 +814,7 @@ static Expression *calculate(Expression *a, enum op_type op)
             break;
         case OP_NOT:
             if(isfloatpoint)
-                yyerror("logical not is not supported for double type");
+                yyerror("bitwise not is not supported for double type");
             else
                 num.longValue = ~((Number *)a)->longView();
             break;

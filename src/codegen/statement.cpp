@@ -71,7 +71,7 @@ Value *WhileStatement::codeGen(CodeGenerator &ctx)
     BasicBlock *whileloop = BasicBlock::Create(ctx.ctx, "while.loop", ctx.curFunction);
     BasicBlock *whileout = BasicBlock::Create(ctx.ctx, "while.out", ctx.curFunction);
     ctx.builder.CreateBr(whilecond);
-    ctx.loopctx.push_back(pair<BasicBlock *, BasicBlock *>(whilecond, whileout));
+    ctx.jumpctx.push_back(pair<BasicBlock *, BasicBlock *>(whilecond, whileout));
 
     ctx.builder.SetInsertPoint(whilecond);
     Value *cmpres = cond->codeGen(ctx);
@@ -88,7 +88,7 @@ Value *WhileStatement::codeGen(CodeGenerator &ctx)
     ctx.builder.CreateBr(whilecond);
 
     ctx.builder.SetInsertPoint(whileout);
-    ctx.loopctx.pop_back();
+    ctx.jumpctx.pop_back();
 
     return nullptr;
 }
@@ -98,7 +98,7 @@ Value *DoWhileStatement::codeGen(CodeGenerator &ctx)
     BasicBlock *dowhilecond = BasicBlock::Create(ctx.ctx, "dowhile.cond", ctx.curFunction);
     BasicBlock *dowhileloop = BasicBlock::Create(ctx.ctx, "dowhile.loop", ctx.curFunction);
     BasicBlock *dowhileout = BasicBlock::Create(ctx.ctx, "dowhile.out", ctx.curFunction);
-    ctx.loopctx.push_back(pair<BasicBlock *, BasicBlock *>(dowhilecond, dowhileout));
+    ctx.jumpctx.push_back(pair<BasicBlock *, BasicBlock *>(dowhilecond, dowhileout));
 
     // do loop first
     ctx.builder.CreateBr(dowhileloop);
@@ -117,7 +117,7 @@ Value *DoWhileStatement::codeGen(CodeGenerator &ctx)
     ctx.builder.CreateCondBr(cmpres, dowhileloop, dowhileout);
 
     ctx.builder.SetInsertPoint(dowhileout);
-    ctx.loopctx.pop_back();
+    ctx.jumpctx.pop_back();
 
     return nullptr;
 }
@@ -131,7 +131,7 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
     BasicBlock *forend = BasicBlock::Create(ctx.ctx, "for.end", ctx.curFunction);
     BasicBlock *forout = BasicBlock::Create(ctx.ctx, "for.out", ctx.curFunction);
     ctx.builder.CreateBr(forinit);
-    ctx.loopctx.push_back(pair<BasicBlock *, BasicBlock *>(forend, forout));
+    ctx.jumpctx.push_back(pair<BasicBlock *, BasicBlock *>(forend, forout));
 
     // init expr
     ctx.builder.SetInsertPoint(forinit);
@@ -168,7 +168,7 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
 
     // go out
     ctx.builder.SetInsertPoint(forout);
-    ctx.loopctx.pop_back();
+    ctx.jumpctx.pop_back();
 
     return nullptr;
 }
@@ -176,8 +176,16 @@ Value *ForStatement::codeGen(CodeGenerator &ctx)
 Value *ReturnStatement::codeGen(CodeGenerator &ctx)
 {
     if (res)
-        // correct the ret val type and do a type cast
-        ctx.builder.CreateRet(ctx.CreateCast(res->codeGen(ctx), ctx.curFunction->getReturnType()));
+    {
+        Value *retval = res->codeGen(ctx);
+        if (retval->getType() != ctx.curFunction->getReturnType())
+        {
+            // correct the ret val type and do a type cast
+            ctx.warning("return value will be casted to the function return type");
+            retval = ctx.CreateCast(retval, ctx.curFunction->getReturnType());
+        }
+        ctx.builder.CreateRet(retval);
+    }
     else
         ctx.builder.CreateRetVoid();
 
@@ -186,18 +194,18 @@ Value *ReturnStatement::codeGen(CodeGenerator &ctx)
 
 Value *BreakStatement::codeGen(CodeGenerator &ctx)
 {
-    if (ctx.loopctx.size() == 0)
+    if (ctx.jumpctx.size() == 0)
         ctx.error("keyword break used outside of iteration or switch");
-    ctx.builder.CreateBr(ctx.loopctx.back().second);
+    ctx.builder.CreateBr(ctx.jumpctx.back().second);
 
     return nullptr;
 }
 
 Value *ContinueStatement::codeGen(CodeGenerator &ctx)
 {
-    if (ctx.loopctx.size() == 0)
+    if (ctx.jumpctx.size() == 0)
         ctx.error("keyword continue used outside of iteration or switch");
-    ctx.builder.CreateBr(ctx.loopctx.back().first);
+    ctx.builder.CreateBr(ctx.jumpctx.back().first);
 
     return nullptr;
 }
@@ -207,7 +215,7 @@ Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
     BasicBlock *switchcond = BasicBlock::Create(ctx.ctx, "switch.cond", ctx.curFunction);
     BasicBlock *switchout = BasicBlock::Create(ctx.ctx, "switch.out", ctx.curFunction);
     ctx.builder.CreateBr(switchcond);
-    ctx.loopctx.push_back(pair<BasicBlock *, BasicBlock *>(switchcond, switchout));
+    ctx.jumpctx.push_back(pair<BasicBlock *, BasicBlock *>(switchcond, switchout));
 
     ctx.builder.SetInsertPoint(switchcond);
     Value *condexp = cond->codeGen(ctx);
@@ -250,13 +258,19 @@ Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
         ctx.builder.CreateBr(switchout);
 
     ctx.builder.SetInsertPoint(switchout);
-    ctx.loopctx.pop_back();
+    ctx.jumpctx.pop_back();
 
     return nullptr;
 }
 
 Value *CaseStatement::codeGen(CodeGenerator &ctx)
 {
+    // this method should never be called
+    if (val)
+        ctx.error("keyword case used outside of switch statement");
+    else
+        ctx.error("keyword default used outside of switch statement");
+
     return nullptr;
 }
 

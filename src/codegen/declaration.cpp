@@ -10,6 +10,9 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
     for (; pt != types->end() && pi != ids->end(); pt++, pi++)
     {
         string varname = (*pi)->name;
+        if ((!ctx.isglobal && ctx.blocks.front().find(varname) != ctx.blocks.front().end()) ||
+            ctx.isglobal && ctx.module->getGlobalVariable(varname))
+            ctx.error("redefinition of variable '" + varname + "'");
 
         // if type is a undefined struct type, declare a opaque type first
         if ((*pt)->getRootType()->type == TYPE_STRUCT && !ctx.module->getTypeByName(((AggregateType *)(*pt)->getRootType())->name))
@@ -29,7 +32,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     *ctx.module,
                     array_t,
                     (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
-                    GlobalValue::PrivateLinkage,
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
                     0,
                     varname);
                 vector<Constant *> elements;
@@ -37,7 +40,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     elements.push_back(ctx.Num2Constant((Number *)q));
                 Constant *constarr = ConstantArray::get(array_t, elements);
                 v->setInitializer(constarr);
-                ctx.blocks.front()[varname] = v;
+                // ctx.globals[varname] = v;
             }
             else
                 // TODO: local variable initialize not supported yet
@@ -54,7 +57,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     *ctx.module,
                     stype,
                     (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
-                    GlobalValue::PrivateLinkage,
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
                     0,
                     varname);
                 vector<Constant *> elements;
@@ -62,7 +65,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     elements.push_back(ctx.Num2Constant((Number *)q));
                 Constant *constarr = ConstantStruct::get(stype, elements);
                 v->setInitializer(constarr);
-                ctx.blocks.front()[varname] = v;
+                // ctx.globals[varname] = v;
             }
             else
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(stype, 0, varname.c_str());
@@ -78,7 +81,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     *ctx.module,
                     t,
                     (*pt)->qual && (*pt)->qual->isconst ? true : false,
-                    GlobalValue::PrivateLinkage,
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
                     0,
                     varname);
                 if ((*pi)->init)
@@ -87,7 +90,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 else
                     // else initialize to 0
                     v->setInitializer(ConstantInt::get(t, 0));
-                ctx.blocks.front()[varname] = v;
+                // ctx.globals[varname] = v;
             }
             else
             {
@@ -195,8 +198,8 @@ Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
         StructType *stype = ctx.module->getTypeByName(mst->name);
         if (!stype)
             stype = StructType::create(ctx.ctx, mst->name);
-        ctx.structtypes[mst->name] = vector<string>();
 
+        ctx.structtypes[mst->name] = vector<string>();
         if (mst->members)
         {
             // set members

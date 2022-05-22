@@ -125,6 +125,11 @@ void replace(string &src, string sub, string tar)
                                     {
                                         debug();
                                         yylval.num.longValue = atoll(yytext);
+                                        if((yylval.num.longValue >> 32) == 0)
+                                        {
+                                            yylval.num.intValue = yylval.num.longValue;
+                                            return NUMINT;
+                                        }
                                     }
                                     return NUMLONG;
                                 }
@@ -133,6 +138,11 @@ void replace(string &src, string sub, string tar)
                                     {
                                         debug();
                                         yylval.num.longValue = strtol(yytext, NULL, 8);
+                                        if((yylval.num.longValue >> 32) == 0)
+                                        {
+                                            yylval.num.intValue = yylval.num.longValue;
+                                            return NUMINT;
+                                        }
                                     }
                                     return NUMLONG;
                                 }
@@ -141,6 +151,11 @@ void replace(string &src, string sub, string tar)
                                     {
                                         debug();
                                         yylval.num.longValue = strtol(yytext, NULL, 16);
+                                        if((yylval.num.longValue >> 32) == 0)
+                                        {
+                                            yylval.num.intValue = yylval.num.longValue;
+                                            return NUMINT;
+                                        }
                                     }
                                     return NUMLONG;
                                 }

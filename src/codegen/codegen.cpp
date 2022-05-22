@@ -188,11 +188,11 @@ Value *CodeGenerator::CreateCast(Value *V, Type *DestTy)
         return builder.CreateFPToSI(V, DestTy);
     else if (dst->isFloatingPointTy())
         return builder.CreateSIToFP(V, DestTy);
-    else if(src->isPointerTy() && dst->isPointerTy())
+    else if (src->isPointerTy() && dst->isPointerTy())
         return builder.CreatePointerCast(V, DestTy);
-    else if(src->isIntegerTy() && dst->isPointerTy())
+    else if (src->isIntegerTy() && dst->isPointerTy())
         return builder.CreateIntToPtr(V, DestTy);
-    else if(src->isPointerTy() && dst->isIntegerTy())
+    else if (src->isPointerTy() && dst->isIntegerTy())
         return builder.CreatePtrToInt(V, DestTy);
     else
         // error("type casting failed.");
@@ -235,7 +235,9 @@ Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
         case OP_DEC_REAR:
             return builder.CreateBinOp(Instruction::BinaryOps::Sub, a, ConstantInt::get(a->getType(), 1));
         case OP_NOT:
-            return a->getType()->isIntegerTy() ? builder.CreateNeg(a) : builder.CreateFNeg(a);
+            if (a->getType()->isFloatingPointTy())
+                error("bitwise not requires integer operands");
+            return builder.CreateUnOp(Instruction::UnaryOps::FNeg, a);
         default:
             cout << op << endl;
             error("operator type not supoorted for general operands");
@@ -266,7 +268,7 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
                 return builder.CreateGEP(b, builder.CreateNeg(a));
             else if (a->getType()->isPointerTy() && b->getType()->isIntegerTy())
                 return builder.CreateGEP(a, builder.CreateNeg(b));
-            else if(a->getType()->isPointerTy() && b->getType()->isPointerTy())
+            else if (a->getType()->isPointerTy() && b->getType()->isPointerTy())
                 // two pointer diff
                 return builder.CreatePtrDiff(a, b);
             else
@@ -296,11 +298,11 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
                 CmpInst::ICMP_ULE,
                 builder.CreatePtrToInt(a, Type::getInt64Ty(ctx)),
                 builder.CreatePtrToInt(b, Type::getInt64Ty(ctx)));
-        case OP_GEQ:   
+        case OP_GEQ:
             return builder.CreateICmp(
                 CmpInst::ICMP_UGE,
                 builder.CreatePtrToInt(a, Type::getInt64Ty(ctx)),
-                builder.CreatePtrToInt(b, Type::getInt64Ty(ctx)));     
+                builder.CreatePtrToInt(b, Type::getInt64Ty(ctx)));
         default:
             cout << op << endl;
             error("operator type not supported for pointer type");
@@ -339,10 +341,16 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
         case OP_NEQ:
             return isfloatpoint ? builder.CreateFCmp(CmpInst::FCMP_ONE, a, b) : builder.CreateICmp(CmpInst::ICMP_NE, a, b);
         case OP_AND:
+            if (isfloatpoint)
+                error("bitwise and requires integer operands");
             return builder.CreateBinOp(Instruction::BinaryOps::And, a, b);
         case OP_OR:
+            if (isfloatpoint)
+                error("bitwise or requires integer operands");
             return builder.CreateBinOp(Instruction::BinaryOps::Or, a, b);
         case OP_XOR:
+            if (isfloatpoint)
+                error("bitwise xor requires integer operands");
             return builder.CreateBinOp(Instruction::BinaryOps::Xor, a, b);
         case OP_ADD:
             return isfloatpoint ? builder.CreateBinOp(Instruction::BinaryOps::FAdd, a, b) : builder.CreateBinOp(Instruction::BinaryOps::Add, a, b);
@@ -353,11 +361,17 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
         case OP_DIV:
             return isfloatpoint ? builder.CreateBinOp(Instruction::BinaryOps::FDiv, a, b) : builder.CreateBinOp(Instruction::BinaryOps::SDiv, a, b);
         case OP_MOD:
+            if (b->getType()->isFloatingPointTy())
+                error("modulation operand should be an integer");
             return builder.CreateBinOp(Instruction::BinaryOps::SRem, a, b);
         case OP_SL:
+            if (isfloatpoint)
+                error("shift-left requires integer operands");
             return builder.CreateBinOp(Instruction::BinaryOps::Shl, a, b);
         case OP_SR:
             // TODO: may be not ok if always arithmetic shift right
+            if (isfloatpoint)
+                error("shift-right requires integer operands");
             return builder.CreateBinOp(Instruction::BinaryOps::AShr, a, b);
         default:
             cout << op << endl;

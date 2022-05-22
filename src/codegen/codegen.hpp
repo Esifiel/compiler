@@ -48,15 +48,16 @@ public:
     Module *module;
     IRBuilder<> builder;
     // auxiliary
-    Function *curFunction;
-    map<string, Function *> functions;
-    list<map<string, Value *>> blocks;
-    list<pair<BasicBlock *, BasicBlock *>> loopctx; // for jump statement
-    bool isglobal;  // global definition
-    bool isleft;    // left value
-    map<string, vector<string>> structtypes;
-    map<string, AggregateType *> structvars;
-    map<string, BasicBlock *> labels;
+    Function *curFunction;                          // current defined function
+    map<string, Function *> functions;              // functions' def
+    list<map<string, Value *>> blocks;              // local environments
+    // map<string, Value *> globals;                   // global variable
+    list<pair<BasicBlock *, BasicBlock *>> jumpctx; // for jump statement
+    bool isglobal;                                  // global definition
+    bool isleft;                                    // left value
+    map<string, vector<string>> structtypes;        // record members' name
+    map<string, AggregateType *> structvars;        // record struct types' def
+    map<string, BasicBlock *> labels;               // record labels' def
 
     CodeGenerator();
     ~CodeGenerator();
