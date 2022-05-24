@@ -138,6 +138,40 @@ CodeGenerator::CodeGenerator() : builder(ctx), curFunction(nullptr), isglobal(fa
     func = Function::Create(functype, Function::ExternalLinkage, "exit", module);
     func->setCallingConv(CallingConv::C);
     functions["exit"] = func;
+
+    // struct __va_list_tag
+    StructType *stype = StructType::create(ctx, "struct.__va_list_tag");
+    vector<Type *> elements;
+    elements.push_back(builder.getInt32Ty());
+    elements.push_back(builder.getInt32Ty());
+    elements.push_back(builder.getInt8PtrTy());
+    elements.push_back(builder.getInt8PtrTy());
+    stype->setBody(elements);
+
+    // va_start
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getVoidTy(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "llvm.va_start", module);
+    func->setCallingConv(CallingConv::C);
+    functions["va_start"] = func;
+
+    // va_end
+    args.clear();
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getVoidTy(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "llvm.va_end", module);
+    func->setCallingConv(CallingConv::C);
+    functions["va_end"] = func;
+
+    // va_arg
+    args.clear();
+    args.push_back(ArrayType::get(module->getTypeByName("struct.__va_list_tag"), 1));
+    args.push_back(Type::getInt8PtrTy(ctx));
+    functype = FunctionType::get(Type::getInt64Ty(ctx), args, false);
+    func = Function::Create(functype, Function::ExternalLinkage, "va_arg", module);
+    func->setCallingConv(CallingConv::C);
+    functions["va_arg"] = func;
 }
 
 // destructor

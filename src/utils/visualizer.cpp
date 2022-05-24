@@ -193,7 +193,17 @@ void Visualizer::visitIdentifier(Identifier *i)
     }
 }
 
-void replace(string &src, string sub, string tar);
+static void replace(string &src, string sub, string tar)
+{
+    string::size_type pos = 0;
+    int curpos = 0;
+    while((pos = src.find(sub, curpos)) != string::npos)
+    {
+        src.replace(pos, sub.length(), tar);
+        curpos = pos + tar.length();
+    }
+}
+
 void Visualizer::visitString(String *s)
 {
     if (s)

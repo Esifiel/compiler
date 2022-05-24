@@ -42,38 +42,97 @@ Value *Identifier::codeGen(CodeGenerator &ctx)
     }
 }
 
+static void replace(string &src, string sub, string tar)
+{
+    string::size_type pos = 0;
+    int curpos = 0;
+    while((pos = src.find(sub, curpos)) != string::npos)
+    {
+        src.replace(pos, sub.length(), tar);
+        curpos = pos + tar.length();
+    }
+}
+
 Value *FunctionCall::codeGen(CodeGenerator &ctx)
 {
-    Function *func = ctx.GetFunction(((Identifier *)name)->name);
-
-    // set the params
-    vector<Value *> args;
-    auto arg = func->args().begin();
-    auto p = varlist->begin();
-    for (; p != varlist->end(); p++)
+    if(((Identifier *)name)->name == "va_arg")
     {
-        // type conversion to args type
-        Value *tmp = (*p)->codeGen(ctx);
-        if (arg != func->args().end())
-        {
-            if (tmp->getType()->isArrayTy() && arg->getType()->isPointerTy())
-            {
-                // pass array to pointer arg
-                bool tmpleft = ctx.isleft;
-                ctx.isleft = true;
-                tmp = (*p)->codeGen(ctx);
-                tmp = ctx.builder.CreateGEP(tmp, {ctx.builder.getInt64(0), ctx.builder.getInt64(0)});
-                ctx.isleft = tmpleft;
-            }
-            else
-                tmp = ctx.CreateCast(tmp, arg->getType());
-            arg++;
-        }
-        args.push_back(tmp);
+        Type *type;
+        string type_name = ((String *)(*varlist)[1])->val;
+        replace(type_name, " ", "");
+        if(type_name == "char")
+            type = ctx.builder.getInt8Ty();
+        else if(type_name == "short")
+            type = ctx.builder.getInt16Ty();
+        else if(type_name == "int")
+            type = ctx.builder.getInt32Ty();
+        else if(type_name == "long")
+            type = ctx.builder.getInt64Ty();
+        else if(type_name == "float")
+            type = ctx.builder.getFloatTy();
+        else if(type_name == "double")
+            type = ctx.builder.getDoubleTy();
+        else if(type_name == "char*")
+            type = ctx.builder.getInt8PtrTy();
+        else if(type_name == "short*")
+            type = Type::getInt16PtrTy(ctx.ctx);
+        else if(type_name == "int*")
+            type = Type::getInt32PtrTy(ctx.ctx);
+        else if(type_name == "long*")
+            type = Type::getInt64PtrTy(ctx.ctx);
+        else if(type_name == "float*")
+            type = Type::getFloatTy(ctx.ctx);
+        else if(type_name == "double*")
+            type = Type::getDoublePtrTy(ctx.ctx);
+        else
+            ctx.error("not supported type for va_arg yet");
+        return ctx.builder.CreateVAArg((*varlist)[0]->codeGen(ctx), type);
     }
+    else if(((Identifier *)name)->name == "va_start")
+    {
+        Function *func = ctx.GetFunction(((Identifier *)name)->name);
+        vector<Value *> args;
+        args.push_back(ctx.builder.CreatePointerCast((*varlist)[0]->codeGen(ctx), ctx.builder.getInt8PtrTy()));
+        return ctx.builder.CreateCall(func, args);
+    }
+    else
+    {
+        Function *func = ctx.GetFunction(((Identifier *)name)->name);
 
-    // build a call instruction
-    return ctx.builder.CreateCall(func, args);
+        // set the params
+        vector<Value *> args;
+        auto arg = func->args().begin();
+        auto p = varlist->begin();
+        for (; p != varlist->end(); p++)
+        {
+            // type conversion to args type
+            Value *tmp = (*p)->codeGen(ctx);
+            if (arg != func->args().end())
+            {
+                if (tmp->getType()->isArrayTy() && arg->getType()->isPointerTy())
+                {
+                    // pass array to pointer arg
+                    bool tmpleft = ctx.isleft;
+                    ctx.isleft = true;
+                    tmp = (*p)->codeGen(ctx);
+                    tmp = ctx.builder.CreateGEP(tmp, {ctx.builder.getInt64(0), ctx.builder.getInt64(0)});
+                    ctx.isleft = tmpleft;
+                }
+                else
+                    tmp = ctx.CreateCast(tmp, arg->getType());
+                
+                // // unknown bug fixed
+                // if(func->isVarArg() && arg == func->args().begin() && (arg->getType()->isIntegerTy(32) || arg->getType()->isIntegerTy(64)))
+                //     ctx.CreateBinaryExpr(tmp, ctx.builder.getInt32(8), OP_SUB);
+
+                arg++;
+            }
+            args.push_back(tmp);
+        }
+
+        // build a call instruction
+        return ctx.builder.CreateCall(func, args);
+    }
 }
 
 extern map<string, AggregateType *> aggrdef;

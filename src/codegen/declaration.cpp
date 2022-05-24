@@ -54,15 +54,15 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             else
             {
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(array_t, 0, varname.c_str());
-                // initalize an array
-                Value *var = ctx.CreateCast(ctx.blocks.front()[varname], (*pt)->getRootType()->getType(ctx)->getPointerTo());
-                int idx = 0;
-                for (Expression *p = (*pi)->init; p; p = p->left, idx++)
-                {
-                    Value *initval = p->codeGen(ctx);
-                    if (initval)
-                        ctx.builder.CreateStore(initval, ctx.builder.CreateGEP(var, ctx.builder.getInt32(idx)));
-                }
+                // TODO: initalize an array
+                // Value *var = ctx.CreateCast(ctx.blocks.front()[varname], (*pt)->getRootType()->getType(ctx)->getPointerTo());
+                // int idx = 0;
+                // for (Expression *p = (*pi)->init; p; p = p->left, idx++)
+                // {
+                //     Value *initval = p->codeGen(ctx);
+                //     if (initval)
+                //         ctx.builder.CreateStore(initval, ctx.builder.CreateGEP(var, ctx.builder.getInt32(idx)));
+                // }
             }
         }
         else if ((*pt)->type == TYPE_STRUCT || (*pt)->type == TYPE_UNION)
@@ -70,6 +70,8 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             // struct type
             AggregateType *at = (AggregateType *)*pt;
             StructType *stype = ctx.module->getTypeByName(at->name);
+            if(!stype)
+                ctx.error("struct or union not defined");
 
             if (ctx.isglobal)
             {
@@ -149,11 +151,11 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 
     // create function type
     FunctionType *functype;
+    bool isvarargs = false;
     if (params)
     {
         // collect args
         vector<Type *> args;
-        bool isvarargs = false;
         for (Parameter *p = params; p; p = (Parameter *)(p->next))
         {
             args.push_back((Type *)(p->codeGen(ctx)));
@@ -221,48 +223,51 @@ Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
         StructType *stype = ctx.module->getTypeByName(at->name);
         if (!stype)
             stype = StructType::create(ctx.ctx, at->name);
-        if (!stype->isOpaque())
+        if (!stype->isOpaque() && at->members)
             ctx.error("redefinition of struct or union '" + at->name + "'");
 
-        if (type->type == TYPE_STRUCT)
+        if (stype->isOpaque())
         {
-            ctx.structtypes[at->name] = vector<string>();
-            if (at->members)
+            if (type->type == TYPE_STRUCT)
             {
-                // set members
-                vector<Type *> elements;
-                for (auto &p : *at->members)
+                ctx.structtypes[at->name] = vector<string>();
+                if (at->members)
                 {
-                    for (auto &q : *p->first)
-                        elements.push_back(q->getType(ctx));
-                    // record field name in context
-                    for (auto &q : *p->second)
-                        ctx.structtypes[at->name].push_back(q->name);
-                }
-                stype->setBody(elements);
-            }
-            // if no member, just a forward declaration, set as opaque type (default)
-        }
-        else if (type->type == TYPE_UNION)
-        {
-            ctx.uniontypes[at->name] = map<string, Type *>();
-            if (at->members)
-            {
-                vector<Type *> elements;
-                // regard a union as a non-type memory space
-                elements.push_back(ArrayType::get(ctx.builder.getInt8Ty(), at->getSize()));
-                stype->setBody(elements);
-
-                // set members
-                for (auto &p : *at->members)
-                {
-                    auto m = (*p->first).begin();
-                    auto n = (*p->second).begin();
-                    for (; m != (*p->first).end() && n != (*p->second).end(); m++, n++)
+                    // set members
+                    vector<Type *> elements;
+                    for (auto &p : *at->members)
                     {
-                        if (ctx.uniontypes[at->name].find((*n)->name) != ctx.uniontypes[at->name].end())
-                            ctx.error("redefiniton of member '" + (*n)->name + "'");
-                        ctx.uniontypes[at->name][(*n)->name] = (*m)->getType(ctx);
+                        for (auto &q : *p->first)
+                            elements.push_back(q->getType(ctx));
+                        // record field name in context
+                        for (auto &q : *p->second)
+                            ctx.structtypes[at->name].push_back(q->name);
+                    }
+                    stype->setBody(elements);
+                }
+                // if no member, just a forward declaration, set as opaque type (default)
+            }
+            else if (type->type == TYPE_UNION)
+            {
+                ctx.uniontypes[at->name] = map<string, Type *>();
+                if (at->members)
+                {
+                    vector<Type *> elements;
+                    // regard a union as a non-type memory space
+                    elements.push_back(ArrayType::get(ctx.builder.getInt8Ty(), at->getSize()));
+                    stype->setBody(elements);
+
+                    // set members
+                    for (auto &p : *at->members)
+                    {
+                        auto m = (*p->first).begin();
+                        auto n = (*p->second).begin();
+                        for (; m != (*p->first).end() && n != (*p->second).end(); m++, n++)
+                        {
+                            if (ctx.uniontypes[at->name].find((*n)->name) != ctx.uniontypes[at->name].end())
+                                ctx.error("redefiniton of member '" + (*n)->name + "'");
+                            ctx.uniontypes[at->name][(*n)->name] = (*m)->getType(ctx);
+                        }
                     }
                 }
             }

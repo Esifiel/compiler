@@ -286,6 +286,16 @@ type-spec                   : CHAR      { $$ = new CharType();      }
                             | TYPENAME  {
                                 if(typealias.find(*$1) != typealias.end())
                                     $$ = typealias[*$1];
+                                else if(*$1 == "va_list")
+                                {
+                                    aggrdef["struct.__va_list_tag"] = new MyStructType();
+                                    aggrdef["struct.__va_list_tag"]->name = "struct.__va_list_tag";
+                                    typealias["struct.__va_list_tag"] = aggrdef["struct.__va_list_tag"];
+                                    
+                                    $$ = new MyStructType();
+                                    ((MyStructType *)$$)->name = "struct.__va_list_tag";
+                                    $$ = new MyArrayType($$, 1);
+                                }
                                 else
                                     yyerror("type name '" + *$1 + "' not found");
                                 delete $1;

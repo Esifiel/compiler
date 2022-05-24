@@ -20,7 +20,7 @@ static inline void debug() {
 }
 
 // replace escape char
-void replace(string &src, string sub, string tar)
+static void replace(string &src, string sub, string tar)
 {
     string::size_type pos = 0;
     int curpos = 0;
@@ -183,7 +183,7 @@ void replace(string &src, string sub, string tar)
                                     {
                                         debug();
                                         yylval.stringValue = new string(yytext);
-                                        if(typealias.find(*yylval.stringValue) != typealias.end())
+                                        if(*yylval.stringValue == "va_list" || typealias.find(*yylval.stringValue) != typealias.end())
                                             return TYPENAME;
                                         else
                                             return IDENTIFIER;
