@@ -15,7 +15,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             ctx.error("redefinition of variable '" + varname + "'");
 
         // if type is a undefined struct type, declare a opaque type first
-        if ((*pt)->getRootType()->type == TYPE_STRUCT && !ctx.module->getTypeByName(((AggregateType *)(*pt)->getRootType())->name))
+        if (((*pt)->getRootType()->type == TYPE_STRUCT || (*pt)->getRootType()->type == TYPE_UNION) && ((AggregateType *)*pt)->members)
         {
             TypeDeclaration td = TypeDeclaration((*pt)->getRootType());
             td.codeGen(ctx);
@@ -32,40 +32,62 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     *ctx.module,
                     array_t,
                     (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
-                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage
+                                                                                                                           : GlobalValue::PrivateLinkage,
                     0,
                     varname);
+
+                // not supported multi-dimension array initialization
+
                 vector<Constant *> elements;
                 for (Expression *q = (*pi)->init; q; q = q->left)
                     elements.push_back(ctx.Num2Constant((Number *)q));
+                // remaining initialize to 0
+                Value *zero = ctx.CreateCast(ctx.builder.getInt32(0), (*pt)->getType(ctx));
+                while (elements.size() < ((MyArrayType *)(*pt))->size)
+                    elements.push_back((Constant *)zero);
+
                 Constant *constarr = ConstantArray::get(array_t, elements);
                 v->setInitializer(constarr);
-                // ctx.globals[varname] = v;
+                ctx.blocks.back()[varname] = v;
             }
             else
-                // TODO: local variable initialize not supported yet
+            {
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(array_t, 0, varname.c_str());
+                // initalize an array
+                Value *var = ctx.CreateCast(ctx.blocks.front()[varname], (*pt)->getRootType()->getType(ctx)->getPointerTo());
+                int idx = 0;
+                for (Expression *p = (*pi)->init; p; p = p->left, idx++)
+                {
+                    Value *initval = p->codeGen(ctx);
+                    if (initval)
+                        ctx.builder.CreateStore(initval, ctx.builder.CreateGEP(var, ctx.builder.getInt32(idx)));
+                }
+            }
         }
-        else if ((*pt)->type == TYPE_STRUCT)
+        else if ((*pt)->type == TYPE_STRUCT || (*pt)->type == TYPE_UNION)
         {
             // struct type
-            MyStructType *mst = (MyStructType *)*pt;
-            StructType *stype = ctx.module->getTypeByName(mst->name);
+            AggregateType *at = (AggregateType *)*pt;
+            StructType *stype = ctx.module->getTypeByName(at->name);
+
             if (ctx.isglobal)
             {
                 GlobalVariable *v = new GlobalVariable(
                     *ctx.module,
                     stype,
                     (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
-                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage
+                                                                                                                           : GlobalValue::PrivateLinkage,
                     0,
                     varname);
-                vector<Constant *> elements;
-                for (Expression *q = (*pi)->init; q; q = q->left)
-                    elements.push_back(ctx.Num2Constant((Number *)q));
-                Constant *constarr = ConstantStruct::get(stype, elements);
+                // vector<Constant *> elements;
+                // for (Expression *q = (*pi)->init; q; q = q->left)
+                //     elements.push_back(ctx.Num2Constant((Number *)q));
+                // Constant *constarr = ConstantStruct::get(stype, elements);
+                Constant *constarr = ConstantStruct::get(stype);
                 v->setInitializer(constarr);
-                // ctx.globals[varname] = v;
+                ctx.blocks.back()[varname] = v;
             }
             else
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(stype, 0, varname.c_str());
@@ -81,7 +103,8 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     *ctx.module,
                     t,
                     (*pt)->qual && (*pt)->qual->isconst ? true : false,
-                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage
+                                                                                                                           : GlobalValue::PrivateLinkage,
                     0,
                     varname);
                 if ((*pi)->init)
@@ -90,7 +113,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 else
                     // else initialize to 0
                     v->setInitializer(ConstantInt::get(t, 0));
-                // ctx.globals[varname] = v;
+                ctx.blocks.back()[varname] = v;
             }
             else
             {
@@ -102,7 +125,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
         }
 
         // collect struct type variable
-        if ((*pt)->getRootType()->type == TYPE_STRUCT)
+        if ((*pt)->getRootType()->type == TYPE_STRUCT || (*pt)->getRootType()->type == TYPE_UNION)
             ctx.structvars[varname] = (AggregateType *)((*pt)->getRootType());
     }
 
@@ -174,7 +197,7 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     stmts->codeGen(ctx);
 
     // default return statement
-    if (stmts->stmt->tail && stmts->stmt->tail->getName() != "\"ReturnStatement\"")
+    if (stmts->stmt && stmts->stmt->tail && stmts->stmt->tail->getName() != "\"ReturnStatement\"")
     {
         if (rettype->type == TYPE_VOID)
             ctx.builder.CreateRetVoid();
@@ -191,30 +214,59 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
 
 Value *TypeDeclaration::codeGen(CodeGenerator &ctx)
 {
-    if (type && type->type == TYPE_STRUCT)
+    if (type && (type->type == TYPE_STRUCT || type->type == TYPE_UNION))
     {
-        MyStructType *mst = (MyStructType *)type;
+        AggregateType *at = (AggregateType *)type;
         // create struct type for assigned name or implement the member declaration
-        StructType *stype = ctx.module->getTypeByName(mst->name);
+        StructType *stype = ctx.module->getTypeByName(at->name);
         if (!stype)
-            stype = StructType::create(ctx.ctx, mst->name);
+            stype = StructType::create(ctx.ctx, at->name);
+        if (!stype->isOpaque())
+            ctx.error("redefinition of struct or union '" + at->name + "'");
 
-        ctx.structtypes[mst->name] = vector<string>();
-        if (mst->members)
+        if (type->type == TYPE_STRUCT)
         {
-            // set members
-            vector<Type *> elements;
-            for (auto &p : *mst->members)
+            ctx.structtypes[at->name] = vector<string>();
+            if (at->members)
             {
-                for (auto &q : *p->first)
-                    elements.push_back(q->getType(ctx));
-                // record field name in context
-                for (auto &q : *p->second)
-                    ctx.structtypes[mst->name].push_back(q->name);
+                // set members
+                vector<Type *> elements;
+                for (auto &p : *at->members)
+                {
+                    for (auto &q : *p->first)
+                        elements.push_back(q->getType(ctx));
+                    // record field name in context
+                    for (auto &q : *p->second)
+                        ctx.structtypes[at->name].push_back(q->name);
+                }
+                stype->setBody(elements);
             }
-            stype->setBody(elements);
+            // if no member, just a forward declaration, set as opaque type (default)
         }
-        // if no member, just a forward declaration, set as opaque type (default)
+        else if (type->type == TYPE_UNION)
+        {
+            ctx.uniontypes[at->name] = map<string, Type *>();
+            if (at->members)
+            {
+                vector<Type *> elements;
+                // regard a union as a non-type memory space
+                elements.push_back(ArrayType::get(ctx.builder.getInt8Ty(), at->getSize()));
+                stype->setBody(elements);
+
+                // set members
+                for (auto &p : *at->members)
+                {
+                    auto m = (*p->first).begin();
+                    auto n = (*p->second).begin();
+                    for (; m != (*p->first).end() && n != (*p->second).end(); m++, n++)
+                    {
+                        if (ctx.uniontypes[at->name].find((*n)->name) != ctx.uniontypes[at->name].end())
+                            ctx.error("redefiniton of member '" + (*n)->name + "'");
+                        ctx.uniontypes[at->name][(*n)->name] = (*m)->getType(ctx);
+                    }
+                }
+            }
+        }
     }
 
     return nullptr;

@@ -28,7 +28,7 @@ static void err(string s)
     cerr << "\033[1;31m"
          << "error: "
          << "\033[0m" << s << endl;
-    exit(1);
+    exit(-1);
 }
 
 int main(int argc, char *argv[], char **envp)

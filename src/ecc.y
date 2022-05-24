@@ -16,6 +16,7 @@ map<string, TypeSpecifier *> typealias;
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <unistd.h>
 #include "ast/basic.hpp"
 #include "ast/expression.hpp"
 #include "ast/statement.hpp"
@@ -36,6 +37,7 @@ static void debug(string s);
 static Expression *calculate(Expression *a, enum op_type op);
 static Expression *calculate(Expression *a, Expression *b, enum op_type op);
 static Expression *calculate(Expression *a, Expression *b, Expression *c, enum op_type op);
+static string randstr();
 }
 
 %union {
@@ -266,7 +268,7 @@ init-declarator             : declarator { $$ = (Identifier *)$1; }
 storage-class-specifier     : EXTERN    { $$ = new TypeSpecifier(LINKAGE_EXTERNAL); }
                             | STATIC    { $$ = new TypeSpecifier(LINKAGE_INTERNAL); }
                             | AUTO      { $$ = new TypeSpecifier(LINKAGE_NONE); }
-                            | REGISTER  // TODO: register
+                            | REGISTER  { yyerror("register keywork not supported yet"); } // TODO: register
                             /* | TYPEDEF */
                             ;
 
@@ -312,7 +314,7 @@ struct-or-union-spec        : struct-or-union IDENTIFIER LC struct-decl-list RC 
                                 }
                                 delete $2;
                             }
-                            | struct-or-union LC struct-decl-list RC { $$ = $1; $$->members = $3; } // annoymous struct
+                            | struct-or-union LC struct-decl-list RC { $$ = $1; $$->name = randstr(); $$->members = $3; } // annoymous struct
                             | struct-or-union IDENTIFIER { $$ = $1; $$->name = *$2; delete $2; }
                             ;
 
@@ -688,7 +690,10 @@ unary-exp		            : postfix-exp { $$ = $1; }
                                 $$ = new Expression($2, OP_DEC_FRONT);
                             }
                             | unary-operator cast-exp { $$ = calculate($2, $1); }
-                            | SIZEOF unary-exp // TODO: size of a expr { yylval.num.longValue = $2->type->getSize(); $$ = new Number(yylval.num, new LongType(), VAL_LONG); }
+                            | SIZEOF unary-exp {
+                                // TODO: size of a expr { yylval.num.longValue = $2->type->getSize(); $$ = new Number(yylval.num, new LongType(), VAL_LONG); }
+                                yyerror("sizeof an expression is not supported yet");
+                            }
                             | SIZEOF LP type-name RP {
                                 if($3->isAggregateType())
                                     yylval.num.longValue = aggrdef[((AggregateType *)$3)->name]->getSize();
@@ -1029,4 +1034,19 @@ static Expression *calculate(Expression *a, Expression *b, Expression *c, enum o
     }
     
     return new Expression(a, b, c, op);
+}
+
+static string randstr()
+{
+    static FILE *fp = fopen("/dev/urandom", "rb");
+    static string table = "0123456789abcdef";
+    uint8_t buf[16] = {0};
+    fread(buf, 1, 16, fp);
+    string res = "";
+    for(int i = 0; i < 16; i++)
+    {
+        res += table[buf[i] >> 4];
+        res += table[buf[i] & 0xf];
+    }
+    return res;
 }

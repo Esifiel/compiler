@@ -190,9 +190,12 @@ void replace(string &src, string sub, string tar)
                                     }
                                 }
 \'.\'                           {
-                                    // normal single char
-                                    debug();
-                                    yylval.num.charValue = yytext[1];
+                                    if(inyyparse)
+                                    {
+                                        // normal single char
+                                        debug();
+                                        yylval.num.charValue = yytext[1];
+                                    }
                                     return NUMCHAR;
                                 }
 \'\\[abfnrtv\'\"\\]\'           {

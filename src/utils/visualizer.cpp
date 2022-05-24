@@ -149,7 +149,7 @@ void Visualizer::visitType(TypeSpecifier *t)
             out << ((MyArrayType *)t)->size << sep;
         if (t->type == TYPE_ARRAY || t->type == TYPE_POINTER)
             visitType(((IterableType *)t)->basictype);
-        if (t->type == TYPE_STRUCT)
+        if (t->type == TYPE_STRUCT || t->type == TYPE_UNION)
             visitAggregateType((AggregateType *)t);
         out << subend << tail;
     }
@@ -262,6 +262,10 @@ void Visualizer::visitStatement(Statement *s)
             visitSwitchCaseStatement((SwitchCaseStatement *)s);
         else if (s->getName() == "\"CaseStatement\"")
             visitCaseStatement((CaseStatement *)s);
+        else if (s->getName() == "\"LabelStatement\"")
+            visitLabelStatement((LabelStatement *)s);
+        else if (s->getName() == "\"GotoStatement\"")
+            visitGotoStatement((GotoStatement *)s);
     }
 }
 

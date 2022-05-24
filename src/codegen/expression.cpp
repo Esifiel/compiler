@@ -27,7 +27,7 @@ Value *Identifier::codeGen(CodeGenerator &ctx)
 {
     Value *var = ctx.GetVar(name);
     if (!var)
-        ctx.error(string("variable '") + name + string("' not found"));
+        ctx.error("variable '" + name + "' not found");
 
     if (ctx.isleft)
         // return as left value
@@ -87,6 +87,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     Type *t;
     vector<string> members;
     Expression *expr;
+    AggregateType *stype;
 
     switch (op)
     {
@@ -262,7 +263,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
                 idxlist[1] = right->codeGen(ctx);
                 idxlist[0] = ConstantInt::get(idxlist[1]->getType(), 0);
                 var = ctx.builder.CreateGEP(var, ArrayRef<Value *>(idxlist, 2));
-                if(var->getType()->getPointerElementType()->isArrayTy())
+                if (var->getType()->getPointerElementType()->isArrayTy())
                     // **all array will be returned as pointer**
                     return ctx.builder.CreateGEP(var, {ctx.builder.getInt64(0), ctx.builder.getInt64(0)});
                 else
@@ -273,9 +274,9 @@ Value *Expression::codeGen(CodeGenerator &ctx)
             ctx.error("variable '" + ((Identifier *)left)->name + "' is not subscriptable");
     case OP_DEREFERENCE:
         var = left->codeGen(ctx);
-        if(var->getType()->isPointerTy())
+        if (var->getType()->isPointerTy())
             return ctx.builder.CreateLoad(var);
-        else if(var->getType()->isArrayTy())
+        else if (var->getType()->isArrayTy())
             return ctx.builder.CreateExtractValue(var, 0);
         else
             ctx.error("'" + ((Identifier *)left)->name + "' is not iterable");
@@ -296,15 +297,30 @@ Value *Expression::codeGen(CodeGenerator &ctx)
         while (expr->getName() != "\"Identifier\"")
             expr = expr->left;
 
-        // find member offset and get pointer
-        members = ctx.structtypes[ctx.structvars[((Identifier *)expr)->name]->name];
+        stype = ctx.structvars[((Identifier *)expr)->name];
         if (op == OP_TO)
             // the difference between . and -> on codegen level is only a load inst
             var = ctx.builder.CreateLoad(var);
-        var = ctx.builder.CreateGEP(
-            var,
-            {ctx.builder.getInt32(0),
-             ctx.builder.getInt32(find(members.begin(), members.end(), ((Identifier *)right)->name) - members.begin())});
+
+        if (stype->type == TYPE_STRUCT)
+        {
+            // find member offset and get pointer
+            members = ctx.structtypes[stype->name];
+            var = ctx.builder.CreateGEP(
+                var,
+                {ctx.builder.getInt32(0),
+                 ctx.builder.getInt32(find(members.begin(), members.end(), ((Identifier *)right)->name) - members.begin())});
+        }
+        else if (stype->type == TYPE_UNION)
+        {
+            // get pointer of the memory space
+            var = ctx.builder.CreateGEP(var, {ctx.builder.getInt32(0), ctx.builder.getInt32(0)});
+            // cast to the member's pointer
+            var = ctx.builder.CreatePointerCast(var, ctx.uniontypes[stype->name][((Identifier *)right)->name]->getPointerTo());
+        }
+        else
+            ctx.error("'" + ((Identifier *)expr)->name + "' is not a struct or union type");
+
         if (ctx.isleft)
             return var;
         else if (var->getType()->getPointerElementType()->isArrayTy())
@@ -314,7 +330,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_IFELSE:
         var = addition->codeGen(ctx);
         // select inst of LLVM IR
-        if(var->getType()->isPointerTy() || var->getType()->getIntegerBitWidth() != 1)
+        if (var->getType()->isPointerTy() || var->getType()->getIntegerBitWidth() != 1)
             // logical operator is omitted
             var = ctx.CreateBinaryExpr(
                 var,

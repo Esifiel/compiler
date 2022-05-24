@@ -51,13 +51,14 @@ public:
     Function *curFunction;                          // current defined function
     map<string, Function *> functions;              // functions' def
     list<map<string, Value *>> blocks;              // local environments
-    // map<string, Value *> globals;                   // global variable
     list<pair<BasicBlock *, BasicBlock *>> jumpctx; // for jump statement
     bool isglobal;                                  // global definition
     bool isleft;                                    // left value
     map<string, vector<string>> structtypes;        // record members' name
     map<string, AggregateType *> structvars;        // record struct types' def
+    map<string, map<string, Type *>> uniontypes;    // record union type def
     map<string, BasicBlock *> labels;               // record labels' def
+    vector<pair<BasicBlock *, string>> dummy;       // record backward goto
 
     CodeGenerator();
     ~CodeGenerator();

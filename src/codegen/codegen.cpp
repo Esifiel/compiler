@@ -206,8 +206,7 @@ Value *CodeGenerator::GetVar(string name)
         for (auto &p : blocks)
             if (p.find(name) != p.end())
                 return p[name];
-    // if not local, find in global
-    return module->getGlobalVariable(name);
+    return nullptr;
 }
 
 Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)

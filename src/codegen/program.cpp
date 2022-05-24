@@ -22,5 +22,15 @@ Value *Program::codeGen(CodeGenerator &ctx)
             p->codeGen(ctx);
     }
 
+    // backpatching
+    for (auto &gotolabel : ctx.dummy)
+    {
+        if(ctx.labels.find(gotolabel.second) == ctx.labels.end())
+            ctx.error(string("label '") + gotolabel.second + string("' is not defined"));
+
+        ctx.builder.SetInsertPoint(gotolabel.first);
+        ctx.builder.CreateBr(ctx.labels[gotolabel.second]);
+    }
+
     return nullptr;
 }
