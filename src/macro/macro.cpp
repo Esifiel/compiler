@@ -2,10 +2,15 @@
 #include <iostream>
 #include <stdlib.h>
 #include <ctype.h>
+#include <limits.h>
 #include <vector>
 #include <fstream>
+#include <algorithm>
+#include <map>
 
 using namespace std;
+
+#define MAXLEN 4096
 
 static void err(string s)
 {
@@ -50,8 +55,8 @@ static bool startswith(const string &s, const string &head)
         return false;
 }
 
-// tuple (name, args, definition)
-vector<tuple<string, vector<string>, string>> macrodef;
+// map { name: (args, definition) }
+map<string, pair<vector<string>, string>> macrodef;
 
 void macro_expansion(string src)
 {
@@ -62,11 +67,8 @@ void macro_expansion(string src)
     if (!ofs.is_open())
         err("open output tmp file failed");
 
-    string buf, tmp, path = src;
-    if (path.find('/') != string::npos)
-        path = path.substr(0, path.find_last_of('/') + 1);
-    else
-        path = "./";
+    string buf, tmp;
+    bool ifdefined = true;
     while (getline(ifs, buf))
     {
         // continue reading if '\' in the end of line
@@ -81,6 +83,7 @@ void macro_expansion(string src)
         // skip blank
         while (q < buf.length() && isspace(buf[q]))
             p = ++q;
+
         // if macro start symbol
         if (buf[p] == '#')
         {
@@ -89,6 +92,22 @@ void macro_expansion(string src)
                 q++;
             // parse macro instruction
             tmp = buf.substr(p, q - p);
+
+            if (tmp == "#endif")
+            {
+                ifdefined = true;
+                continue;
+            }
+            else if (tmp == "#else")
+            {
+                ifdefined = !ifdefined;
+                continue;
+            }
+
+            // if #ifdef is false, ignore the line
+            if (!ifdefined)
+                continue;
+
             if (tmp == "#include")
             {
                 // skip blank
@@ -103,8 +122,9 @@ void macro_expansion(string src)
                 else if (buf[q] == '"' && buf[buf.length() - 1] == '"')
                 {
                     // recursively expansion
-                    cout << path + buf.substr(q + 1, buf.length() - 2 - q) << endl;
-                    macro_expansion(path + buf.substr(q + 1, buf.length() - 1 - (q + 1)));
+                    char path[MAXLEN] = {0};
+                    realpath(src.c_str(), path);
+                    macro_expansion(string(path).substr(0, string(path).find_last_of("/") + 1) + buf.substr(q + 1, buf.length() - 1 - (q + 1)));
                 }
                 else
                     err("missing <> or \"\" around filename: " + buf.substr(q, buf.length() - 1 - q));
@@ -115,7 +135,7 @@ void macro_expansion(string src)
                 while (q < buf.length() && isspace(buf[q]))
                     p = ++q;
 
-                if(buf[q] != '_' && !isalpha(buf[q]))
+                if (buf[q] != '_' && !isalpha(buf[q]))
                     err("macro names must be identifiers: " + buf);
 
                 bool hasparameter = false;
@@ -132,7 +152,11 @@ void macro_expansion(string src)
                 }
 
                 if (q >= buf.length())
-                    err("not enough definition: " + buf.substr(p, buf.length() - 1 - p));
+                {
+                    // no definition macro
+                    macrodef[buf.substr(p, buf.length() - p)] = pair<vector<string>, string>();
+                    continue;
+                }
 
                 if (!hasparameter)
                 {
@@ -143,39 +167,45 @@ void macro_expansion(string src)
                         q++;
                     string definition = buf.substr(q, buf.length() - q);
 
-                    macrodef.push_back(
-                        tuple<string, vector<string>, string>(
-                            name,
-                            vector<string>(),
-                            definition));
+                    // cover directly (in gcc's behavior)
+                    macrodef[name] = pair<vector<string>, string>(vector<string>(), definition);
                     // replacement will be done in yylex()
-                    
-                    // check
-                    for(auto &p : macrodef)
-                        cout << "macro: " << get<0>(p) << " " << get<2>(p) << endl;
                 }
                 else
                 {
                     // macro with parameter
                 }
             }
-            else if (tmp == "#ifdef")
+            else if (tmp == "#ifdef" || tmp == "#ifndef")
             {
-            }
-            else if (tmp == "#ifndef")
-            {
-            }
-            else if (tmp == "#else")
-            {
-            }
-            else if (tmp == "#endif")
-            {
+                // skip blank
+                while (q < buf.length() && isspace(buf[q]))
+                    p = ++q;
+
+                if (buf[q] != '_' && !isalpha(buf[q]))
+                    err("macro names must be identifiers: " + buf);
+
+                while (q < buf.length() && (buf[q] == '_' || isalpha(buf[q]) || isdigit(buf[q])))
+                    q++;
+
+                string name = buf.substr(p, q - p);
+                if ((tmp == "#ifdef") ^ (macrodef.find(name) != macrodef.end()))
+                    ifdefined = false;
             }
             else if (tmp == "#pragma")
             {
             }
+            else if (tmp == "#")
+            {
+            }
+            else if (tmp == "##")
+            {
+            }
         }
         else
-            ofs << buf << endl;
+        {
+            if (ifdefined)
+                ofs << buf << endl;
+        }
     }
 }

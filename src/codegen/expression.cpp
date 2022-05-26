@@ -120,11 +120,6 @@ Value *FunctionCall::codeGen(CodeGenerator &ctx)
                 }
                 else
                     tmp = ctx.CreateCast(tmp, arg->getType());
-                
-                // // unknown bug fixed
-                // if(func->isVarArg() && arg == func->args().begin() && (arg->getType()->isIntegerTy(32) || arg->getType()->isIntegerTy(64)))
-                //     ctx.CreateBinaryExpr(tmp, ctx.builder.getInt32(8), OP_SUB);
-
                 arg++;
             }
             args.push_back(tmp);

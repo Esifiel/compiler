@@ -1,10 +1,12 @@
 %{
 #include "ast/program.hpp"
+#include <stdint.h>
 #include <map>
 Program *program;
 map<string, Number *> constvar;
 map<string, AggregateType *> aggrdef;
 map<string, TypeSpecifier *> typealias;
+map<string, uint64_t> enumvalue;
 %}
 
 %expect 1 // shift-reduce conflict: optional else-part for if-else statement
@@ -15,7 +17,6 @@ map<string, TypeSpecifier *> typealias;
 #include <iostream>
 #include <string>
 #include <vector>
-#include <stdint.h>
 #include <unistd.h>
 #include "ast/basic.hpp"
 #include "ast/expression.hpp"

@@ -9,7 +9,7 @@
 #include "parser.hpp"
 
 extern bool inyyparse;
-extern vector<tuple<string, vector<string>, string>> macrodef;
+extern map<string, pair<vector<string>, string>> macrodef;
 extern map<string, TypeSpecifier *> typealias;
 
 // print out token scanned
@@ -171,10 +171,10 @@ static void replace(string &src, string sub, string tar)
                                     if(!inyyparse)
                                     {
                                         for(auto &p : macrodef)
-                                            if(get<0>(p) == string(yytext))
+                                            if(p.first == string(yytext))
                                             {
-                                                yytext = (char *)malloc(get<2>(p).length() + 1);
-                                                strcpy(yytext, get<2>(p).c_str());
+                                                yytext = (char *)malloc(p.second.second.length() + 1);
+                                                strcpy(yytext, p.second.second.c_str());
                                                 break;
                                             }
                                         return IDENTIFIER;
