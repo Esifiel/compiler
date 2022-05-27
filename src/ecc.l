@@ -2,15 +2,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <unistd.h>
 #include <string>
 #include <vector>
 #include <map>
+#include <fstream>
 #include "ast/type.hpp"
 #include "parser.hpp"
 
 extern bool inyyparse;
 extern map<string, pair<vector<string>, string>> macrodef;
 extern map<string, TypeSpecifier *> typealias;
+extern ofstream ofs;
+extern bool isedited;
+static bool norecursive = false;
+
+extern void yyerror(string s);
 
 // print out token scanned
 uint64_t cnt = 0;
@@ -29,6 +36,21 @@ static void replace(string &src, string sub, string tar)
         src.replace(pos, sub.length(), tar);
         curpos = pos + tar.length();
     }
+}
+
+static string randstr()
+{
+    static FILE *fp = fopen("/dev/urandom", "rb");
+    static string table = "0123456789abcdef";
+    uint8_t buf[16] = {0};
+    fread(buf, 1, 16, fp);
+    string res = "";
+    for(int i = 0; i < 16; i++)
+    {
+        res += table[buf[i] >> 4];
+        res += table[buf[i] & 0xf];
+    }
+    return res;
 }
 %}
 
@@ -168,26 +190,66 @@ static void replace(string &src, string sub, string tar)
                                     return NUMDOUBLE;
                                 }
 [A-Za-z_][A-Za-z0-9_]*          {
-                                    if(!inyyparse)
-                                    {
-                                        for(auto &p : macrodef)
-                                            if(p.first == string(yytext))
-                                            {
-                                                yytext = (char *)malloc(p.second.second.length() + 1);
-                                                strcpy(yytext, p.second.second.c_str());
-                                                break;
-                                            }
-                                        return IDENTIFIER;
-                                    }
-                                    else
+                                    if(inyyparse)
                                     {
                                         debug();
                                         yylval.stringValue = new string(yytext);
                                         if(*yylval.stringValue == "va_list" || typealias.find(*yylval.stringValue) != typealias.end())
                                             return TYPENAME;
-                                        else
-                                            return IDENTIFIER;
                                     }
+                                    else
+                                    {
+                                        if(macrodef.find(yytext) != macrodef.end() && !norecursive)
+                                        {
+                                            norecursive = true;
+                                            isedited = true;
+
+                                            if(macrodef[yytext].first.size() == 0)
+                                            {
+                                                string def = macrodef[yytext].second;
+                                                yytext = (char *)malloc(def.length() + 1);
+                                                strcpy(yytext, def.c_str());
+                                            }
+                                            else
+                                            {
+                                                string curmacro = yytext;
+                                                if(!(yylex() && !strcmp(yytext, "(")))
+                                                    yyerror("expected '('");
+
+                                                if(yylex() && strcmp(yytext, ")"))
+                                                {
+                                                    int cnt = 1;
+                                                    for(int argindex = 0; ; argindex++)
+                                                    {
+                                                        ofs << endl << "#define " + macrodef[curmacro].first[argindex] + " ";
+                                                        while(1)
+                                                        {
+                                                            if(yytext[0] == '(')
+                                                                cnt++;
+                                                            if(yytext[0] == ')')
+                                                                cnt--;
+                                                            if(!strcmp(yytext, ",") && (cnt == 1))
+                                                                break;
+                                                            if(!strcmp(yytext, ")") && (cnt == 0))
+                                                                break;
+                                                            ofs << yytext;
+                                                            yylex();
+                                                        }
+                                                        if(!strcmp(yytext, ")"))
+                                                            break;
+                                                        yylex();
+                                                    }
+                                                }
+                                                ofs << endl << macrodef[curmacro].second << endl;
+                                                // for(auto &p : macrodef[curmacro].first)
+                                                //     ofs << "#undef " + p << endl;
+                                                yylex();
+                                            }
+
+                                            norecursive = false;
+                                        }
+                                    }
+                                    return IDENTIFIER;
                                 }
 \'.\'                           {
                                     if(inyyparse)
@@ -262,7 +324,7 @@ static void replace(string &src, string sub, string tar)
                                     }
                                     return NUMCHAR;
                                 }
-(\"([^"]|\\\")*\")+             {
+\"((\\.)|[^"\\])*\"             {
                                     if(inyyparse)
                                     {
                                         // string const
@@ -285,6 +347,18 @@ static void replace(string &src, string sub, string tar)
                                     }
                                     return STRING;
                                 }
+
+"#include"                      { if(!inyyparse) return 1; }
+"<".*">"                        { if(!inyyparse) return 1; }
+"#define"                       { if(!inyyparse) return 1; }
+"#ifdef"                        { if(!inyyparse) return 1; }
+"#ifndef"                       { if(!inyyparse) return 1; }
+"#else"                         { if(!inyyparse) return 1; }
+"#endif"                        { if(!inyyparse) return 1; }
+"#undef"                        { if(!inyyparse) return 1; }
+"#pragma"                       { if(!inyyparse) return 1; }
+"##"                            { if(!inyyparse) return 1; }
+"#"                             { if(!inyyparse) return 1; }               
 
 [ \t\n]                         { if(!inyyparse) return 1; }
 "//".*                          { if(!inyyparse) return 1; }

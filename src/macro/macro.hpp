@@ -6,9 +6,10 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
-void macro_expansion(string src);
+void macro_expansion(string src, ofstream &ofs);
 
 #endif

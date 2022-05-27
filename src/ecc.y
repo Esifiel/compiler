@@ -72,6 +72,7 @@ static string randstr();
     vector<Identifier *> *ids;
     vector<Expression *> *exprs;
     Number *number;
+    String *str;
 }
 
 %token  CHAR SHORT INT LONG FLOAT DOUBLE STRUCT ENUM UNION VOID
@@ -114,6 +115,7 @@ static string randstr();
 %type<identifier> init-declarator struct-declarator
 %type<ids> id-list init-declarator-list struct-declarator-list
 %type<number> number const const-exp
+%type<str> string-list
 
 %type<node> direct-declarator declarator abstract-declarator
 
@@ -763,7 +765,8 @@ postfix-exp		            : primary-exp { $$ = $1; }
 primary-exp		            : IDENTIFIER    { $$ = new Identifier(*$1); delete $1; }
                             /* | CONSTANT */
                             | const         { $$ = $1; }
-                            | STRING        { $$ = new String(*$1); delete $1; }
+                            /* | STRING        { $$ = new String(*$1); delete $1; } */
+                            | string-list   { $$ = $1; }
                             | LP exp RP     { $$ = $2; }
                             ;
 
@@ -780,6 +783,14 @@ number                      : NUMCHAR   { $$ = new Number($1, new CharType(),   
                             | NUMLONG   { $$ = new Number($1, new LongType(),   VAL_LONG); }
                             | NUMFLOAT  { $$ = new Number($1, new FloatType(),  VAL_FLOAT); }
                             | NUMDOUBLE { $$ = new Number($1, new DoubleType(), VAL_DOUBLE); }
+                            ;
+
+string-list                 : STRING             { $$ = new String(*$1); delete $1; }
+                            | string-list STRING {
+                                $$ = $1;
+                                $$->val = $$->val + *$2;
+                                delete $2;
+                            }
                             ;
 
 %%

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <deque>
+#include <map>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -20,8 +21,11 @@ extern int yydebug;
 extern char *yytext;
 extern FILE *yyin;
 extern Program *program;
+extern map<string, pair<vector<string>, string>> macrodef;
 
 bool inyyparse;
+bool isedited;
+ofstream ofs;
 
 static void err(string s)
 {
@@ -65,18 +69,38 @@ int main(int argc, char *argv[], char **envp)
     if (src == "")
         err("no input file");
 
-    // macro expansion to "./tmp.i"
-    macro_expansion(src);
-    // redirect yyin and call yylex to do replacement for macro
-    yyin = fopen("./tmp.i", "r");
-    if (!yyin)
-        err("open source file error");
+    // macro expansion
     inyyparse = false;
-    ofstream ofs(filenameE, ios::out);
-    while (yylex())
-        ofs << yytext;
-    ofs.close();
+    string tmp = src;
+    while (1)
+    {
+        isedited = false;
+
+        ofstream macro_out("./tmp.i", ios::out);
+        if (!macro_out.is_open())
+            err("open output tmp file failed");
+        
+        macro_expansion(tmp, macro_out);
+        macro_out.close();
+        // redirect yyin and call yylex to do replacement for macro
+        yyin = fopen("./tmp.i", "r");
+        if (!yyin)
+            err("open source file error");
+        ofs = ofstream("./tmp2.i", ios::out);
+        while (yylex())
+            ofs << yytext;
+        ofs.close();
+
+        if (!isedited)
+            break;
+
+        // next round
+        tmp = "./src.i";
+        rename("./tmp2.i", "./src.i");
+    }
+    rename("./tmp2.i", filenameE.c_str());
     remove("./tmp.i");
+    remove("./src.i");
 
     // parse the source code
     // yydebug = 1;
