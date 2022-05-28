@@ -25,6 +25,8 @@ extern Program *program;
 
 bool inyyparse;
 bool isedited;
+bool normalpass;
+bool argspass;
 ofstream ofs;
 
 static void err(string s)
@@ -72,35 +74,29 @@ int main(int argc, char *argv[], char **envp)
     // macro expansion
     inyyparse = false;
     string tmp = src;
+    normalpass = true;
+    argspass = false;
     while (1)
     {
         isedited = false;
-
-        ofstream macro_out("./tmp.i", ios::out);
-        if (!macro_out.is_open())
-            err("open output tmp file failed");
-        
-        macro_expansion(tmp, macro_out);
-        macro_out.close();
-        // redirect yyin and call yylex to do replacement for macro
-        yyin = fopen("./tmp.i", "r");
-        if (!yyin)
-            err("open source file error");
-        ofs = ofstream("./tmp2.i", ios::out);
-        while (yylex())
-            ofs << yytext;
+        ofs = ofstream("./tmp.i");
+        macro_expansion(tmp, ofs);
         ofs.close();
-
-        if (!isedited)
-            break;
-
         // next round
-        tmp = "./src.i";
-        rename("./tmp2.i", "./src.i");
+        tmp = filenameE;
+        rename("./tmp.i", filenameE.c_str());
+        if (!isedited)
+        {
+            if (normalpass)
+            {
+                normalpass = false;
+                argspass = true;
+            }
+            else
+                break;
+        }
     }
-    rename("./tmp2.i", filenameE.c_str());
     remove("./tmp.i");
-    remove("./src.i");
 
     // parse the source code
     // yydebug = 1;

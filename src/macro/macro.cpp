@@ -21,6 +21,18 @@ static void err(string s)
     exit(1);
 }
 
+// the same with 'startwith' in python
+static bool startswith(const string &s, const string &head)
+{
+    size_t begin = 0, end = s.length() - 1;
+    while (begin < end && isspace(s[begin]))
+        begin++;
+    if (s.substr(begin, head.length()) == head)
+        return true;
+    else
+        return false;
+}
+
 // map { name: (args, definition) }
 map<string, pair<vector<string>, string>> macrodef;
 extern int yylex();
@@ -195,8 +207,19 @@ void macro_expansion(string src, ofstream &ofs)
         }
         else
         {
+            // according to current macro definition, do expansion immediately
             if (ifdefined)
-                ofs << buf << endl;
+            {
+                FILE *fp = fopen("./.tttttmp", "w+");
+                fwrite(buf.c_str(), 1, strlen(buf.c_str()), fp);
+                fseek(fp, 0, SEEK_SET);
+                yyin = fp;
+                while(yylex())
+                    ofs << yytext;
+                ofs << endl;
+                fclose(fp);
+                remove("./.tttttmp");
+            }
         }
     }
 }

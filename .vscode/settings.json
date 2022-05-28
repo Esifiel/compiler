@@ -87,7 +87,8 @@
         "assert.h": "c",
         "string.h": "c",
         "stdio.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "header.h": "c"
     },
     "python.linting.enabled": false
 }

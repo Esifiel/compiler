@@ -1,8 +1,10 @@
-#include "demo/header.h"
+#include "header.h"
 
 #define DEBUG
 #define x 1
 #define y 2
+#define X x
+#define Y y
 #define BBB(x, y) x * y + AAA
 #define AAA CCC
 #define CCC 10
@@ -34,7 +36,7 @@ int main()
     printf("macro AAA = %d\n", AAA);
     printf("macro BBB(2, 3) = %d\n", BBB(2, 3));
     printf("macro BBB(2 + 3, 3 + 2) = %d\n", BBB(2 + 3, 3 + 2));
-    printf("macro x = %d, y = %d\n", x, y);
+    printf("macro X = %d, Y = %d\n", X, Y);
     printf("macro BBB(BBB(2, 3), 4) = %d\n", BBB(BBB(2, 3), 4));
 
     PRINT_MAX(3, 5)

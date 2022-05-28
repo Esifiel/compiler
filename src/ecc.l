@@ -15,6 +15,8 @@ extern map<string, pair<vector<string>, string>> macrodef;
 extern map<string, TypeSpecifier *> typealias;
 extern ofstream ofs;
 extern bool isedited;
+extern bool normalpass;
+extern bool argspass;
 static bool norecursive = false;
 
 extern void yyerror(string s);
@@ -202,16 +204,19 @@ static string randstr()
                                         if(macrodef.find(yytext) != macrodef.end() && !norecursive)
                                         {
                                             norecursive = true;
-                                            isedited = true;
 
                                             if(macrodef[yytext].first.size() == 0)
                                             {
+                                                isedited = true;
+
                                                 string def = macrodef[yytext].second;
                                                 yytext = (char *)malloc(def.length() + 1);
                                                 strcpy(yytext, def.c_str());
                                             }
-                                            else
+                                            else if(argspass)
                                             {
+                                                isedited = true;
+
                                                 string curmacro = yytext;
                                                 if(!(yylex() && !strcmp(yytext, "(")))
                                                     yyerror("expected '('");
@@ -222,6 +227,7 @@ static string randstr()
                                                     for(int argindex = 0; ; argindex++)
                                                     {
                                                         ofs << endl << "#define " + macrodef[curmacro].first[argindex] + " ";
+
                                                         while(1)
                                                         {
                                                             if(yytext[0] == '(')
@@ -241,8 +247,8 @@ static string randstr()
                                                     }
                                                 }
                                                 ofs << endl << macrodef[curmacro].second << endl;
-                                                // for(auto &p : macrodef[curmacro].first)
-                                                //     ofs << "#undef " + p << endl;
+                                                for(auto &p : macrodef[curmacro].first)
+                                                    ofs << "#undef " + p << endl;
                                                 yylex();
                                             }
 
