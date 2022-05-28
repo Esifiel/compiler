@@ -13,7 +13,7 @@ Value *Number::codeGen(CodeGenerator &ctx)
 
 Value *String::codeGen(CodeGenerator &ctx)
 {
-    Value *var = ctx.module->getGlobalVariable(val);
+    Value *var = ctx.module->getGlobalVariable(val, true);
     if (!var)
     {
         Constant *str = ConstantDataArray::getString(ctx.ctx, val);
@@ -30,8 +30,10 @@ Value *Identifier::codeGen(CodeGenerator &ctx)
         ctx.error("variable '" + name + "' not found");
 
     if (ctx.isleft)
+    {
         // return as left value
         return var;
+    }
     else
     {
         // return as right value
@@ -142,6 +144,7 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     vector<string> members;
     Expression *expr;
     AggregateType *stype;
+    BasicBlock *ifcond, *ifthen, *ifelse, *ifout, *cur;
 
     switch (op)
     {
@@ -163,19 +166,27 @@ Value *Expression::codeGen(CodeGenerator &ctx)
     case OP_ADD:
         return ctx.CreateBinaryExpr(left->codeGen(ctx), right->codeGen(ctx), op);
     case OP_ANDAND:
-        lv = left->codeGen(ctx);
-        rv = right->codeGen(ctx);
-        return ctx.CreateBinaryExpr(
-            ctx.CreateBinaryExpr(lv, ctx.builder.getInt64(0), OP_NEQ),
-            ctx.CreateBinaryExpr(rv, ctx.builder.getInt64(0), OP_NEQ),
-            OP_AND);
     case OP_OROR:
-        lv = left->codeGen(ctx);
-        rv = right->codeGen(ctx);
-        return ctx.CreateBinaryExpr(
-            ctx.CreateBinaryExpr(lv, ctx.builder.getInt64(0), OP_NEQ),
-            ctx.CreateBinaryExpr(rv, ctx.builder.getInt64(0), OP_NEQ),
-            OP_OR);
+        // short circuit logic
+        ifthen = BasicBlock::Create(ctx.ctx, "if.then", ctx.curFunction);
+        ifout = BasicBlock::Create(ctx.ctx, "if.out", ctx.curFunction);
+        var = ctx.builder.CreateAlloca(Type::getInt1Ty(ctx.ctx), 0, "tmp");
+        
+        cond = ctx.CreateBinaryExpr(left->codeGen(ctx), ctx.builder.getInt64(0), OP_NEQ);
+        ctx.builder.CreateStore(cond, var);
+        if(op == OP_ANDAND)
+            ctx.builder.CreateCondBr(cond, ifthen, ifout);
+        else if(op == OP_OROR)
+            ctx.builder.CreateCondBr(cond, ifout, ifthen);
+
+        ctx.builder.SetInsertPoint(ifthen);
+        cond = ctx.CreateBinaryExpr(right->codeGen(ctx), ctx.builder.getInt64(0), OP_NEQ);
+        ctx.builder.CreateStore(cond, var);
+        ctx.builder.CreateBr(ifout);
+
+        ctx.builder.SetInsertPoint(ifout);
+
+        return ctx.builder.CreateLoad(var);
     case OP_NOTNOT:
         lv = left->codeGen(ctx);
         return ctx.CreateBinaryExpr(

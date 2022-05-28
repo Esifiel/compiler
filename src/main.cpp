@@ -4,6 +4,7 @@
 #include <string>
 #include <deque>
 #include <map>
+#include <list>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -21,7 +22,6 @@ extern int yydebug;
 extern char *yytext;
 extern FILE *yyin;
 extern Program *program;
-extern map<string, pair<vector<string>, string>> macrodef;
 
 bool inyyparse;
 bool isedited;

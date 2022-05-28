@@ -168,16 +168,36 @@ decl                        : decl-specs init-declarator-list DELIM {
                                 {
                                     Expression *size = p->right;
 
+                                    // combine qualifier
+                                    Qualifier *qual = new Qualifier();
+                                    if(p->qual)
+                                    {
+                                        if(p->qual->isconst)
+                                            qual->isconst = true;
+                                        if(p->qual->isvolatile)
+                                            qual->isvolatile = true;
+                                        if(p->qual->pcnt)
+                                            qual->pcnt = p->qual->pcnt;
+                                    }
+                                    if($1->qual)
+                                    {
+                                        if($1->qual->isconst)
+                                            qual->isconst = true;
+                                        if($1->qual->isvolatile)
+                                            qual->isvolatile = true;
+                                        if($1->qual->pcnt)
+                                            qual->pcnt += $1->qual->pcnt;
+                                    }
+
                                     // no array size defined and pointer qualifier
-                                    if(!size && (p->qual && !p->qual->pcnt))
+                                    if(!size && !qual->pcnt)
                                         ts->push_back($1);
                                     else
                                     {
                                         // basic type
                                         TypeSpecifier *t = $1;
                                         // pointer qualifier
-                                        if(p->qual)
-                                            for(int i = 0; i < p->qual->pcnt; i++)
+                                        for(int i = 0; i < qual->pcnt; i++)
                                                 t = new MyPointerType(t);
                                         // if array size defined
                                         while(size)
@@ -188,15 +208,15 @@ decl                        : decl-specs init-declarator-list DELIM {
                                                 t = new MyPointerType(t);
                                             Expression *tmp = size;
                                             size = size->right;
-                                            // delete tmp
                                         }
+                                        t->qual = qual;
                                         ts->push_back(t);
                                     }
 
-                                    // constant variable
-                                    if($1->qual && $1->qual->isconst && !ts->back()->isIterableType() && !ts->back()->isAggregateType())
+                                    // constant simple value variable
+                                    if(qual->isconst)
                                     {
-                                        if(p->init->getName() == "\"Number\"")
+                                        if(!ts->back()->isIterableType() && !ts->back()->isAggregateType() && p->init->getName() == "\"Number\"")
                                             constvar[p->name] = (Number *)(p->init);
                                     }
                                 }

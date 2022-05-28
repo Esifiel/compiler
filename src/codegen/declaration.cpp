@@ -31,9 +31,8 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 GlobalVariable *v = new GlobalVariable(
                     *ctx.module,
                     array_t,
-                    (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
-                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage
-                                                                                                                           : GlobalValue::PrivateLinkage,
+                    (*pt)->qual && (*pt)->qual->isconst ? true : false, // const attribute
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
                     0,
                     varname);
 
@@ -55,14 +54,24 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
             {
                 ctx.blocks.front()[varname] = ctx.builder.CreateAlloca(array_t, 0, varname.c_str());
                 // TODO: initalize an array
-                // Value *var = ctx.CreateCast(ctx.blocks.front()[varname], (*pt)->getRootType()->getType(ctx)->getPointerTo());
-                // int idx = 0;
-                // for (Expression *p = (*pi)->init; p; p = p->left, idx++)
-                // {
-                //     Value *initval = p->codeGen(ctx);
-                //     if (initval)
-                //         ctx.builder.CreateStore(initval, ctx.builder.CreateGEP(var, ctx.builder.getInt32(idx)));
-                // }
+                Value *var = ctx.CreateCast(ctx.blocks.front()[varname], (*pt)->getRootType()->getType(ctx)->getPointerTo());
+                // a[] = {0}
+                if((*pi)->init && (*pi)->init->getName() == "\"Number\"" && ((Number *)((*pi)->init))->longView() == 0)
+                {
+                    if(((MyArrayType *)(*pt))->size < 100)
+                        for(int i = 0; i < ((MyArrayType *)(*pt))->size; i++)
+                            ctx.builder.CreateStore(ctx.CreateCast(ctx.builder.getInt32(0), array_t->getElementType()), ctx.builder.CreateGEP(var, ctx.builder.getInt32(i)));
+                }
+                else
+                {
+                    int idx = 0;
+                    for (Expression *p = (*pi)->init; p; p = p->left, idx++)
+                    {
+                        Value *initval = p->codeGen(ctx);
+                        if (initval)
+                            ctx.builder.CreateStore(ctx.CreateCast(initval, array_t->getElementType()), ctx.builder.CreateGEP(var, ctx.builder.getInt32(idx)));
+                    }
+                }
             }
         }
         else if ((*pt)->type == TYPE_STRUCT || (*pt)->type == TYPE_UNION)
@@ -78,9 +87,8 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                 GlobalVariable *v = new GlobalVariable(
                     *ctx.module,
                     stype,
-                    (*pi)->qual && (*pi)->qual->isconst ? true : false, // const attribute
-                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage
-                                                                                                                           : GlobalValue::PrivateLinkage,
+                    (*pt)->qual && (*pt)->qual->isconst ? true : false, // const attribute
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
                     0,
                     varname);
                 // vector<Constant *> elements;
@@ -105,8 +113,7 @@ Value *VariableDeclaration::codeGen(CodeGenerator &ctx)
                     *ctx.module,
                     t,
                     (*pt)->qual && (*pt)->qual->isconst ? true : false,
-                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage
-                                                                                                                           : GlobalValue::PrivateLinkage,
+                    (*pt)->linkage == LINKAGE_EXTERNAL ? GlobalValue::ExternalLinkage : (*pt)->linkage == LINKAGE_INTERNAL ? GlobalValue::InternalLinkage : GlobalValue::PrivateLinkage,
                     0,
                     varname);
                 if ((*pi)->init)
