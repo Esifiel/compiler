@@ -218,6 +218,8 @@ Value *FunctionDeclaration::codeGen(CodeGenerator &ctx)
     ctx.curFunction = nullptr;
     ctx.blocks.pop_front();
 
+    ctx.dump();
+
     return func;
 }
 

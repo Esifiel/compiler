@@ -225,12 +225,26 @@ public:
     virtual bool isIterableType() { return false; }
 };
 
+class Enumerator {
+public:
+    string name;
+    int val;
+    bool hasinit;
+
+    Enumerator(string s) : name(s), val(0), hasinit(false) {}
+    Enumerator(string s, int v) : name(s), val(v), hasinit(true) {}
+};
+
 class EnumType : public TypeSpecifier
 {
 public:
     string name;
+    vector<Enumerator *> *enumlist;
 
-    EnumType() : TypeSpecifier(TYPE_ENUM) {}
+    EnumType() : name(""), TypeSpecifier(TYPE_ENUM) {}
+    EnumType(string s) : name(s), enumlist(nullptr), TypeSpecifier(TYPE_ENUM) {}
+    EnumType(vector<Enumerator *> *e) : name(""), enumlist(e), TypeSpecifier(TYPE_ENUM) {}
+    EnumType(string s, vector<Enumerator *> *e) : name(s), enumlist(e), TypeSpecifier(TYPE_ENUM) {}
 
     virtual string getName() { return "\"EnumType\""; }
     virtual Type *getType(CodeGenerator &ctx);

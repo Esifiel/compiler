@@ -50,7 +50,25 @@ public:
 
     uint8_t charView() { return *(uint8_t *)buf; }
     uint16_t shortView() { return *(uint16_t *)buf; }
-    uint32_t intView() { return *(uint32_t *)buf; }
+    uint32_t intView() {
+        switch (valtype)
+        {
+        case VAL_CHAR:
+            return (uint32_t)charView();
+        case VAL_SHORT:
+            return (uint32_t)shortView();
+        case VAL_LONG:
+            // return (uint32_t)intView();
+            return 0;
+        case VAL_FLOAT:
+            return (uint32_t)floatView();
+        case VAL_DOUBLE:
+            return (uint32_t)doubleView();
+        case VAL_INT:
+        default:
+            return *(uint32_t *)buf;
+        }
+    }
     uint64_t longView()
     {
         switch (valtype)
@@ -90,6 +108,8 @@ public:
             return *(double_t *)buf;
         }
     }
+    bool isInteger() { return valtype == VAL_CHAR || valtype == VAL_SHORT || valtype == VAL_INT || valtype == VAL_LONG; }
+    bool isFloat() { return !isInteger(); }
 };
 
 class String : public Expression

@@ -151,7 +151,24 @@ void Visualizer::visitType(TypeSpecifier *t)
             visitType(((IterableType *)t)->basictype);
         if (t->type == TYPE_STRUCT || t->type == TYPE_UNION)
             visitAggregateType((AggregateType *)t);
+        if (t->type == TYPE_ENUM)
+            visitEnumType((EnumType *)t);
         out << subend << tail;
+    }
+}
+
+void Visualizer::visitEnumType(EnumType *e)
+{
+    if (e)
+    {
+        out << "\"" << e->name << "\"";
+        if (e->enumlist)
+
+            for (auto &p : *(e->enumlist))
+            {
+                out << sep;
+                out << "\"" << p->name << "\"";
+            }
     }
 }
 
@@ -197,7 +214,7 @@ static void replace(string &src, string sub, string tar)
 {
     string::size_type pos = 0;
     int curpos = 0;
-    while((pos = src.find(sub, curpos)) != string::npos)
+    while ((pos = src.find(sub, curpos)) != string::npos)
     {
         src.replace(pos, sub.length(), tar);
         curpos = pos + tar.length();

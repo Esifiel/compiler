@@ -265,6 +265,7 @@ Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
         if (((CompoundStatement *)stmt)->decl)
             ctx.warning("variable or type declaration inside switch statement will never be executed");
 
+        bool hasdefault = false;
         for (Statement *p = ((CompoundStatement *)stmt)->stmt; p; p = p->next)
         {
             if (p->getName() == "\"CaseStatement\"")
@@ -283,17 +284,32 @@ Value *SwitchCaseStatement::codeGen(CodeGenerator &ctx)
                 }
                 else
                 {
-                    BasicBlock *switchdefault = BasicBlock::Create(ctx.ctx, "switch.default", ctx.curFunction);
-                    swinst->setDefaultDest(switchdefault);
-                    if (!ctx.builder.GetInsertBlock()->getTerminator())
-                        ctx.builder.CreateBr(switchdefault);
-                    ctx.builder.SetInsertPoint(switchdefault);
+                    if (!hasdefault)
+                    {
+                        hasdefault = true;
+                        BasicBlock *switchdefault = BasicBlock::Create(ctx.ctx, "switch.default", ctx.curFunction);
+                        swinst->setDefaultDest(switchdefault);
+                        if (!ctx.builder.GetInsertBlock()->getTerminator())
+                            ctx.builder.CreateBr(switchdefault);
+                        ctx.builder.SetInsertPoint(switchdefault);
+                    }
+                    else
+                        ctx.error("redefinition of default block");
                 }
             }
             else if (p->getName() == "\"ContinueStatement\"")
                 ctx.error("keyword continue used in switch statement");
             else
                 p->codeGen(ctx);
+        }
+        // default is ignored
+        if (!hasdefault)
+        {
+            BasicBlock *switchdefault = BasicBlock::Create(ctx.ctx, "switch.default", ctx.curFunction);
+            swinst->setDefaultDest(switchdefault);
+            if (!ctx.builder.GetInsertBlock()->getTerminator())
+                ctx.builder.CreateBr(switchdefault);
+            ctx.builder.SetInsertPoint(switchdefault);
         }
         if (!ctx.builder.GetInsertBlock()->getTerminator())
             ctx.builder.CreateBr(switchout);

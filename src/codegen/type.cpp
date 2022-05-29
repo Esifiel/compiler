@@ -59,7 +59,7 @@ Type *UnionType::getType(CodeGenerator &ctx)
 
 Type *EnumType::getType(CodeGenerator &ctx)
 {
-    return nullptr;
+    return ctx.builder.getInt32Ty();
 }
 
 uint64_t MyStructType::getSize()

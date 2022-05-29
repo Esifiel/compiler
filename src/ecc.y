@@ -6,7 +6,8 @@ Program *program;
 map<string, Number *> constvar;
 map<string, AggregateType *> aggrdef;
 map<string, TypeSpecifier *> typealias;
-map<string, uint64_t> enumvalue;
+map<string, int> enumvalue;
+map<string, EnumType *> enumdef;
 %}
 
 %expect 1 // shift-reduce conflict: optional else-part for if-else statement
@@ -54,6 +55,8 @@ static string randstr();
     AggregateType *aggrtype;
     pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *member;
     vector<pair<vector<TypeSpecifier *> *, vector<Identifier *> *> *> *members;
+    Enumerator *enumerator;
+    vector<Enumerator *> *enumlist;
 
     Declaration *declaration;
     VariableDeclaration *variableDeclaration;
@@ -94,11 +97,13 @@ static string randstr();
 
 %type<program> program
 
-%type<type> type-spec decl-specs spec-qualifier-list type-name storage-class-specifier
+%type<type> type-spec decl-specs spec-qualifier-list type-name storage-class-specifier enum-spec
 %type<qual> pointer type-qualifier type-qualifier-list 
 %type<aggrtype> struct-or-union-spec struct-or-union
 %type<members> struct-decl-list
 %type<member> struct-decl
+%type<enumerator> enumerator
+%type<enumlist> enumerator-list
 
 %type<declaration> external-decl translation-unit decl decl-list
 %type<functionDeclaration> function-definition
@@ -227,6 +232,26 @@ decl                        : decl-specs init-declarator-list DELIM {
                                 // type definition
                                 if($1->isAggregateType())
                                     $$ = new TypeDeclaration($1);
+                                else if($1->getName() == "\"EnumType\"")
+                                {
+                                    EnumType *e = (EnumType *)$1;
+                                    if(enumdef.find(e->name) != enumdef.end())
+                                        yyerror("redefinition of enum type '" + e->name + "'");
+                                    enumdef[e->name] = e;
+
+                                    int cur = 0;
+                                    for(auto &p : *(e->enumlist))
+                                    {
+                                        if(enumvalue.find(p->name) != enumvalue.end())
+                                            yyerror("redefinition of enumerator '" + p->name + "'");
+                                        if(p->hasinit)
+                                            cur = p->val;
+                                        enumvalue[p->name] = cur;
+                                        cur++;
+                                    }
+
+                                    $$ = new TypeDeclaration(e);
+                                }
                                 else
                                 {
                                     yywarning("useless type name in empty declaration");
@@ -295,17 +320,17 @@ storage-class-specifier     : EXTERN    { $$ = new TypeSpecifier(LINKAGE_EXTERNA
                             /* | TYPEDEF */
                             ;
 
-type-spec                   : CHAR      { $$ = new CharType();      }
-                            | SHORT     { $$ = new ShortType();     }
-                            | INT       { $$ = new IntType();       }
-                            | LONG      { $$ = new LongType();      }
-                            | FLOAT     { $$ = new FloatType();     }
-                            | DOUBLE    { $$ = new DoubleType();    }
-                            | VOID      { $$ = new VoidType();      }
+type-spec                   : CHAR      { $$ = new CharType(); }
+                            | SHORT     { $$ = new ShortType(); }
+                            | INT       { $$ = new IntType(); }
+                            | LONG      { $$ = new LongType(); }
+                            | FLOAT     { $$ = new FloatType(); }
+                            | DOUBLE    { $$ = new DoubleType(); }
+                            | VOID      { $$ = new VoidType(); }
                             | SIGNED    { $$ = new TypeSpecifier(false); }
                             | UNSIGNED  { $$ = new TypeSpecifier(true); }
                             | struct-or-union-spec { $$ = $1; }
-                            | enum-spec // TODO: enum type
+                            | enum-spec { $$ = $1; }
                             | TYPENAME  {
                                 if(typealias.find(*$1) != typealias.end())
                                     $$ = typealias[*$1];
@@ -415,24 +440,36 @@ struct-declarator           : declarator {
                             | COLON const-exp // TODO: bit-fields
                             ;
                     
-enum-spec                   : ENUM IDENTIFIER LC enumerator-list RC
-                            | ENUM LC enumerator-list RC
-                            | ENUM IDENTIFIER
+enum-spec                   : ENUM IDENTIFIER LC enumerator-list RC { $$ = new EnumType(*$2, $4); delete $2; }
+                            | ENUM LC enumerator-list RC { $$ = new EnumType($3); }
+                            | ENUM IDENTIFIER { $$ = new EnumType(*$2); delete $2; }
                             ;
 
-enumerator-list             : enumerator
-                            | enumerator-list COMMA enumerator
+enumerator-list             : enumerator { $$ = new vector<Enumerator *>(); $$->push_back($1); }
+                            | enumerator-list COMMA enumerator { $$ = $1; $$->push_back($3); }
                             ;
 
-enumerator                  : IDENTIFIER
-                            | IDENTIFIER ASSIGN const-exp
+enumerator                  : IDENTIFIER { $$ = new Enumerator(*$1); delete $1; }
+                            | IDENTIFIER ASSIGN const-exp {
+                                if($3->getName() != "\"Number\"")
+                                    yyerror("enumerator is not a constant");
+                                if(!$3->isInteger())
+                                    yyerror("enumerator is not a integer constant");
+                                $$ = new Enumerator(*$1, $3->intView());
+                                delete $1;
+                            }
                             ;
 
 declarator                  : pointer direct-declarator { $$ = $2; ((Identifier *)$$)->qual = $1; }
                             | direct-declarator { $$ = $1; }
                             ;
 
-direct-declarator           : IDENTIFIER { $$ = new Identifier(*$1); delete $1; }
+direct-declarator           : IDENTIFIER {
+                                if(enumvalue.find(*$1) != enumvalue.end())
+                                    yyerror("redefinition of enum value '" + *$1 + "' with another type");
+                                $$ = new Identifier(*$1);
+                                delete $1;
+                            }
                             | LP declarator RP // TODO: unknown
                             | direct-declarator LB const-exp       RB {
                                 $$ = $1;
@@ -501,8 +538,16 @@ param-decl                  : decl-specs declarator {
                             | decl-specs { $$ = new Parameter($1); }
                             ;
 
-id-list			            : IDENTIFIER { $$ = new vector<Identifier *>; $$->push_back(new Identifier(*$1)); delete $1; }
-                            | id-list COMMA IDENTIFIER { $1->push_back(new Identifier(*$3)); $$ = $1; delete $3;  }
+id-list			            : IDENTIFIER {
+                                $$ = new vector<Identifier *>;
+                                $$->push_back(new Identifier(*$1));
+                                delete $1;
+                            }
+                            | id-list COMMA IDENTIFIER {
+                                $1->push_back(new Identifier(*$3));
+                                $$ = $1;
+                                delete $3;
+                            }
                             ;
 
 initializer                 : assignment-exp               { $$ = $1; }
@@ -782,7 +827,15 @@ postfix-exp		            : primary-exp { $$ = $1; }
                             }
                             ;
 
-primary-exp		            : IDENTIFIER    { $$ = new Identifier(*$1); delete $1; }
+primary-exp		            : IDENTIFIER    {
+                                if(enumvalue.find(*$1) != enumvalue.end())
+                                {
+                                    yylval.num.intValue = enumvalue[*$1];
+                                    $$ = new Number(yylval.num, new IntType(), VAL_INT);
+                                }
+                                else
+                                    $$ = new Identifier(*$1); delete $1;
+                            }
                             /* | CONSTANT */
                             | const         { $$ = $1; }
                             /* | STRING        { $$ = new String(*$1); delete $1; } */

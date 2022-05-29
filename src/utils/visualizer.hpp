@@ -49,6 +49,7 @@ private:
     void visitCaseStatement(CaseStatement *c);
     void visitGotoStatement(GotoStatement *s);
     void visitLabelStatement(LabelStatement *s);
+    void visitEnumType(EnumType *e);
 };
 
 #endif
