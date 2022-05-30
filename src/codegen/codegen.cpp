@@ -270,7 +270,7 @@ Value *CodeGenerator::CreateUnaryExpr(Value *a, enum op_type op)
         case OP_NOT:
             if (a->getType()->isFloatingPointTy())
                 error("bitwise not requires integer operands");
-            return builder.CreateUnOp(Instruction::UnaryOps::FNeg, a);
+            return builder.CreateBinOp(Instruction::BinaryOps::Xor, a, ConstantInt::get(a->getType(), -1));
         default:
             cout << op << endl;
             error("operator type not supoorted for general operands");
@@ -302,8 +302,12 @@ Value *CodeGenerator::CreateBinaryExpr(Value *a, Value *b, enum op_type op)
             else if (a->getType()->isPointerTy() && b->getType()->isIntegerTy())
                 return builder.CreateGEP(a, builder.CreateNeg(b));
             else if (a->getType()->isPointerTy() && b->getType()->isPointerTy())
+            {
+                if(a->getType()->getPointerElementType() != b->getType()->getPointerElementType())
+                    error("invalid operand type for two ptr diff");
                 // two pointer diff
                 return builder.CreatePtrDiff(a, b);
+            }
             else
                 error("- not supported for the types");
         case OP_EQ:

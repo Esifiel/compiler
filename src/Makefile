@@ -35,13 +35,10 @@ scanner.cpp: $(NAME).l parser.hpp
 	$(CC) -g3 -c $(LLVMFLAGS) -MMD -o $@ $<
 
 $(NAME): $(OBJECTS)
-	@if [ ! -d tmp ]; then mkdir tmp; fi
-	@if [ ! -d obj ]; then mkdir obj; fi
-
 	$(CC) -g3 -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 
-	@./$(NAME) -o obj/1 ../test/1.c
-	@./obj/1
+	@./$(NAME) ../test/1.c
+	@./a.out
 
 	# @cd tmp && for i in `find . | grep "^\./\." | grep "\.dot$$"`; do(dot -Tpng $$i -o $$i.png); done
 
@@ -54,22 +51,19 @@ clean:
 	@rm -rf obj
 	@rm -f .gdb_history ../test/.gdb_history
 	@cd ../test && make clean && cd ../src
-	@rm -f *.ll *.bc *.i *.out
+	@rm -f *.ll *.bc *.i *.out *.json
 
 test:
-	@if [ ! -d tmp ]; then mkdir tmp; fi
-	@if [ ! -d obj ]; then mkdir obj; fi
-
 	$(CC) -g3 -o $(NAME) $(OBJECTS) $(LLVMFLAGS)
 
-	@./$(NAME) -o obj/quicksort ../test/quicksort.c
-	@./$(NAME) -o obj/matrix-multiplication ../test/matrix-multiplication.c
-	@./$(NAME) -o obj/auto-advisor ../test/auto-advisor.c
+	@./$(NAME) -o quicksort ../test/quicksort.c
+	@./$(NAME) -o matrix-multiplication ../test/matrix-multiplication.c
+	@./$(NAME) -o auto-advisor ../test/auto-advisor.c
 
-	# @cd tmp && opt -dot-cfg ../obj/quicksort.ll
-	# @cd tmp && opt -dot-cfg ../obj/matrix-multiplication.ll
-	# @cd tmp && opt -dot-cfg ../obj/auto-advisor.ll
+	# @cd tmp && opt -dot-cfg ../quicksort.ll
+	# @cd tmp && opt -dot-cfg ../matrix-multiplication.ll
+	# @cd tmp && opt -dot-cfg ../auto-advisor.ll
 
-	@../test/tester/quicksort/linux-amd64 obj/quicksort
-	@../test/tester/matrix-multiplication/linux-amd64 obj/matrix-multiplication
-	@../test/tester/auto-advisor/linux-amd64 obj/auto-advisor
+	@../test/tester/quicksort/linux-amd64 ./quicksort
+	@../test/tester/matrix-multiplication/linux-amd64 ./matrix-multiplication
+	@../test/tester/auto-advisor/linux-amd64 ./auto-advisor

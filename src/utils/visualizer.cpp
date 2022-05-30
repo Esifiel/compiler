@@ -146,7 +146,11 @@ void Visualizer::visitType(TypeSpecifier *t)
         if (t->qual)
             visitQualifier(t->qual);
         if (t->type == TYPE_ARRAY)
+        {
+            if(t->qual)
+                out << sep;
             out << ((MyArrayType *)t)->size << sep;
+        }
         if (t->type == TYPE_ARRAY || t->type == TYPE_POINTER)
             visitType(((IterableType *)t)->basictype);
         if (t->type == TYPE_STRUCT || t->type == TYPE_UNION)

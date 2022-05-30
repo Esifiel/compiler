@@ -44,44 +44,36 @@ AST可视化部分：
 #### 1.3.1 源码目录结构
 
 ```
-compiler
+.
 ├── Dockerfile
 ├── README.md
-├── src
-│   ├── ast
-│   │   ├── basic.hpp
-│   │   ├── declaration.hpp
-│   │   ├── expression.hpp
-│   │   ├── program.hpp
-│   │   ├── statement.hpp
-│   │   └── type.hpp
-│   ├── codegen
-│   │   ├── codegen.cpp
-│   │   ├── codegen.hpp
-│   │   ├── declaration.cpp
-│   │   ├── expression.cpp
-│   │   ├── program.cpp
-│   │   ├── statement.cpp
-│   │   └── type.cpp
-│   ├── ecc.l
-│   ├── ecc.y
-│   ├── macro
-│   │   ├── macro.cpp
-│   │   └── macro.hpp
-│   ├── main.cpp
-│   ├── Makefile
-│   └── utils
-│       ├── json2dot.py
-│       ├── visualizer.cpp
-│       └── visualizer.hpp
-└── test
-    ├── auto-advisor.c
-    ├── demo
-    │   ├── demo.c
-    │   └── header.h
-    ├── Makefile
-    ├── matrix-multiplication.c
-    └── quicksort.c
+└── src
+    ├── ast
+    │   ├── basic.hpp
+    │   ├── declaration.hpp
+    │   ├── expression.hpp
+    │   ├── program.hpp
+    │   ├── statement.hpp
+    │   └── type.hpp
+    ├── codegen
+    │   ├── codegen.cpp
+    │   ├── codegen.hpp
+    │   ├── declaration.cpp
+    │   ├── expression.cpp
+    │   ├── program.cpp
+    │   ├── statement.cpp
+    │   └── type.cpp
+    ├── ecc.l
+    ├── ecc.y
+    ├── macro
+    │   ├── macro.cpp
+    │   └── macro.hpp
+    ├── main.cpp
+    ├── Makefile
+    └── utils
+        ├── json2dot.py
+        ├── visualizer.cpp
+        └── visualizer.hpp
 ```
 
 - `ecc.l`和`ecc.y`分别为词法分析文件和语法分析文件
@@ -89,8 +81,7 @@ compiler
 - `ast`目录下文件均为抽象语法树的节点类型定义
 - `codegen`目录下文件均用于生成中间代码
 - `utils`目录下文件均用于AST可视化
-
-`demo`文件夹中的附件展示了本编译器可支持的**所有**语法，如有需要可以阅读其中的`demo.c`，使用本实验实现的编译器可以编译并正常工作
+- `macro`目录下为解析宏语法的实现
 
 `Dockerfile`用于构建可以编译本实验代码的环境，方便测试
 
@@ -100,15 +91,13 @@ compiler
 
 运行`./ecc FILENAME`（FILENAME为合法的C源代码文件），会自动编译生成名为`a.out`的可执行文件。如果不想使用默认的名字，可以用`-o`参数指定输出文件名；还可以使用`-E`选项输出宏展开后的源文件。例如`./ecc src.c -o src -E src.i`（用法均同gcc）
 
-编译器在生成AST后会将结果写为一个json文件，存在`./tmp`目录下，如果需要查看AST的可视化效果，可以在`src`目录下执行`python3 utils/json2dot.py <json filename>`生成对应的可视化png图片
-
-如果需要进行测试，在执行`make`之后再执行`make test`会自动编译三个测试点源码并运行三个测试程序，也可以自行使用`./ecc ...`进行手动编译
+编译器在生成AST后会将结果写为一个json文件，如果需要查看AST的可视化效果，可以在`src`目录下执行`python3 utils/json2dot.py <json filename>`生成对应的可视化png图片
 
 #### 1.3.3 版本控制与代码风格
 
 实验全程使用`git`进行版本控制，仓库地址：https://github.com/Esifiel/compiler。此仓库于实验验收结束之后公开，此前均处于`private`状态
 
-截至2022年5月18日，仓库共有47个commit
+截至2022年5月30日，仓库共有59个commit
 
 在代码风格上，
 
@@ -457,6 +446,56 @@ vector {
 ```
 
 `getMemberDef`方法是一个辅助函数，用于返回一对结构体或联合体中的成员声明，包括类型与标识符
+
+##### 3.2.2.5 枚举量
+
+枚举类型包括一个类型名称和一系列枚举量`Enumerator`：
+
+```c++
+class Enumerator {
+public:
+    string name;
+    int val;
+    bool hasinit;
+
+    Enumerator(string s) : name(s), val(0), hasinit(false) {}
+    Enumerator(string s, int v) : name(s), val(v), hasinit(true) {}
+};
+
+class EnumType : public TypeSpecifier
+{
+public:
+    string name;
+    vector<Enumerator *> *enumlist;
+
+    EnumType() : name(""), TypeSpecifier(TYPE_ENUM) {}
+    EnumType(string s) : name(s), enumlist(nullptr), TypeSpecifier(TYPE_ENUM) {}
+    EnumType(vector<Enumerator *> *e) : name(""), enumlist(e), TypeSpecifier(TYPE_ENUM) {}
+    EnumType(string s, vector<Enumerator *> *e) : name(s), enumlist(e), TypeSpecifier(TYPE_ENUM) {}
+
+    virtual TypeSpecifier *getRootType() { return this; }
+    virtual uint64_t getSize() { return sizeof(int); }
+};
+```
+
+按照C语言的语法，枚举量的值从0开始递增，且可以自定义初始值、后续的值以这个值为基础继续递增。因此在语法分析时会按照这个规则记录枚举值：
+
+```c++
+int cur = 0;
+for(auto &p : enumtype->enumlist)
+{
+    if(enumvalue.find(p->name) != enumvalue.end())
+        yyerror("redefinition of enumerator '" + p->name + "'");
+    if(p->hasinit)
+        cur = p->val;
+    enumvalue[p->name] = cur;
+    cur++;
+}
+```
+
+由于枚举值相当于32位有符号int常量，因此在生成AST时就可以将用到枚举值的地方直接替换成对应的常数，同时在codegen时遇到枚举类型的值定义也可以直接生成为`Int32`类型，例如：函数声明`void f(enum e arg)`会被解析为`void f(int arg)`
+
+此外，gcc是不允许枚举量的递增上溢的，此时会报错。但是我的实现不对这种情况做处理，即对于一个赋值为0x7fffffff（2147483647）的32位有符号int值，下一个枚举量的值将会是0x80000000（-2147483648）
 
 #### 3.2.3 expression.hpp
 
@@ -866,7 +905,7 @@ Program是整个AST的根节点，一个C源代码程序是由各种声明构成
 - 定义AST的根节点`Program *program;`，以及需要用到的一些字典结构：
 
     ```c++
-    map<string, Number *> constvar; // 声明为const的变量
+    map<string, Number *> constvar; // 声明为const的常值变量
     map<string, AggregateType *> aggrdef; // 聚合类型定义
     map<string, TypeSpecifier *> typealias; // typedef定义的类型别名
     ```
@@ -1081,8 +1120,8 @@ if (
 
 `calculate`函数进行折叠计算时，还会涉及到隐式类型转换的问题。虽然C语言有很多的数值类型，但是从目前gcc的实现来看，常浮点数都认为是double，常整数在int范围内时认为是int（常字符也会认为是int），超过int范围时认为是long，因此我在实现时就做的比较简单了：
 
-- 对于常量的比较运算和逻辑运算，折叠为一个`LongType`类型的结果
-- 对于算术运算，如果操作数至少有一个是浮点类型，就折叠为一个`DoubleType`类型的结果，否则就同样折叠为一个`LongType`类型的结果
+- 对于常量的比较运算和逻辑运算，折叠为一个`LongType`或`IntType`类型的结果
+- 对于算术运算，如果操作数至少有一个是浮点类型，就折叠为一个`DoubleType`类型的结果，否则就同样折叠为一个`LongType`或`IntType`类型的结果
 
 ### 3.4 AST可视化示例
 
@@ -1193,6 +1232,7 @@ public:
     map<string, vector<string>> structtypes;        // record members' name
     map<string, AggregateType *> structvars;        // record struct types' def
     map<string, BasicBlock *> labels;               // record labels' def
+    vector<pair<BasicBlock *, string>> dummy;       // record backward goto
 
     CodeGenerator();
     ~CodeGenerator();
@@ -1236,10 +1276,28 @@ public:
     每当进入一个新的块（复合语句）时，就向列表**头部**加入新的块，退出时则删除列表头部的块。在codegen过程中声明的变量等都会保存在当前列表头部的块中，生命周期由块来决定。需要获取变量时，按顺序遍历列表中的块，即按从内到外的层次遍历，直到找到一个符合要求的变量
 
 - `list<pair<BasicBlock *, BasicBlock *>> jumpctx`：该变量记录当前所在块的外层执行体的起始和结束，用于跳转语句确定跳转的目标基本块
+
 - `bool isglobal`：用于标识当前环境为全局，当该标志置位时，声明的变量均为全局变量
+
 - `bool isleft`：用于标识当前目标值为左值，当该标志置位时，对目标值的codegen会返回一个C语言概念下的左值的指针，方便创建IR的`store`指令
+
 - `map<string, vector<string>> structtypes`、`map<string, AggregateType *> structvars`：存放结构体成员名称和定义的字典。在LLVM IR中，对结构体的访问和访问数组和指针是一致的，第一个成员的下标为0、第二个成员的下标为1，以此类推，因此在实现结构体访问的运算符时需要知道成员在定义中的位置
+
 - `map<string, BasicBlock *> labels`：存放程序中的标签定义，方便goto语句直接获取目标`BasicBlock`
+
+- `vector<pair<BasicBlock *, string>> dummy`：存放标签空缺的goto语句块。由于标签定义有可能出现在goto语句使用它之后，所以需要先将这个位置保存下来，在解析完整个程序之后做backpatching：                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+
+    ```c++
+    // backpatching
+    for (auto &gotolabel : ctx.dummy)
+    {
+        if(ctx.labels.find(gotolabel.second) == ctx.labels.end())
+            ctx.error(string("label '") + gotolabel.second + string("' is not defined"));
+    
+        ctx.builder.SetInsertPoint(gotolabel.first);
+        ctx.builder.CreateBr(ctx.labels[gotolabel.second]);
+    }
+    ```
 
 在`CodeGenerator`的构造函数中，会完成
 
@@ -1647,9 +1705,100 @@ GlobalVariable *v = new GlobalVariable(
 
 LLVM IR要求全局变量必须有初始值，可以用`GlobalVariable::setInitializer`来设置
 
+> 这里需要说明几点：
+>
+> 1. 本实验中`const`关键字只对全局变量起作用。**按照目前我对LLVM的了解**，对于LLVM IR来说，本地变量只是一块标注了类型的内存空间，没有任何多余的属性，因此如果要为本地变量引入const语义需要自己另外实现，但经过思考后我认为在本实验目前的结构中实现起来比较麻烦，因此暂时放弃了这个点。
+> 2. **LLVM IR中`constant`修饰符并不会阻止代码对变量赋值，只是令赋值无效化**，所以如果要像gcc一样在对const变量赋值时直接报错，也需要自己另外单独实现。
+> 3. 由于第一点的原因，LLVM IR中本地变量也没有自己的initializer，要初始化就只能一个值一个值store，所以在初始化这一块我也没有做得非常完善。
+
 ##### 4.4.4.2 函数声明
 
 函数的定义和4.3节中提到的对于C库函数的声明的步骤是一样的，只是在声明后还需要创建基本块并对函数体进行codegen
+
+###### 4.4.4.2.1 可变参数传递与获取
+
+C89支持`...`关键字，用于表示一个函数的参数是可变数量，在实际使用时需要配合`stdarg.h`中定义的宏`va_start`、`va_arg`、`va_end`等来使用。由于我的编译器暂时没有能力解析系统头文件，所以我参考clang编译出的IR指令，用自己的方法实现了一个简单一点的可变参数获取。
+
+以下面这个求平均数的函数为例：
+
+```c
+double average(int num, ...)
+{
+    va_list valist;
+    double sum = 0.0;
+    int i;
+
+    va_start(valist, num);
+    for (i = 0; i < num; i++)
+        sum += va_arg(valist, int);
+    va_end(valist);
+
+    return sum / num;
+}
+```
+
+经过clang编译后的IR中有几个地方需关注：
+
+- `va_list`是一个长度为1的结构体数组，该结构体为`struct __va_list_tag`，在我本机上定义如下：
+
+    ```asm
+    %struct.__va_list_tag = type { i32, i32, i8*, i8* }
+    %valist = alloca [1 x %struct.__va_list_tag], align 16
+    ```
+
+- `va_start`和`va_end`宏对应的实际函数都是接受一个`i8 *`参数的函数，在LLVM中属于Intrinsic函数，IR中声明如下：
+
+    ```
+    ; Function Attrs: nofree nosync nounwind willreturn
+    declare void @llvm.va_start(i8*) #2
+    
+    ; Function Attrs: nofree nosync nounwind willreturn
+    declare void @llvm.va_end(i8*) #2
+    ```
+
+    IR中调用这两个函数时，就是将`struct __va_list_tag *`强转为`i8 *`传递：
+
+    ```
+    %arraydecay = getelementptr inbounds [1 x %struct.__va_list_tag], [1 x %struct.__va_list_tag]* %valist, i64 0, i64 0
+    %arraydecay1 = bitcast %struct.__va_list_tag* %arraydecay to i8*
+    call void @llvm.va_start(i8* %arraydecay1)
+    ```
+
+在编译器中提前将上述类型和函数都声明好即可。至于`va_arg`，LLVM的`IRBuilder`类提供了一个对应的API`CreateVAArg`，参数为一个`va_list`类型的值和一个类型`type`，表示从可变参数列表中取出下一个`type`类型的值。在我的实现中稍微修改了一下，将`va_arg`直接声明为了一个函数，要求类型参数加上双引号作为字符串传递，即上述C源码第9行需要变成`sum += va_arg(valist, "int");`，该字符串会在编译器内转换成对应类型。
+
+使用我的编译器编译该求平均函数得到的IR中用于可变参数的部分如下：
+
+```
+%struct.__va_list_tag = type { i32, i32, i8*, i8* }
+
+; Function Attrs: nounwind
+declare void @llvm.va_start(i8*) #0
+
+; Function Attrs: nounwind
+declare void @llvm.va_end(i8*) #0
+
+declare i64 @va_arg([1 x %struct.__va_list_tag], i8*)
+
+define double @average(i32 %num, ...) {
+entry:
+  ...
+  %valist = alloca [1 x %struct.__va_list_tag]
+  ...
+  %0 = getelementptr [1 x %struct.__va_list_tag], [1 x %struct.__va_list_tag]* %valist, i32 0, i32 0
+  %1 = bitcast %struct.__va_list_tag* %0 to i8*
+  call void @llvm.va_start(i8* %1)
+  ...
+  %6 = getelementptr [1 x %struct.__va_list_tag], [1 x %struct.__va_list_tag]* %valist, i32 0, i32 0
+  %7 = va_arg %struct.__va_list_tag* %6, i32
+  ...
+  %12 = getelementptr [1 x %struct.__va_list_tag], [1 x %struct.__va_list_tag]* %valist, i32 0, i32 0
+  %13 = bitcast %struct.__va_list_tag* %12 to i8*
+  call void @llvm.va_end(i8* %13)
+  ...
+}
+
+attributes #0 = { nounwind }
+```
 
 ##### 4.4.4.3 类型声明
 
@@ -1740,13 +1889,139 @@ Value *Program::codeGen(CodeGenerator &ctx)
 
 在验收要求指出的进阶主题中，除了上文提到过的结构体，我还实现了一点简单的宏功能。由于宏不属于C语言语句而是编译器预处理指令，因此单独作为一个模块来描述。
 
-目前只实现了`#define`和`#include`两条指令，且：
+目前实现了`#define`、`#include`、`#ifdef`、`#ifndef`、`#endif`，`#undef`且：
 
-- `#define`只能够定义一般常量，无法定义带参数宏
+- `#define`可以定义一般常量，也可以定义带参数宏，而且定义时能够嵌套。但是有一点和gcc的行为不同，在gcc的宏定义中用于数值计算的未定义标识符会默认定义为1，而不是进行报错，我的实现中都统一认为是未定义值然后报错。
 - `#include`可以进行文件内容的替换，但以`<>`包围的文件名不会进行解析（因为本实验实现的编译器暂不能到达解析C语言系统头文件中某些语法的水平），以`""`包围的、符合本实验语法解析器语法定义的文件能够递归进行宏展开
-- 其余的如条件编译选项`#ifdef`、`#ifndef`、`#else`、`#endif`（因此也还不能解决循环包含的问题）以及`#pragma`（特定于计算机或特定于操作系统）、`##`字符串化等等均没有实现
+- 其余的如`#pragma`（特定于计算机或特定于操作系统）、`##`字符串化等等没有实现
 
-实现原理就是在进行语法分析前先扫描一遍文件，收集宏定义信息，对于`#include`，递归读取文件并写入展开后的输出；对于`#define`，将定义好的常量收集起来，调用`yylex()`，对识别到的宏定义标识符进行文本替换，并写入文件。
+实现原理就是在进行语法分析前反复扫描文件，收集宏定义信息，对于`#include`，递归读取文件并写入展开后的输出；对于`#define`，将定义好的常量收集起来，调用`yylex()`，对识别到的宏定义标识符进行文本替换，并写入文件；如果是带参数宏，以下面这段代码为例：
+
+```c
+#defind f(a, b) a * 2 + b
+printf("%d\n", f(1, 2));
+```
+
+第一遍展开后会变成：
+
+```c
+#define a 1
+#define b 2
+printf("%d\n", a * 2 + b);
+#undef
+#undef
+```
+
+这是一份示例代码，包括本实验实现的宏的文件包含、条件编译、嵌套定义与使用：
+
+```c
+#include "demo/header.h"
+
+#define DEBUG
+#define x 1
+#define y 2
+#define X x
+#define Y y
+#define BBB(x, y) x * y + AAA
+#define AAA CCC
+#define CCC 10
+#define PRINT_MAX(x, y)         \
+    if (x > y)                  \
+        printf("%d\n", x);      \
+    else                        \
+        printf("%d\n", y);
+#define STR(s1, s2) s1 s2
+
+int main()
+{
+    printf("variable 'a' defined in header.h = %d\n", a);
+
+#ifdef DEBUG
+    puts("debug macro has been defined");
+#else
+    puts("not defined");
+#endif
+
+#undef DEBUG
+
+#ifdef DEBUG
+    puts("debug macro is still defined");
+#else
+    puts("debug macro has been undefined");
+#endif
+
+    printf("macro AAA = %d\n", AAA);
+    printf("macro BBB(2, 3) = %d\n", BBB(2, 3));
+    printf("macro BBB(2 + 3, 3 + 2) = %d\n", BBB(2 + 3, 3 + 2));
+    printf("macro X = %d, Y = %d\n", X, Y);
+    printf("macro BBB(BBB(2, 3), 4) = %d\n", BBB(BBB(2, 3), 4));
+
+    PRINT_MAX(3, 5)
+
+    printf("STR(\"a\", \"b\") = %s\n", STR("a", "b"));
+
+    return 0;
+}
+```
+
+这份源码完全展开后是这样的：
+
+```c
+int a = 1;
+
+
+int main()
+{
+    printf("variable 'a' defined in header.h = %d\n", a);
+
+    puts("debug macro has been defined");
+
+
+    puts("debug macro has been undefined");
+
+    printf("macro AAA = %d\n", 10);
+    printf("macro BBB(2, 3) = %d\n", 
+2 * 3 + 10
+);
+    printf("macro BBB(2 + 3, 3 + 2) = %d\n", 
+2 + 3 * 3 + 2 + 10
+);
+    printf("macro X = %d, Y = %d\n", 1, 2);
+    printf("macro BBB(BBB(2, 3), 4) = %d\n", 
+
+2 * 3 + 10
+ * 4 + 10
+);
+
+    
+if (3 > 5)                 
+        printf("%d\n", 3);     
+    else                       
+        printf("%d\n", 5);
+
+
+    printf("STR(\"a\", \"b\") = %s\n", 
+"a" "b"
+);
+
+    return 0;
+}
+```
+
+最终可执行文件输出如下（和gcc编译后的执行结果相同）：
+
+```
+variable 'a' defined in header.h = 1
+debug macro has been defined
+debug macro has been undefined
+macro AAA = 10
+macro BBB(2, 3) = 16
+macro BBB(2 + 3, 3 + 2) = 23
+macro X = 1, Y = 2
+macro BBB(BBB(2, 3), 4) = 56
+5
+STR("a", "b") = ab
+```
 
 ## 七、测试
 
@@ -1812,6 +2087,8 @@ int main()
 source_filename = "main"
 target triple = "x86_64-pc-linux-gnu"
 
+%struct.__va_list_tag = type { i32, i32, i8*, i8* }
+
 @stdin = external global i8*
 @"%d" = private constant [3 x i8] c"%d\00"
 @"%d\0A" = private constant [4 x i8] c"%d\0A\00"
@@ -1842,6 +2119,14 @@ declare void @free(i8*)
 
 declare i32 @exit(i32)
 
+; Function Attrs: nounwind
+declare void @llvm.va_start(i8*) #0
+
+; Function Attrs: nounwind
+declare void @llvm.va_end(i8*) #0
+
+declare i64 @va_arg([1 x %struct.__va_list_tag], i8*)
+
 define void @quicksort(i32* %A, i32 %len) {
 entry:
   %A1 = alloca i32*
@@ -1856,33 +2141,32 @@ entry:
 
 if.cond:                                          ; preds = %entry
   %0 = load i32, i32* %len2
-  %1 = zext i32 %0 to i64
-  %2 = icmp slt i64 %1, 2
-  br i1 %2, label %if.then, label %if.else
+  %1 = icmp slt i32 %0, 2
+  br i1 %1, label %if.then, label %if.else
 
 if.then:                                          ; preds = %if.cond
-  ret void
+  br label %return
 
 if.else:                                          ; preds = %if.cond
   br label %if.out
 
 if.out:                                           ; preds = %if.else
-  %3 = load i32*, i32** %A1
-  %4 = load i32, i32* %len2
-  %5 = zext i32 %4 to i64
-  %6 = sdiv i64 %5, 2
-  %7 = getelementptr i32, i32* %3, i64 %6
-  %8 = load i32, i32* %7
-  store i32 %8, i32* %pivot
+  %2 = load i32*, i32** %A1
+  %3 = load i32, i32* %len2
+  %4 = sdiv i32 %3, 2
+  %5 = getelementptr i32, i32* %2, i32 %4
+  %6 = load i32, i32* %5
+  store i32 %6, i32* %pivot
   br label %for.init
+
+return:                                           ; preds = %if.then
+  ret void
 
 for.init:                                         ; preds = %if.out
   store i32 0, i32* %i
-  %9 = load i32, i32* %len2
-  %10 = zext i32 %9 to i64
-  %11 = sub i64 %10, 1
-  %12 = trunc i64 %11 to i32
-  store i32 %12, i32* %j
+  %7 = load i32, i32* %len2
+  %8 = sub i32 %7, 1
+  store i32 %8, i32* %j
   br label %for.cond
 
 for.cond:                                         ; preds = %for.end, %for.init
@@ -1892,68 +2176,68 @@ for.loop:                                         ; preds = %for.cond
   br label %while.cond
 
 for.end:                                          ; preds = %if.out9
-  %13 = load i32, i32* %i
-  %14 = add i32 %13, 1
-  store i32 %14, i32* %i
-  %15 = load i32, i32* %j
-  %16 = sub i32 %15, 1
-  store i32 %16, i32* %j
+  %9 = load i32, i32* %i
+  %10 = add i32 %9, 1
+  store i32 %10, i32* %i
+  %11 = load i32, i32* %j
+  %12 = sub i32 %11, 1
+  store i32 %12, i32* %j
   br label %for.cond
 
 for.out:                                          ; preds = %if.then7
-  %17 = load i32*, i32** %A1
+  %13 = load i32*, i32** %A1
+  %14 = load i32, i32* %i
+  call void @quicksort(i32* %13, i32 %14)
+  %15 = load i32, i32* %i
+  %16 = load i32*, i32** %A1
+  %17 = getelementptr i32, i32* %16, i32 %15
   %18 = load i32, i32* %i
-  call void @quicksort(i32* %17, i32 %18)
-  %19 = load i32*, i32** %A1
-  %20 = load i32, i32* %i
-  %21 = getelementptr i32, i32* %19, i32 %20
-  %22 = load i32, i32* %len2
-  %23 = load i32, i32* %i
-  %24 = sub i32 %22, %23
-  call void @quicksort(i32* %21, i32 %24)
+  %19 = load i32, i32* %len2
+  %20 = sub i32 %19, %18
+  call void @quicksort(i32* %17, i32 %20)
   ret void
 
 while.cond:                                       ; preds = %while.loop, %for.loop
-  %25 = load i32, i32* %pivot
-  %26 = load i32*, i32** %A1
-  %27 = load i32, i32* %i
-  %28 = getelementptr i32, i32* %26, i32 %27
-  %29 = load i32, i32* %28
-  %30 = icmp slt i32 %29, %25
-  br i1 %30, label %while.loop, label %while.out
+  %21 = load i32, i32* %pivot
+  %22 = load i32*, i32** %A1
+  %23 = load i32, i32* %i
+  %24 = getelementptr i32, i32* %22, i32 %23
+  %25 = load i32, i32* %24
+  %26 = icmp slt i32 %25, %21
+  br i1 %26, label %while.loop, label %while.out
 
 while.loop:                                       ; preds = %while.cond
-  %31 = load i32, i32* %i
-  %32 = add i32 %31, 1
-  store i32 %32, i32* %i
+  %27 = load i32, i32* %i
+  %28 = add i32 %27, 1
+  store i32 %28, i32* %i
   br label %while.cond
 
 while.out:                                        ; preds = %while.cond
   br label %while.cond3
 
 while.cond3:                                      ; preds = %while.loop4, %while.out
-  %33 = load i32, i32* %pivot
-  %34 = load i32*, i32** %A1
-  %35 = load i32, i32* %j
-  %36 = getelementptr i32, i32* %34, i32 %35
-  %37 = load i32, i32* %36
-  %38 = icmp sgt i32 %37, %33
-  br i1 %38, label %while.loop4, label %while.out5
+  %29 = load i32, i32* %pivot
+  %30 = load i32*, i32** %A1
+  %31 = load i32, i32* %j
+  %32 = getelementptr i32, i32* %30, i32 %31
+  %33 = load i32, i32* %32
+  %34 = icmp sgt i32 %33, %29
+  br i1 %34, label %while.loop4, label %while.out5
 
 while.loop4:                                      ; preds = %while.cond3
-  %39 = load i32, i32* %j
-  %40 = sub i32 %39, 1
-  store i32 %40, i32* %j
+  %35 = load i32, i32* %j
+  %36 = sub i32 %35, 1
+  store i32 %36, i32* %j
   br label %while.cond3
 
 while.out5:                                       ; preds = %while.cond3
   br label %if.cond6
 
 if.cond6:                                         ; preds = %while.out5
-  %41 = load i32, i32* %j
-  %42 = load i32, i32* %i
-  %43 = icmp sge i32 %42, %41
-  br i1 %43, label %if.then7, label %if.else8
+  %37 = load i32, i32* %j
+  %38 = load i32, i32* %i
+  %39 = icmp sge i32 %38, %37
+  br i1 %39, label %if.then7, label %if.else8
 
 if.then7:                                         ; preds = %if.cond6
   br label %for.out
@@ -1962,33 +2246,34 @@ if.else8:                                         ; preds = %if.cond6
   br label %if.out9
 
 if.out9:                                          ; preds = %if.else8
+  %40 = load i32*, i32** %A1
+  %41 = load i32, i32* %i
+  %42 = getelementptr i32, i32* %40, i32 %41
+  %43 = load i32, i32* %42
+  store i32 %43, i32* %temp
   %44 = load i32*, i32** %A1
   %45 = load i32, i32* %i
   %46 = getelementptr i32, i32* %44, i32 %45
-  %47 = load i32, i32* %46
-  store i32 %47, i32* %temp
-  %48 = load i32*, i32** %A1
-  %49 = load i32, i32* %i
-  %50 = getelementptr i32, i32* %48, i32 %49
+  %47 = load i32*, i32** %A1
+  %48 = load i32, i32* %j
+  %49 = getelementptr i32, i32* %47, i32 %48
+  %50 = load i32, i32* %49
+  store i32 %50, i32* %46
   %51 = load i32*, i32** %A1
   %52 = load i32, i32* %j
   %53 = getelementptr i32, i32* %51, i32 %52
-  %54 = load i32, i32* %53
-  store i32 %54, i32* %50
-  %55 = load i32*, i32** %A1
-  %56 = load i32, i32* %j
-  %57 = getelementptr i32, i32* %55, i32 %56
-  %58 = load i32, i32* %temp
-  store i32 %58, i32* %57
+  %54 = load i32, i32* %temp
+  store i32 %54, i32* %53
   br label %for.end
 }
 
 define i32 @main() {
 entry:
   %A = alloca [10010 x i32]
+  %0 = bitcast [10010 x i32]* %A to i32*
   %n = alloca i32
   %i = alloca i32
-  %0 = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @"%d", i32 0, i32 0), i32* %n)
+  %1 = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @"%d", i32 0, i32 0), i32* %n)
   br label %for.init
 
 for.init:                                         ; preds = %entry
@@ -1996,27 +2281,27 @@ for.init:                                         ; preds = %entry
   br label %for.cond
 
 for.cond:                                         ; preds = %for.end, %for.init
-  %1 = load i32, i32* %n
-  %2 = load i32, i32* %i
-  %3 = icmp slt i32 %2, %1
-  br i1 %3, label %for.loop, label %for.out
+  %2 = load i32, i32* %n
+  %3 = load i32, i32* %i
+  %4 = icmp slt i32 %3, %2
+  br i1 %4, label %for.loop, label %for.out
 
 for.loop:                                         ; preds = %for.cond
-  %4 = load i32, i32* %i
-  %5 = getelementptr [10010 x i32], [10010 x i32]* %A, i32 0, i32 %4
-  %6 = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @"%d", i32 0, i32 0), i32* %5)
+  %5 = load i32, i32* %i
+  %6 = getelementptr [10010 x i32], [10010 x i32]* %A, i32 0, i32 %5
+  %7 = call i32 (i8*, ...) @scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @"%d", i32 0, i32 0), i32* %6)
   br label %for.end
 
 for.end:                                          ; preds = %for.loop
-  %7 = load i32, i32* %i
-  %8 = add i32 %7, 1
-  store i32 %8, i32* %i
+  %8 = load i32, i32* %i
+  %9 = add i32 %8, 1
+  store i32 %9, i32* %i
   br label %for.cond
 
 for.out:                                          ; preds = %for.cond
-  %9 = getelementptr [10010 x i32], [10010 x i32]* %A, i32 0, i32 0
-  %10 = load i32, i32* %n
-  call void @quicksort(i32* %9, i32 %10)
+  %10 = getelementptr [10010 x i32], [10010 x i32]* %A, i32 0, i32 0
+  %11 = load i32, i32* %n
+  call void @quicksort(i32* %10, i32 %11)
   br label %for.init1
 
 for.init1:                                        ; preds = %for.out
@@ -2024,27 +2309,32 @@ for.init1:                                        ; preds = %for.out
   br label %for.cond2
 
 for.cond2:                                        ; preds = %for.end4, %for.init1
-  %11 = load i32, i32* %n
-  %12 = load i32, i32* %i
-  %13 = icmp slt i32 %12, %11
-  br i1 %13, label %for.loop3, label %for.out5
+  %12 = load i32, i32* %n
+  %13 = load i32, i32* %i
+  %14 = icmp slt i32 %13, %12
+  br i1 %14, label %for.loop3, label %for.out5
 
 for.loop3:                                        ; preds = %for.cond2
-  %14 = load i32, i32* %i
-  %15 = getelementptr [10010 x i32], [10010 x i32]* %A, i32 0, i32 %14
-  %16 = load i32, i32* %15
-  %17 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"%d\0A", i32 0, i32 0), i32 %16)
+  %15 = load i32, i32* %i
+  %16 = getelementptr [10010 x i32], [10010 x i32]* %A, i32 0, i32 %15
+  %17 = load i32, i32* %16
+  %18 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @"%d\0A", i32 0, i32 0), i32 %17)
   br label %for.end4
 
 for.end4:                                         ; preds = %for.loop3
-  %18 = load i32, i32* %i
-  %19 = add i32 %18, 1
-  store i32 %19, i32* %i
+  %19 = load i32, i32* %i
+  %20 = add i32 %19, 1
+  store i32 %20, i32* %i
   br label %for.cond2
 
 for.out5:                                         ; preds = %for.cond2
+  br label %return
+
+return:                                           ; preds = %for.out5
   ret i32 0
 }
+
+attributes #0 = { nounwind }
 ```
 
 运行测试程序，结果如下。单次运行通过所有测试点，运行100次并搜索fail的输出为空：
@@ -2300,29 +2590,26 @@ int main()
 
 ## 八、总结
 
-在本实验中我设计并完成了一个C语言子集的编译器，支持C语言中大部分常用的语法，目前已经实现的内容包括但不限于：
+在本实验中我设计并完成了一个C语言子集的编译器，支持C语言中大部分常用的语法，**目前已经实现的内容包括但不限于**：
 
-- C语言类型系统，包括基本类型、数组、指针、struct
-- 多维数组、多级指针、指针数组声明
-- const、extern、static修饰符
-- C语言所有运算符，支持指针、数组的比较与加减运算
+- C语言类型系统，包括基本类型、数组和指针（包括多维数组、多级指针、指针数组）、结构和联合（包括匿名定义、和数组和指针连用）、枚举量
+- `extern`、`static`修饰符，`const`修饰符（只对全局变量有效）
+- C语言所有运算符，支持指针、数组的比较与加减运算，支持`&&`和`||`的短路逻辑
 - C语言所有语句
-- 结构体的定义与使用，包括结构体和数组、指针的结合使用
-- 函数声明
-- typedef关键字
-- 简单的宏定义
+- 函数声明，包括可变参数函数
+- `typedef`关键字，`sizeof`关键字（部分）
+- 宏语法，包括`#include`、`#define`（包括普通常量和带参数宏，可嵌套）、条件编译指令
 
-暂未**未**实现的语法包括但不限于：
+**暂时未实现的语法包括但不限于**：
 
 - u、L、e、f等常量修饰符
-
-- 指向const的指针、函数指针等复杂指针声明
-
-- volatile、register修饰符
-
+- 指向const的指针、函数指针、数组指针（包含`(*)`模式的声明语法）等复杂指针声明
+- `volatile`、`register`修饰符
 - struct的位域语法
-
-- 复杂的宏语法
+- 宏语法中的`#pragma`、`##`、`#`
+- 多维数组、结构和联合的初始化，本地数组的初始化
+- 对表达式使用`sizeof`运算符
+- 内联汇编
 
 
 在代码优化方面，由于时间关系，暂时只实现了AST层面的常量折叠，后续打算学习LLVM Pass，通过它来进行其他优化（虽然clang编译IR时也会进行优化，但是还是希望这个工作可以由我自己完成一部分）

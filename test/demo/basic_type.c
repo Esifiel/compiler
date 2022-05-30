@@ -17,6 +17,12 @@ int main()
     uint_a /= 7;
     printf("after /= 7, uint_a = %d\n", uint_a);
 
+    uint_a = 0x80000000;
+    printf("%d\n", -1);
+    printf("%d\n", 1 << 31);
+    printf("%d", uint_a);
+    printf("%u\n", uint_a);
+
     float float_a = 1.2;
     double double_a = -2.3;
     printf("float_a = %f, double_a = %lf\n", float_a, double_a);

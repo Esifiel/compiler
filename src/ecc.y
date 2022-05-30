@@ -931,7 +931,15 @@ static Expression *calculate(Expression *a, enum op_type op)
         if(isfloatpoint)
             return new Number(num, new DoubleType(), VAL_DOUBLE);
         else
-            return new Number(num, new LongType(), VAL_LONG);
+        {
+            if(num.longValue >> 32 != 0 || num.longValue >> 32 != 0xffffffff)
+                return new Number(num, new LongType(), VAL_LONG);
+            else
+            {
+                num.intValue = (int)num.longValue;
+                return new Number(num, new IntType(), VAL_INT);
+            }
+        }
     }
     
     return new Expression(a, op);
@@ -1001,7 +1009,7 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
         }
         else
         {
-            uint64_t v1 = ((Number *)a)->longView(), v2 = ((Number *)b)->longView();
+            int64_t v1 = ((Number *)a)->longView(), v2 = ((Number *)b)->longView();
             switch(op)
             {
             case OP_ADD:
@@ -1023,10 +1031,10 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
                 num.longValue = v2;
                 break;
             case OP_SL:
-                num.longValue = v1 >> v2;
+                num.longValue = v1 << v2;
                 break;
             case OP_SR:
-                num.longValue = v1 << v2;
+                num.longValue = v1 >> v2;
                 break;
             case OP_AND:
                 num.longValue = v1 & v2;
@@ -1064,7 +1072,6 @@ static Expression *calculate(Expression *a, Expression *b, enum op_type op)
             default:
                 yyerror("not supported binary operator for long type");
             }
-
             return new Number(num, new LongType(), VAL_LONG);
         }
     

@@ -110,7 +110,7 @@ int main(int argc, char *argv[], char **envp)
     //     remove(filenameE.c_str());
 
     // do visualization (output json and png)
-    string path = string("./tmp/ast_") + src.substr(src.find_last_of('/') + 1, src.length()) + string(".json");
+    string path = string("./ast_") + src.substr(src.find_last_of('/') + 1, src.length()) + string(".json");
     Visualizer *v = new Visualizer(program, path);
     v->traverse();
     delete v;

@@ -10,10 +10,10 @@ class CodeGenerator;
 
 union union_num
 {
-    uint8_t charValue;
-    uint16_t shortValue;
-    uint32_t intValue;
-    uint64_t longValue;
+    int8_t charValue;
+    int16_t shortValue;
+    int32_t intValue;
+    int64_t longValue;
     float_t floatValue;
     double_t doubleValue;
 };

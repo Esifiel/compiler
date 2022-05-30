@@ -43,49 +43,79 @@ public:
     enum val_type valtype;
 
     Number() : valtype(VAL_NONE) {}
-    Number(union union_num u, TypeSpecifier *t, enum val_type v) : Expression(t), valtype(v) { memcpy(buf, &u, 8); }
+    Number(union union_num u, TypeSpecifier *t, enum val_type v) {
+        if(v == VAL_LONG)
+            if((u.longValue >> 32) == 0 || ((u.longValue >> 32) & 0xffffffff) == 0xffffffff)
+            {
+                v = VAL_INT;
+                TypeSpecifier *tmp =  t;
+                t = new IntType();
+                delete tmp;
+            }
+
+        type = t;
+        valtype = v;
+        memset(buf, 0, 8);
+        switch (valtype)
+        {
+        case VAL_CHAR:
+            memcpy(buf, &u, 1);
+            break;
+        case VAL_SHORT:
+            memcpy(buf, &u, 2);
+            break;
+        case VAL_INT:
+        case VAL_FLOAT:
+            memcpy(buf, &u, 4);
+            break;
+        case VAL_LONG:
+        case VAL_DOUBLE:
+        default:
+            memcpy(buf, &u, 8);
+            break;
+        }
+    }
 
     virtual string getName() { return "\"Number\""; }
     virtual llvm::Value *codeGen(CodeGenerator &ctx);
 
-    uint8_t charView() { return *(uint8_t *)buf; }
-    uint16_t shortView() { return *(uint16_t *)buf; }
-    uint32_t intView() {
+    int8_t charView() { return *(int8_t *)buf; }
+    int16_t shortView() { return *(int16_t *)buf; }
+    int32_t intView() {
         switch (valtype)
         {
         case VAL_CHAR:
-            return (uint32_t)charView();
+            return (int32_t)charView();
         case VAL_SHORT:
-            return (uint32_t)shortView();
+            return (int32_t)shortView();
         case VAL_LONG:
-            // return (uint32_t)intView();
-            return 0;
+            return (int32_t)longView();
         case VAL_FLOAT:
-            return (uint32_t)floatView();
+            return (int32_t)floatView();
         case VAL_DOUBLE:
-            return (uint32_t)doubleView();
+            return (int32_t)doubleView();
         case VAL_INT:
         default:
-            return *(uint32_t *)buf;
+            return *(int32_t *)buf;
         }
     }
-    uint64_t longView()
+    int64_t longView()
     {
         switch (valtype)
         {
         case VAL_CHAR:
-            return (uint64_t)charView();
+            return (int64_t)charView();
         case VAL_SHORT:
-            return (uint64_t)shortView();
+            return (int64_t)shortView();
         case VAL_INT:
-            return (uint64_t)intView();
+            return (int64_t)intView();
         case VAL_FLOAT:
-            return (uint64_t)floatView();
+            return (int64_t)floatView();
         case VAL_DOUBLE:
-            return (uint64_t)doubleView();
+            return (int64_t)doubleView();
         case VAL_LONG:
         default:
-            return *(uint64_t *)buf;
+            return *(int64_t *)buf;
         }
     }
     float_t floatView() { return *(float_t *)buf; }
